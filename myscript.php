@@ -38,36 +38,32 @@ window.onload = function() {
 
 	?>
 	
+	var processes_max = 0;
+	
+	for (var i = 1; i < processes.length; i++) {
+		if (processes[i] > processes_max) { processes_max = processes[i];}
+	}
+		
 	var proctimes = [];
 	
-	for (var j = 0; j < 8; j++) {
-		
-		proctimes[j] = [];
-		var last_was_open = 0;
-		var start_end_time = {"starting_time": 0, "ending_time": 0};
-		
-		for (var i = 0; i < times.length; i = i + 2) {
-			if (processes[i] == j) {
-				if (event[i] == "Open"){
-					start_end_time["starting_time"] = Date.parse(times[i]);
-					last_was_open = 1;
-				}
-				if (event[i] == "Close"){
-					start_end_time["ending_time"] = Date.parse(times[i]);
-					proctimes[j].push(start_end_time);
-					last_was_open = 0;
-				}
+	for (var j = 0; j <= processes_max; j++) { proctimes[j] = []; }
+	
+	for (var i = 1; i < times.length; i = i + 1) {
+			if (event[i] != "Close"){
+				var start_end_time = {"starting_time": 0, "ending_time": 0};
+				start_end_time["starting_time"] = Date.parse(times[i-1]);
+				start_end_time["ending_time"] = Date.parse(times[i]);
+				proctimes[processes[i-1]].push(start_end_time);
 			}
-		}
 	}
+	
 	
     var data = [];
 	
 	for (var j = 0; j < 8; j++) {
 		data.push({icon: "x.png", times: proctimes[j]});
 	}
-
-  var width = 500;
+  var width = 1000;
   function timelineStackedIcons() {
     var chart = d3.timeline()
       .stack() // toggles graph stacking
