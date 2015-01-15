@@ -1,0 +1,22 @@
+<h1>Contributing</h1>
+
+<p>If you’re looking for ways to contribute, please <a href="https://github.com/mbostock/d3/issues?milestone=&amp;page=1&amp;state=open">peruse open issues</a>. The icebox is a good place to find ideas that are not currently in development. If you already have an idea, please check past issues to see whether your idea or a similar one was previously discussed.</p>
+
+<p>Before submitting a pull request, consider implementing a live example first, say using <a href="http://bl.ocks.org">bl.ocks.org</a>. Real-world use cases go a long way to demonstrating the usefulness of a proposed feature. The more complex a feature’s implementation, the more usefulness it should provide. Share your demo using the #d3js tag on Twitter or by sending it to the d3-js Google group.</p>
+
+<p>If your proposed feature does not involve changing core functionality, consider submitting it instead as a <a href="https://github.com/d3/d3-plugins">D3 plugin</a>. New core features should be for general use, whereas plugins are suitable for more specialized use cases. When in doubt, it’s easier to start with a plugin before “graduating” to core.</p>
+
+<p>To contribute new documentation or add examples to the gallery, just <a href="https://github.com/mbostock/d3/wiki">edit the Wiki</a>!</p>
+
+<h2>How to Submit a Pull Request</h2>
+
+<ol>
+<li><p>Click the “Fork” button to create your personal fork of the D3 repository.</p></li>
+<li><p>After cloning your fork of the D3 repository in the terminal, run <code>npm install</code> to install D3’s dependencies.</p></li>
+<li><p>Create a new branch for your new feature. For example: <code>git checkout -b my-awesome-feature</code>. A dedicated branch for your pull request means you can develop multiple features at the same time, and ensures that your pull request is stable even if you later decide to develop an unrelated feature.</p></li>
+<li><p>The <code>d3.js</code> and <code>d3.min.js</code> files are built from source files in the <code>src</code> directory. <em>Do not edit <code>d3.js</code> directly.</em> Instead, edit the source files, and then run <code>make</code> to build the generated files.</p></li>
+<li><p>Use <code>make test</code> to run tests and verify your changes. If you are adding a new feature, you should add new tests! If you are changing existing functionality, make sure the existing tests run, or update them as appropriate.</p></li>
+<li><p>Sign D3’s <a href="https://docs.google.com/forms/d/1CzjdBKtDuA8WeuFJinadx956xLQ4Xriv7-oDvXnZMaI/viewform">Individual Contributor License Agreement</a>. Unless you are submitting a trivial patch (such as fixing a typo), this form is needed to verify that you are able to contribute.</p></li>
+<li><p>Submit your pull request, and good luck!</p></li>
+</ol>
+
