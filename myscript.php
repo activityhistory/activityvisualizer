@@ -53,6 +53,22 @@ window.onload = function() {
 
 	echo "var words = ".json_encode($word_row0).";\n";
 	echo "var word_times = ".json_encode($word_times).";\n";
+	
+	
+	// Get processes for labels //
+	$query = "SELECT * FROM process";
+
+	$row_name = array();
+
+	// Iterate through the results and pass into JSON encoder //
+
+	foreach ($dbh->query($query) as $row) {
+
+		array_push($row_name, $row[2]);
+
+	}
+
+	echo "var processnames = ".json_encode($row_name).";\n";
 
 	?>
 	
@@ -85,13 +101,14 @@ window.onload = function() {
     var data = [];
 	
 	for (var j = 0; j < processes_max; j++) {
-		data.push({icon: "icons/selfspy.png", times: proctimes[j]});
+		data.push({label: processnames[j], times: proctimes[j]});
 	}
   var width = 1000;
+  
   function timelineStackedIcons() {
     var chart = d3.timeline()
       .stack() // toggles graph stacking
-      .margin({left:70, right:30, top:0, bottom:0})
+      .margin({left:140, right:30, top:0, bottom:0})
       ;
     var svg = d3.select("#timeline5").append("svg").attr("width", width)
       .datum(data).call(chart);
