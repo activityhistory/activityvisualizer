@@ -35,8 +35,32 @@ window.onload = function() {
 	echo "var times = ".json_encode($row1).";\n";
 	echo "var processes = ".json_encode($row2).";\n";
 	echo "var event = ".json_encode($row3).";\n";
+	
+	// Get words for wordcloud //
+	$query_words = "SELECT * FROM window";
+
+	$word_row0 = array();
+	$word_times = array();
+
+	// Iterate through the results and pass into JSON encoder //
+
+	foreach ($dbh->query($query_words) as $row) {
+
+		array_push($word_row0, $row[2]);
+		array_push($word_times, $row[1]);
+
+	}
+
+	echo "var words = ".json_encode($word_row0).";\n";
+	echo "var word_times = ".json_encode($word_times).";\n";
 
 	?>
+	
+	
+	
+	
+	
+	
 	
 	var processes_max = 0;
 	
@@ -60,8 +84,8 @@ window.onload = function() {
 	
     var data = [];
 	
-	for (var j = 0; j < 8; j++) {
-		data.push({icon: "x.png", times: proctimes[j]});
+	for (var j = 0; j < processes_max; j++) {
+		data.push({icon: "icons/selfspy.png", times: proctimes[j]});
 	}
   var width = 1000;
   function timelineStackedIcons() {
@@ -73,4 +97,74 @@ window.onload = function() {
       .datum(data).call(chart);
   }
   timelineStackedIcons();
+  
+  
+  
+  
+ var Wordtimes = {};
+ 
+ var addpair = function (my_key, my_value) {
+     Wordtimes[my_key] = my_value;
+ }
+ var givevalue = function (my_key) {
+     return Wordtimes[my_key];
+ }
+
+for (var i = 1; i < words.length; i = i + 1) {
+		var word_and_time = {"word": " ", "time": 0};
+		word_and_time["time"] = Date.parse(word_times[i]) - Date.parse(word_times[i-1]);
+		word_and_time["word"] = words[i];
+		if (!(word_and_time["word"] in Wordtimes)) {
+			addpair(word_and_time["word"], word_and_time["time"]);
+		} else {
+			Wordtimes[word_and_time["word"]] = givevalue[word_and_time["word"]] + word_and_time["time"];
+		}
+		
+}
+
+var render_array = []
+for (var property in Wordtimes) {
+    if (Wordtimes.hasOwnProperty(property)) {
+        if (!(isNaN(Wordtimes[property])) && Wordtimes[property] >= 1) {
+			var word_and_time = {"word": " ", "time": 0};
+			word_and_time["time"] = Wordtimes[property];
+			word_and_time["word"] = property;
+			render_array.push(word_and_time);
+		}
+    }
+}
+
+console.log(render_array);
+  
+  var fill = d3.scale.category20();
+
+  d3.layout.cloud().size([800, 800])
+      .words(render_array.map(function(d) {
+        return {text: d["word"], size: Math.pow(d["time"], 1/6) * 10};
+      }))
+      .padding(5)
+      .rotate(0)
+      .font("Impact")
+      .fontSize(function(d) { return d.size; })
+      .on("end", draw)
+      .start();
+
+  function draw(words) {
+    d3.select("body").append("svg")
+        .attr("width", 800)
+        .attr("height", 800)
+      .append("g")
+        .attr("transform", "translate(400,400)")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function(d, i) { return fill(i); })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+  }
 }
