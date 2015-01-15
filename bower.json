@@ -18,6 +18,7 @@
   "dependencies": {
     "d3": "~3.5.3",
     "d3-timeline": "~0.0.3",
-    "sql.js": "*"
+    "sql.js": "*",
+    "d3-cloud": "~1.0.5"
   }
 }
