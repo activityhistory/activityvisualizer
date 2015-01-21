@@ -107,22 +107,80 @@ window.onload = function() {
 		}
 	}
 	
+	var earliest_time = Date.parse(windowevent_times[0]);
+	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
+	
+	var time_interval = latest_time - earliest_time;
+	
 	function tableCreate(){
 	var body=document.getElementsByTagName('body')[0];
 	var tbl=document.createElement('table');
-	tbl.style.width='100%';
+	//tbl.style.width='100%';
 	tbl.setAttribute('border','1');
 	var tbdy=document.createElement('tbody');
-	for(var i=0;i<parsed_window_times.length;i++){
+	for(var i=earliest_time;i<latest_time;i+=5000){
 	    var tr=document.createElement('tr');
         var td=document.createElement('td');
-		td.appendChild(document.createTextNode(process_names[i]))
-        tr.appendChild(td)
-	    for(var j=0;j<parsed_window_times[i].length;j++){
-	        var td=document.createElement('td');
-			td.appendChild(document.createTextNode(JSON.stringify(parsed_window_times[i][j],null,4)));
-	        tr.appendChild(td)
-	    }
+		td.appendChild(document.createTextNode(i + " to " + (i+5000)));
+        tr.appendChild(td);
+	    
+		var process_with_duration = [];
+		for (var j = 0; j <= processes_max; j++) { process_with_duration[j] = 0; }
+		
+		for(var k=0;k<windowevent_times.length;k++){
+			
+			// TODO this method will not get info about the first ongoing activity in this portion of time
+			// TODO make active time count, not number of events
+		
+			if (windowevent_event_type[k] != "Close" && Date.parse(windowevent_times[k]) > i && Date.parse(windowevent_times[k]) < i+5000){
+				
+				process_with_duration[window_process_id[windowevent_window_ids[k]]] += 1;
+			}
+	    
+		}
+		
+		var highest_1 = -1;
+		var highest_2 = -1;
+		var highest_3 = -1;
+		
+		for (var j = 0; j <= processes_max; j++) { 
+		
+			if ((highest_3 == -1 | process_with_duration[j] > process_with_duration[highest_3]) & process_with_duration[j] > 0){
+				if (highest_2 == -1 | (process_with_duration[j] > process_with_duration[highest_2])){
+					if (highest_1 == -1 | (process_with_duration[j] > process_with_duration[highest_1])){
+						highest_3 = highest_2;
+						highest_2 = highest_1;
+						highest_1 = j;
+					} else {
+						highest_3 = highest_2;
+						highest_2 = j;
+					}
+				}  else {
+						highest_3 = j;
+					}
+			}
+		
+		}
+		
+	    var td=document.createElement('td');
+		if (highest_1 != -1){
+			td.appendChild(document.createTextNode(process_names[highest_1]));
+			tr.appendChild(td);	
+		}
+		
+	    var td=document.createElement('td');
+		if (highest_2 != -1){
+			td.appendChild(document.createTextNode(process_names[highest_2]));
+			tr.appendChild(td);	
+		}
+		
+	    var td=document.createElement('td');
+		if (highest_3 != -1){
+			td.appendChild(document.createTextNode(process_names[highest_3]));
+			tr.appendChild(td);	
+		}
+
+			
 	    tbdy.appendChild(tr);
 	}
 	tbl.appendChild(tbdy);
