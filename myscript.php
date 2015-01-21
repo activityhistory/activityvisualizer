@@ -12,97 +12,115 @@ window.onload = function() {
 	// Instantiate PDO connection object and failure msg //
 	$dbh = new PDO($dir) or die("cannot open database");
 
-	// Define your SQL statement //
-	$query = "SELECT * FROM processevent";
 
-	$row0 = array();
-	$row1 = array();
-	$row2 = array();
-	$row3 = array();
+	// ## PARSE WINDOWEVENT - Get words for wordcloud
+
+	// Define your SQL statement //
+	$query = "SELECT * FROM windowevent";
+	
+	$windowevent_times = array();
+	$windowevent_window_ids = array();
+	$windowevent_event_type = array();
 
 	// Iterate through the results and pass into JSON encoder //
 
 	foreach ($dbh->query($query) as $row) {
 
-		array_push($row0, $row[0]);
-		array_push($row1, $row[1]);
-		array_push($row2, $row[2]);
-		array_push($row3, $row[3]);
+		array_push($windowevent_times, $row[1]);
+		array_push($windowevent_window_ids, $row[2]);
+		array_push($windowevent_event_type, $row[3]);
 
 	}
 
-	echo "var ids = ".json_encode($row0).";\n";
-	echo "var times = ".json_encode($row1).";\n";
-	echo "var processes = ".json_encode($row2).";\n";
-	echo "var event = ".json_encode($row3).";\n";
+	echo "var windowevent_times = ".json_encode($windowevent_times).";\n";
+	echo "var windowevent_window_ids = ".json_encode($windowevent_window_ids).";\n";
+	echo "var windowevent_event_type = ".json_encode($windowevent_event_type).";\n";
 	
-	// Get words for wordcloud //
+	
+	// ## PARSE WINDOW - Get words for wordcloud
 	$query_words = "SELECT * FROM window";
 
-	$word_row0 = array();
-	$word_times = array();
+	$window_ids = array();
+	$window_process_id = array();
 
 	// Iterate through the results and pass into JSON encoder //
 
 	foreach ($dbh->query($query_words) as $row) {
 
-		array_push($word_row0, $row[2]);
-		array_push($word_times, $row[1]);
+		array_push($window_ids, $row[0]);
+		array_push($window_process_id, $row[4]);
 
 	}
 
-	echo "var words = ".json_encode($word_row0).";\n";
-	echo "var word_times = ".json_encode($word_times).";\n";
+	echo "var window_ids = ".json_encode($window_ids).";\n";
+	echo "var window_process_id = ".json_encode($window_process_id).";\n";
 	
 	
-	// Get processes for labels //
+	// ## PARSE PROCESS - Get processes for labels //
 	$query = "SELECT * FROM process";
 
-	$row_name = array();
+	$process_names = array();
+	$process_ids = array();
 
 	// Iterate through the results and pass into JSON encoder //
 
 	foreach ($dbh->query($query) as $row) {
 
-		array_push($row_name, $row[2]);
+		array_push($process_names, $row[2]);
+		array_push($process_ids, $row[0]);
 
 	}
 
-	echo "var processnames = ".json_encode($row_name).";\n";
+	echo "var process_names = ".json_encode($process_names).";\n";
+	echo "var process_ids = ".json_encode($process_ids).";\n";
 
 	?>
 	
 	
+	// ### TODO parse windowids to processnames
 	
 	
 	
-	
+	// ### TIMELINE
+	// ## generate timeline data
 	
 	var processes_max = 0;
 	
-	for (var i = 1; i < processes.length; i++) {
-		if (processes[i] > processes_max) { processes_max = processes[i];}
+	for (var i = 1; i < process_ids.length; i++) {
+		if (process_ids[i] > process_ids) { processes_max = process_ids[i];}
 	}
 		
-	var proctimes = [];
+	var parsed_window_times = [];
 	
-	for (var j = 0; j <= processes_max; j++) { proctimes[j] = []; }
+	for (var j = 0; j <= processes_max; j++) { parsed_window_times[j] = []; }
 	
-	for (var i = 1; i < times.length; i = i + 1) {
-			if (event[i] != "Close"){
-				var start_end_time = {"starting_time": 0, "ending_time": 0};
-				start_end_time["starting_time"] = Date.parse(times[i-1]);
-				start_end_time["ending_time"] = Date.parse(times[i]);
-				proctimes[processes[i-1]].push(start_end_time);
-			}
+	console.log(parsed_window_times);
+	
+	not_include_counter = 0;
+	for (var i = 1; i < windowevent_times.length; i = i + 1) {
+		process_name = process_names[window_process_id[windowevent_window_ids[i-1]]];
+		if (process_name == "Dock"){
+			not_include_counter++;
+		}
+		else if (windowevent_event_type[i] != "Close"){
+			var start_end_time = {"starting_time": 0, "ending_time": 0};
+			start_end_time["starting_time"] = Date.parse(windowevent_times[i-1-not_include_counter]);
+			start_end_time["ending_time"] = Date.parse(windowevent_times[i]);
+			parsed_window_times[window_process_id[windowevent_window_ids[i-1]]].push(start_end_time);
+			not_include_counter = 0;
+		}
 	}
 	
+	// ## draw timeline
 	
     var data = [];
 	
 	for (var j = 0; j < processes_max; j++) {
-		data.push({label: processnames[j], times: proctimes[j]});
+		data.push({label: process_names[j], times: parsed_window_times[j]});
 	}
+	
+	
+	
   var width = 1000;
   
   function timelineStackedIcons() {
@@ -116,6 +134,8 @@ window.onload = function() {
   timelineStackedIcons();
   
   
+  
+  // ### WORDCLOUD
   
   
  var Wordtimes = {};
