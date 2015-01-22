@@ -122,7 +122,7 @@ window.onload = function() {
 	
 	var earliest_time = Date.parse(windowevent_times[0]);
 	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
-	var time_interval = 10000;
+	var time_interval = 1800000;
 	
 	// slicing time and searching for every interval
 	for(var i = earliest_time; i < latest_time;i  += time_interval){
