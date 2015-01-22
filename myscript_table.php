@@ -90,8 +90,6 @@ window.onload = function() {
 	
 	for (var j = 0; j <= processes_max; j++) { parsed_window_times[j] = []; }
 	
-	console.log(parsed_window_times);
-	
 	not_include_counter = 0;
 	for (var i = 1; i < windowevent_times.length; i = i + 1) {
 		process_name = process_names[window_process_id[windowevent_window_ids[i-1]]];
@@ -112,54 +110,90 @@ window.onload = function() {
 	
 	var time_interval = latest_time - earliest_time;
 	
+	var filtered_events_process_id = [];
+	var filtered_events_start_time = [];
+	var filtered_events_end_time = [];
+	
+	// *** simplified activity table START
+	
+	var past_event = -1
+	
+	for(var k=0;k<windowevent_window_ids.length;k++){
+		if (windowevent_event_type[k] == "Active"){
+			if (past_event != -1){
+				filtered_events_process_id.push(window_process_id[windowevent_window_ids[past_event]]);
+				filtered_events_start_time.push(Date.parse(windowevent_times[past_event]));
+				filtered_events_end_time.push(Date.parse(windowevent_times[k]));
+			}
+			past_event = k;
+		} else if (past_event != -1 & windowevent_event_type[k] == "Active" & windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
+			filtered_events_process_id.push(window_process_id[windowevent_window_ids[past_event]]);
+			filtered_events_start_time.push(Date.parse(windowevent_times[past_event]));
+			filtered_events_end_time.push(Date.parse(windowevent_times[k]));
+			past_event = -1;
+		}
+	}
+	
+	
+	// *** simplified activity table END
+	
 	function tableCreate(){
 	var body=document.getElementsByTagName('body')[0];
 	var tbl=document.createElement('table');
 	//tbl.style.width='100%';
 	tbl.setAttribute('border','1');
 	var tbdy=document.createElement('tbody');
-	for(var i=earliest_time;i<latest_time;i+=5000){
+	
+	var time_interval = 100000;
+	
+	for(var i=earliest_time;i<latest_time;i+=time_interval){
 	    var tr=document.createElement('tr');
         var td=document.createElement('td');
-		td.appendChild(document.createTextNode(i + " to " + (i+5000)));
+		td.appendChild(document.createTextNode(i + " to " + (i+time_interval)));
         tr.appendChild(td);
 	    
 		var process_with_duration = [];
 		for (var j = 0; j <= processes_max; j++) { process_with_duration[j] = 0; }
 		
-		for(var k=0;k<windowevent_times.length;k++){
-			
-			// TODO this method will not get info about the first ongoing activity in this portion of time
-			// TODO make active time count, not number of events
+		for(var k=0;k<filtered_events_process_id.length;k++){
 		
-			if (windowevent_event_type[k] != "Close" && Date.parse(windowevent_times[k]) > i && Date.parse(windowevent_times[k]) < i+5000){
+			if (filtered_events_start_time[k] <= i && filtered_events_end_time[k] >= i+time_interval){
 				
-				process_with_duration[window_process_id[windowevent_window_ids[k]]] += 1;
+				process_with_duration[filtered_events_process_id[k]] += time_interval;
+				
+			} else if (filtered_events_start_time[k] >= i && filtered_events_start_time[k] <= i+time_interval){
+				
+				process_with_duration[filtered_events_process_id[k]] += 
+					Math.min.apply(null, [filtered_events_start_time[k], i+time_interval]) - filtered_events_start_time[k];
+					
+			} else if (filtered_events_end_time[k] >= i && filtered_events_end_time[k] <= i+time_interval) {
+				
+				process_with_duration[filtered_events_process_id[k]] += filtered_events_end_time[k] - i;
 			}
-	    
 		}
 		
 		var highest_1 = -1;
 		var highest_2 = -1;
 		var highest_3 = -1;
 		
-		for (var j = 0; j <= processes_max; j++) { 
-		
+		for (var j = 0; j <= processes_max; j++) {
+			console.log(process_with_duration[j]);
 			if ((highest_3 == -1 | process_with_duration[j] > process_with_duration[highest_3]) & process_with_duration[j] > 0){
-				if (highest_2 == -1 | (process_with_duration[j] > process_with_duration[highest_2])){
-					if (highest_1 == -1 | (process_with_duration[j] > process_with_duration[highest_1])){
+				if (highest_2 == -1 | process_with_duration[j] > process_with_duration[highest_2]){
+					if (highest_1 == -1 | process_with_duration[j] > process_with_duration[highest_1]){
 						highest_3 = highest_2;
 						highest_2 = highest_1;
 						highest_1 = j;
 					} else {
+						console.log(B);
 						highest_3 = highest_2;
 						highest_2 = j;
 					}
 				}  else {
+					console.log(C);
 						highest_3 = j;
 					}
 			}
-		
 		}
 		
 	    var td=document.createElement('td');
