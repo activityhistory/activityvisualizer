@@ -128,7 +128,19 @@ window.onload = function() {
 	for(var i = earliest_time; i < latest_time;i  += time_interval){
 	    var tr=document.createElement('tr');
         var td=document.createElement('td');
-		td.appendChild(document.createTextNode(i + " to " + (i+time_interval)));
+		
+		var date = new Date(i);
+		var hours = date.getHours();
+		var minutes = "0" + date.getMinutes();
+		var seconds = "0" + date.getSeconds();
+		var date2 = new Date(i + time_interval);
+		var hours2 = date2.getHours();
+		var minutes2 = "0" + date2.getMinutes();
+		var seconds2 = "0" + date2.getSeconds();
+		var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
+		var formattedTime2 = hours2 + ':' + minutes2.substr(minutes2.length-2) + ':' + seconds2.substr(seconds2.length-2);
+		
+		td.appendChild(document.createTextNode(formattedTime + " to " + formattedTime2));
         tr.appendChild(td);
 	    
 		var process_with_duration = [];
