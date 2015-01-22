@@ -7,7 +7,7 @@ window.onload = function() {
 	*/
 	
 	// Specify your sqlite database name and path //
-	$dir = 'sqlite:/Users/jonas/.selfspy/selfspy.sqlite';
+	$dir = 'sqlite:/Users/jonas/Desktop/Uni/Dlab/cat.sqlite';
 
 	// Instantiate PDO connection object and failure msg //
 	$dbh = new PDO($dir) or die("cannot open database");
@@ -40,19 +40,16 @@ window.onload = function() {
 	// ## PARSE WINDOW - Get words for wordcloud
 	$query_words = "SELECT * FROM window";
 
-	$window_ids = array();
 	$window_process_id = array();
 
 	// Iterate through the results and pass into JSON encoder //
 
 	foreach ($dbh->query($query_words) as $row) {
 
-		array_push($window_ids, $row[0]);
 		array_push($window_process_id, $row[4]);
 
 	}
 
-	echo "var window_ids = ".json_encode($window_ids).";\n";
 	echo "var window_process_id = ".json_encode($window_process_id).";\n";
 	
 	
@@ -80,41 +77,17 @@ window.onload = function() {
 	// ### TABLE
 	// ## generate table data
 	
+	// figuring out how many processes we have to deal with
 	var processes_max = 0;
 	
 	for (var i = 1; i < process_ids.length; i++) {
 		if (process_ids[i] > process_ids) { processes_max = process_ids[i];}
 	}
-		
-	var parsed_window_times = [];
 	
-	for (var j = 0; j <= processes_max; j++) { parsed_window_times[j] = []; }
-	
-	not_include_counter = 0;
-	for (var i = 1; i < windowevent_times.length; i = i + 1) {
-		process_name = process_names[window_process_id[windowevent_window_ids[i-1]]];
-		if (process_name == "Dock"){
-			not_include_counter++;
-		}
-		else if (windowevent_event_type[i] != "Close"){
-			var start_end_time = {"starting_time": 0, "ending_time": 0};
-			start_end_time["starting_time"] = Date.parse(windowevent_times[i-1-not_include_counter]);
-			start_end_time["ending_time"] = Date.parse(windowevent_times[i]);
-			parsed_window_times[window_process_id[windowevent_window_ids[i-1]]].push(start_end_time);
-			not_include_counter = 0;
-		}
-	}
-	
-	var earliest_time = Date.parse(windowevent_times[0]);
-	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
-	
-	var time_interval = latest_time - earliest_time;
-	
+	// generating and abstraction of the activities in time
 	var filtered_events_process_id = [];
 	var filtered_events_start_time = [];
 	var filtered_events_end_time = [];
-	
-	// *** simplified activity table START
 	
 	var past_event = -1
 	
@@ -134,9 +107,11 @@ window.onload = function() {
 		}
 	}
 	
+	//console.log(filtered_events_process_id);
+	//console.log(filtered_events_start_time);
+	//console.log(filtered_events_end_time);
 	
-	// *** simplified activity table END
-	
+	// drawing a table for the three most used activities per time
 	function tableCreate(){
 	var body=document.getElementsByTagName('body')[0];
 	var tbl=document.createElement('table');
@@ -144,31 +119,39 @@ window.onload = function() {
 	tbl.setAttribute('border','1');
 	var tbdy=document.createElement('tbody');
 	
-	var time_interval = 100000;
 	
-	for(var i=earliest_time;i<latest_time;i+=time_interval){
+	var earliest_time = Date.parse(windowevent_times[0]);
+	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
+	var time_interval = 10000;
+	
+	// slicing time and searching for every interval
+	for(var i = earliest_time; i < latest_time;i  += time_interval){
 	    var tr=document.createElement('tr');
         var td=document.createElement('td');
 		td.appendChild(document.createTextNode(i + " to " + (i+time_interval)));
         tr.appendChild(td);
 	    
 		var process_with_duration = [];
-		for (var j = 0; j <= processes_max; j++) { process_with_duration[j] = 0; }
+		for (var j = 0; j <= processes_max; j++) { process_with_duration[j] = 0; }		
 		
-		for(var k=0;k<filtered_events_process_id.length;k++){
-		
-			if (filtered_events_start_time[k] <= i && filtered_events_end_time[k] >= i+time_interval){
-				
+		// figuring out what has been going on in the current timer interval
+		// looking through all entries in the abstraction
+		for(var k = 0; k < filtered_events_process_id.length; k++){
+			
+			// either an event has started before and ended after the current interval
+			if (filtered_events_start_time[k] <= i && filtered_events_end_time[k] >= i + time_interval){
 				process_with_duration[filtered_events_process_id[k]] += time_interval;
-				
-			} else if (filtered_events_start_time[k] >= i && filtered_events_start_time[k] <= i+time_interval){
-				
+			// or it starts in and ends in the interval
+			} else if (filtered_events_start_time[k] >= i && filtered_events_end_time[k] <= i+time_interval){
+				console.log("in interval");
 				process_with_duration[filtered_events_process_id[k]] += 
-					Math.min.apply(null, [filtered_events_start_time[k], i+time_interval]) - filtered_events_start_time[k];
-					
+					Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]) - filtered_events_start_time[k];
+			// or it ends in the interval but started earlier
 			} else if (filtered_events_end_time[k] >= i && filtered_events_end_time[k] <= i+time_interval) {
-				
 				process_with_duration[filtered_events_process_id[k]] += filtered_events_end_time[k] - i;
+			// or it starts in the interval but ends later
+			} else if (filtered_events_start_time[k] >= i && filtered_events_start_time[k] <= i+time_interval) {
+				process_with_duration[filtered_events_process_id[k]] += i+time_interval - filtered_events_start_time[k];
 			}
 		}
 		
@@ -185,12 +168,10 @@ window.onload = function() {
 						highest_2 = highest_1;
 						highest_1 = j;
 					} else {
-						console.log(B);
 						highest_3 = highest_2;
 						highest_2 = j;
 					}
 				}  else {
-					console.log(C);
 						highest_3 = j;
 					}
 			}
