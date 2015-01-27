@@ -128,9 +128,9 @@ window.onload = function() {
 	
 	// ## The following big chunk of code is about finding the three most used activities per time_interval
 	
-	var old_highest_1 = -1;
-	var old_highest_2 = -1;
-	var old_highest_3 = -1;
+	var old_highest_1 = -2;
+	var old_highest_2 = -2;
+	var old_highest_3 = -2;
 	
 	var reset_start_time = 1;
 	var interval_start_time = 0;
@@ -226,19 +226,19 @@ window.onload = function() {
 			// TODO that it's showing the old_highest here might make the whole thing off-by-one
 	    	var td=document.createElement('td');
 			if (old_highest_1 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_1]));
+				td.appendChild(document.createTextNode(process_names[highest_1-1]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_2 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_2]));
+				td.appendChild(document.createTextNode(process_names[highest_2-1]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_3 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_3]));
+				td.appendChild(document.createTextNode(process_names[highest_3-1]));
 				tr.appendChild(td);	
 			}
         	
