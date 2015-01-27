@@ -72,7 +72,8 @@ window.onload = function() {
 	echo "var process_ids = ".json_encode($process_ids).";\n";
 
 	?>
-	
+	// DB backend in JS
+
 	
 	// ### TABLE
 	// ## generate table data
