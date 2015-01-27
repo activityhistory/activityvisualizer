@@ -74,32 +74,38 @@ window.onload = function() {
 	?>
 	
 	
+	// END OF PHP CODE - START OF JS
+	
+	
 	// ### TABLE
 	// ## generate table data
 	
 	// figuring out how many processes we have to deal with
 	var processes_max = 0;
 	
-	for (var i = 1; i < process_ids.length; i++) {
+	for (var i = 0; i < process_ids.length; i++) {
 		if (process_ids[i] > process_ids) { processes_max = process_ids[i];}
 	}
 	
-	// generating and abstraction of the activities in time
+	// generating an abstraction of the activities in time
+	// TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad
 	var filtered_events_process_id = [];
 	var filtered_events_start_time = [];
 	var filtered_events_end_time = [];
 	
-	var past_event = -1
+	var past_event = -1;
 	
-	for(var k=0;k<windowevent_window_ids.length;k++){
-		if (windowevent_event_type[k] == "Active"){
-			if (past_event != -1){
+	for (var k = 0; k < windowevent_window_ids.length; k++) {
+		if (windowevent_event_type[k] == "Active") {
+			if (past_event != -1) {
 				filtered_events_process_id.push(window_process_id[windowevent_window_ids[past_event]]);
 				filtered_events_start_time.push(Date.parse(windowevent_times[past_event]));
 				filtered_events_end_time.push(Date.parse(windowevent_times[k]));
 			}
 			past_event = k;
-		} else if (past_event != -1 & windowevent_event_type[k] == "Active" & windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
+		} else if (past_event != -1 & 
+					windowevent_event_type[k] == "Close" & 
+					windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
 			filtered_events_process_id.push(window_process_id[windowevent_window_ids[past_event]]);
 			filtered_events_start_time.push(Date.parse(windowevent_times[past_event]));
 			filtered_events_end_time.push(Date.parse(windowevent_times[k]));
@@ -118,11 +124,13 @@ window.onload = function() {
 	
 	var earliest_time = Date.parse(windowevent_times[0]);
 	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
-	var time_interval = 300000; // 1800000 milliseconds = 30 minutes
+	var time_interval = 300000; // 1800k milliseconds = 30 minutes
 	
-	var old_highest_1 = -2;
-	var old_highest_2 = -2;
-	var old_highest_3 = -2;
+	// ## The following big chunk of code is about finding the three most used activities per time_interval
+	
+	var old_highest_1 = -1;
+	var old_highest_2 = -1;
+	var old_highest_3 = -1;
 	
 	var reset_start_time = 1;
 	var interval_start_time = 0;
@@ -132,15 +140,19 @@ window.onload = function() {
 	    var tr=document.createElement('tr');
         var td=document.createElement('td');
 		
+		// we only start with a new table entry, if the three most used apps in the interval have changed
 		if (reset_start_time == 1){
 			interval_start_time = i;
 			reset_start_time = 0;
 		}
 	    
 		var process_with_duration = [];
-		for (var j = 0; j <= processes_max; j++) { process_with_duration[j] = 0; }		
 		
-		// figuring out what has been going on in the current timer interval
+		for (var j = 0; j <= processes_max; j++) { 
+			process_with_duration[j] = 0; 
+		} // is this the only way to initialize arrays in JS?	
+		
+		// # figuring out what has been going on in the current time interval
 		// looking through all entries in the abstraction
 		for(var k = 0; k < filtered_events_process_id.length; k++){
 			
@@ -148,9 +160,8 @@ window.onload = function() {
 			if (filtered_events_start_time[k] <= i && filtered_events_end_time[k] >= i + time_interval){
 				process_with_duration[filtered_events_process_id[k]] += time_interval;
 			// or it starts in and ends in the interval
-			} else if (filtered_events_start_time[k] >= i && filtered_events_end_time[k] <= i+time_interval){
-				process_with_duration[filtered_events_process_id[k]] += 
-					Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]) - filtered_events_start_time[k];
+			} else if (filtered_events_start_time[k] > i && filtered_events_end_time[k] < i+time_interval){
+				process_with_duration[filtered_events_process_id[k]] += filtered_events_end_time[k] - filtered_events_start_time[k];
 			// or it ends in the interval but started earlier
 			} else if (filtered_events_end_time[k] >= i && filtered_events_end_time[k] <= i+time_interval) {
 				process_with_duration[filtered_events_process_id[k]] += filtered_events_end_time[k] - i;
@@ -160,14 +171,19 @@ window.onload = function() {
 			}
 		}
 		
+		
+		// In the next 20 lines I find the top 3 apps. Self-implemented sorting. I hope there's no bug in it.
 		var highest_1 = -1;
 		var highest_2 = -1;
 		var highest_3 = -1;
 		
 		for (var j = 0; j <= processes_max; j++) {
-			if ((highest_3 == -1 | process_with_duration[j] > process_with_duration[highest_3]) & process_with_duration[j] > 0){
-				if (highest_2 == -1 | process_with_duration[j] > process_with_duration[highest_2]){
-					if (highest_1 == -1 | process_with_duration[j] > process_with_duration[highest_1]){
+			if ((highest_3 == -1 | process_with_duration[j] > process_with_duration[highest_3]) 
+					& process_with_duration[j] > 0){
+				if (highest_2 == -1 
+					| process_with_duration[j] > process_with_duration[highest_2]){
+					if (highest_1 == -1 
+						| process_with_duration[j] > process_with_duration[highest_1]){
 						highest_3 = highest_2;
 						highest_2 = highest_1;
 						highest_1 = j;
@@ -181,8 +197,10 @@ window.onload = function() {
 			}
 		}
 
+		// if anything has changed compared to the last table entry, then it's time for a new one!
 		if (highest_1 != old_highest_1 | highest_2 != old_highest_2 | highest_3 != old_highest_3){
 			
+			// next 10 lines: converting the unix timestamps to human legible format
 			var date = new Date(interval_start_time);
 			var hours = date.getHours();
 			var minutes = "0" + date.getMinutes();
@@ -205,6 +223,7 @@ window.onload = function() {
 			
 			reset_start_time = 1;
 			
+			// TODO that it's showing the old_highest here might make the whole thing off-by-one
 	    	var td=document.createElement('td');
 			if (old_highest_1 != -1){
 				td.appendChild(document.createTextNode(process_names[old_highest_1]));
