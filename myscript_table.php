@@ -107,41 +107,35 @@ window.onload = function() {
 		}
 	}
 	
-	//console.log(filtered_events_process_id);
-	//console.log(filtered_events_start_time);
-	//console.log(filtered_events_end_time);
-	
 	// drawing a table for the three most used activities per time
 	function tableCreate(){
 	var body=document.getElementsByTagName('body')[0];
 	var tbl=document.createElement('table');
 	//tbl.style.width='100%';
-	tbl.setAttribute('border','1');
+	tbl.setAttribute('border','5');
 	var tbdy=document.createElement('tbody');
 	
 	
 	var earliest_time = Date.parse(windowevent_times[0]);
 	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
-	var time_interval = 1800000;
+	var time_interval = 300000; // 1800000 milliseconds = 30 minutes
+	
+	var old_highest_1 = -2;
+	var old_highest_2 = -2;
+	var old_highest_3 = -2;
+	
+	var reset_start_time = 1;
+	var interval_start_time = 0;
 	
 	// slicing time and searching for every interval
-	for(var i = earliest_time; i < latest_time;i  += time_interval){
+	for(var i = earliest_time; i < latest_time; i  += time_interval){
 	    var tr=document.createElement('tr');
         var td=document.createElement('td');
 		
-		var date = new Date(i);
-		var hours = date.getHours();
-		var minutes = "0" + date.getMinutes();
-		var seconds = "0" + date.getSeconds();
-		var date2 = new Date(i + time_interval);
-		var hours2 = date2.getHours();
-		var minutes2 = "0" + date2.getMinutes();
-		var seconds2 = "0" + date2.getSeconds();
-		var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
-		var formattedTime2 = hours2 + ':' + minutes2.substr(minutes2.length-2) + ':' + seconds2.substr(seconds2.length-2);
-		
-		td.appendChild(document.createTextNode(formattedTime + " to " + formattedTime2));
-        tr.appendChild(td);
+		if (reset_start_time == 1){
+			interval_start_time = i;
+			reset_start_time = 0;
+		}
 	    
 		var process_with_duration = [];
 		for (var j = 0; j <= processes_max; j++) { process_with_duration[j] = 0; }		
@@ -155,7 +149,6 @@ window.onload = function() {
 				process_with_duration[filtered_events_process_id[k]] += time_interval;
 			// or it starts in and ends in the interval
 			} else if (filtered_events_start_time[k] >= i && filtered_events_end_time[k] <= i+time_interval){
-				console.log("in interval");
 				process_with_duration[filtered_events_process_id[k]] += 
 					Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]) - filtered_events_start_time[k];
 			// or it ends in the interval but started earlier
@@ -172,7 +165,6 @@ window.onload = function() {
 		var highest_3 = -1;
 		
 		for (var j = 0; j <= processes_max; j++) {
-			console.log(process_with_duration[j]);
 			if ((highest_3 == -1 | process_with_duration[j] > process_with_duration[highest_3]) & process_with_duration[j] > 0){
 				if (highest_2 == -1 | process_with_duration[j] > process_with_duration[highest_2]){
 					if (highest_1 == -1 | process_with_duration[j] > process_with_duration[highest_1]){
@@ -185,30 +177,59 @@ window.onload = function() {
 					}
 				}  else {
 						highest_3 = j;
-					}
+				}
 			}
 		}
-		
-	    var td=document.createElement('td');
-		if (highest_1 != -1){
-			td.appendChild(document.createTextNode(process_names[highest_1]));
-			tr.appendChild(td);	
-		}
-		
-	    var td=document.createElement('td');
-		if (highest_2 != -1){
-			td.appendChild(document.createTextNode(process_names[highest_2]));
-			tr.appendChild(td);	
-		}
-		
-	    var td=document.createElement('td');
-		if (highest_3 != -1){
-			td.appendChild(document.createTextNode(process_names[highest_3]));
-			tr.appendChild(td);	
-		}
 
+		if (highest_1 != old_highest_1 | highest_2 != old_highest_2 | highest_3 != old_highest_3){
 			
-	    tbdy.appendChild(tr);
+			var date = new Date(interval_start_time);
+			var hours = date.getHours();
+			var minutes = "0" + date.getMinutes();
+			var seconds = "0" + date.getSeconds();
+			var date2 = new Date(i + time_interval);
+			var hours2 = date2.getHours();
+			var minutes2 = "0" + date2.getMinutes();
+			var seconds2 = "0" + date2.getSeconds();
+			var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
+			var formattedTime2 = hours2 + ':' + minutes2.substr(minutes2.length-2) + ':' + seconds2.substr(seconds2.length-2);
+		
+			td.appendChild(document.createTextNode(formattedTime + " to " + formattedTime2));
+	        tr.appendChild(td);
+			
+			var duration = ((i + time_interval) - interval_start_time) / 60000; // 60000 milliseconds in a minute
+		
+			var td=document.createElement('td');
+			td.appendChild(document.createTextNode("Minutes: " + duration));
+	        tr.appendChild(td);
+			
+			reset_start_time = 1;
+			
+	    	var td=document.createElement('td');
+			if (old_highest_1 != -1){
+				td.appendChild(document.createTextNode(process_names[old_highest_1]));
+				tr.appendChild(td);	
+			}
+			
+	    	var td=document.createElement('td');
+			if (old_highest_2 != -1){
+				td.appendChild(document.createTextNode(process_names[old_highest_2]));
+				tr.appendChild(td);	
+			}
+			
+	    	var td=document.createElement('td');
+			if (old_highest_3 != -1){
+				td.appendChild(document.createTextNode(process_names[old_highest_3]));
+				tr.appendChild(td);	
+			}
+        	
+			old_highest_1 = highest_1;
+			old_highest_2 = highest_2;
+			old_highest_3 = highest_3;
+				
+	    	tbdy.appendChild(tr);
+			
+		}
 	}
 	tbl.appendChild(tbdy);
 	body.appendChild(tbl)
