@@ -236,19 +236,19 @@ window.onload = function() {
 			// TODO that it's showing the old_highest here might make the whole thing off-by-one
 	    	var td=document.createElement('td');
 			if (old_highest_1 != -1){
-				td.appendChild(document.createTextNode(filtered_events_decription[old_highest_1-1]));
+				td.appendChild(document.createTextNode(process_names[old_highest_1-1]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_2 != -1){
-				td.appendChild(document.createTextNode(filtered_events_decription[old_highest_2-1]));
+				td.appendChild(document.createTextNode(process_names[old_highest_2-1]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_3 != -1){
-				td.appendChild(document.createTextNode(filtered_events_decription[old_highest_3-1]));
+				td.appendChild(document.createTextNode(process_names[old_highest_3-1]));
 				tr.appendChild(td);	
 			}
         	
