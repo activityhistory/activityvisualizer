@@ -88,27 +88,35 @@ window.onload = function() {
 	}
 	
 	// generating an abstraction of the activities in time
-	// TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad
-	var filtered_events_process_id = [];
+	// TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
+	var filtered_events_decription = [];
 	var filtered_events_start_time = [];
 	var filtered_events_end_time = [];
 	
 	var past_event = -1;
 	
+	function pushEvent(process_id, start_time, end_time){
+		filtered_events_decription.push(process_id);
+		filtered_events_start_time.push(start_time);
+		filtered_events_end_time.push(end_time);
+	}
+	
 	for (var k = 0; k < windowevent_window_ids.length; k++) {
+		var process_id = window_process_id[windowevent_window_ids[past_event]];
+		var start_time = Date.parse(windowevent_times[past_event]);
+		var end_time = Date.parse(windowevent_times[k]);
+		// 1 : We find an 'Active' Event
 		if (windowevent_event_type[k] == "Active") {
+			// 1.a : and we had an active event before
 			if (past_event != -1) {
-				filtered_events_process_id.push(window_process_id[windowevent_window_ids[past_event]]);
-				filtered_events_start_time.push(Date.parse(windowevent_times[past_event]));
-				filtered_events_end_time.push(Date.parse(windowevent_times[k]));
+				pushEvent(process_id, start_time, end_time);
 			}
 			past_event = k;
+		// 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
 		} else if (past_event != -1 & 
 					windowevent_event_type[k] == "Close" & 
 					windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
-			filtered_events_process_id.push(window_process_id[windowevent_window_ids[past_event]]);
-			filtered_events_start_time.push(Date.parse(windowevent_times[past_event]));
-			filtered_events_end_time.push(Date.parse(windowevent_times[k]));
+			pushEvent(process_id, start_time, end_time);
 			past_event = -1;
 		}
 	}
@@ -124,7 +132,7 @@ window.onload = function() {
 	
 	var earliest_time = Date.parse(windowevent_times[0]);
 	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
-	var time_interval = 1800000; // 1800k milliseconds = 30 minutes
+	var time_interval = 1800000; // 1.8m milliseconds = 30 minutes
 	
 	// ## The following big chunk of code is about finding the three most used activities per time_interval
 	
@@ -154,20 +162,21 @@ window.onload = function() {
 		
 		// # figuring out what has been going on in the current time interval
 		// looking through all entries in the abstraction
-		for(var k = 0; k < filtered_events_process_id.length; k++){
-			
+		for(var k = 0; k < filtered_events_decription.length; k++){
+			var start_time = filtered_events_start_time[k];
+			var end_time = filtered_events_end_time[k];
 			// either an event has started before and ended after the current interval
-			if (filtered_events_start_time[k] <= i && filtered_events_end_time[k] >= i + time_interval){
-				process_with_duration[filtered_events_process_id[k]] += time_interval;
+			if (start_time <= i && end_time >= i + time_interval){
+				process_with_duration[filtered_events_decription[k]] += time_interval;
 			// or it starts in and ends in the interval
-			} else if (filtered_events_start_time[k] > i && filtered_events_end_time[k] < i+time_interval){
-				process_with_duration[filtered_events_process_id[k]] += filtered_events_end_time[k] - filtered_events_start_time[k];
+			} else if (start_time > i && end_time < i+time_interval){
+				process_with_duration[filtered_events_decription[k]] += end_time - start_time;
 			// or it ends in the interval but started earlier
-			} else if (filtered_events_end_time[k] >= i && filtered_events_end_time[k] <= i+time_interval) {
-				process_with_duration[filtered_events_process_id[k]] += filtered_events_end_time[k] - i;
+			} else if (end_time >= i && end_time <= i+time_interval) {
+				process_with_duration[filtered_events_decription[k]] += end_time - i;
 			// or it starts in the interval but ends later
-			} else if (filtered_events_start_time[k] >= i && filtered_events_start_time[k] <= i+time_interval) {
-				process_with_duration[filtered_events_process_id[k]] += i+time_interval - filtered_events_start_time[k];
+			} else if (start_time >= i && start_time <= i+time_interval) {
+				process_with_duration[filtered_events_decription[k]] += i+time_interval - start_time;
 			}
 		}
 		
@@ -221,24 +230,25 @@ window.onload = function() {
 			td.appendChild(document.createTextNode("Minutes: " + duration));
 	        tr.appendChild(td);
 			
+			// things have changed, so we will start a new interval
 			reset_start_time = 1;
 			
 			// TODO that it's showing the old_highest here might make the whole thing off-by-one
 	    	var td=document.createElement('td');
 			if (old_highest_1 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_1-1]));
+				td.appendChild(document.createTextNode(filtered_events_decription[old_highest_1-1]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_2 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_2-1]));
+				td.appendChild(document.createTextNode(filtered_events_decription[old_highest_2-1]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_3 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_3-1]));
+				td.appendChild(document.createTextNode(filtered_events_decription[old_highest_3-1]));
 				tr.appendChild(td);	
 			}
         	
