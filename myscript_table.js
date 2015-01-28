@@ -63,13 +63,12 @@ window.onload = function() {
 	
 	
 	function getDurations(i){
-		// # figuring out what has been going on in the current time interval
 		// looking through all entries in the abstraction
 		for(var k = 0; k < filtered_events_description.length; k++){
 			var start_time = Math.max.apply(null, [filtered_events_start_time[k], i]);
 			var end_time = Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]);
 			var duration = end_time - start_time;
-			if (duration > 0){
+			if (duration > 0 && filtered_events_description[k] != "localhost"){
 				pushDuration(k, duration);
 			}	
 		}
@@ -166,14 +165,17 @@ window.onload = function() {
 			// we only start with a new time_interval, if reset_start_time is set to 1
 			if (reset_start_time == 1){
 				interval_start_time = i;
+				index = 0;
 				reset_start_time = 0;
-				for (var j = 0; j <= filtered_events_description; j++) { 
+				for (var j = 0; j <= filtered_events_description.length; j++) { // this seems to be breaking everything
 					activity_durations[j] = 0;
 					activity_names[j] = 0; 
 				}
 			}
 			
 			getDurations(i);
+			
+			console.log(activity_durations);
 			
 			var top3 = findTop3();
 			
@@ -217,7 +219,7 @@ window.onload = function() {
 	var index = 0;
 	var reset_start_time = 1;
 	var interval_start_time = 0;
-	var time_interval = 5 * 60000; // 60k milliseconds = 1 minute
+	var time_interval = 120 * 60000; // 60k milliseconds = 1 minute
 	
 	
 	generateAbstraction();
