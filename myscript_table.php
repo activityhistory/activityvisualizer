@@ -37,20 +37,23 @@ window.onload = function() {
 	echo "var windowevent_event_type = ".json_encode($windowevent_event_type).";\n";
 	
 	
-	// ## PARSE WINDOW - Get words for wordcloud
+	// ## PARSE WINDOW - Get process_ids, urls and stuff
 	$query_words = "SELECT * FROM window";
 
 	$window_process_id = array();
+	$window_browser_url = array();
 
 	// Iterate through the results and pass into JSON encoder //
 
 	foreach ($dbh->query($query_words) as $row) {
 
 		array_push($window_process_id, $row[4]);
+		array_push($window_browser_url, $row[3]);
 
 	}
 
 	echo "var window_process_id = ".json_encode($window_process_id).";\n";
+	echo "var window_browser_url = ".json_encode($window_browser_url).";\n";
 	
 	
 	// ## PARSE PROCESS - Get processes for labels //
@@ -89,18 +92,34 @@ window.onload = function() {
 	
 	// generating an abstraction of the activities in time
 	// TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
-	var filtered_events_decription = [];
+	var filtered_events_description = [];
 	var filtered_events_start_time = [];
 	var filtered_events_end_time = [];
 	
 	var past_event = -1;
 	
-	function pushEvent(process_id, start_time, end_time){
-		filtered_events_decription.push(process_id);
+	function pushEvent(process_id, start_time, end_time, window_id){
+		if (process_names[process_id] == "Google Chrome"){
+			
+			// get hostname from url
+			var getLocation = function(href) {
+			    var l = document.createElement("a");
+			    l.href = href;
+			    return l;
+			};
+			var l = getLocation(window_browser_url[window_id]);
+			
+			if (l.hostname != 'localhost' && l.hostname != 'newtab'){
+				filtered_events_description.push(l.hostname);
+			}
+		} else {
+			filtered_events_description.push(process_names[process_id]);
+		}
 		filtered_events_start_time.push(start_time);
 		filtered_events_end_time.push(end_time);
 	}
 	
+	// TODO this may not properly work anymore for multiple things that share the same process_id (e.g. browser tabs)
 	for (var k = 0; k < windowevent_window_ids.length; k++) {
 		var process_id = window_process_id[windowevent_window_ids[past_event]];
 		var start_time = Date.parse(windowevent_times[past_event]);
@@ -109,14 +128,14 @@ window.onload = function() {
 		if (windowevent_event_type[k] == "Active") {
 			// 1.a : and we had an active event before
 			if (past_event != -1) {
-				pushEvent(process_id, start_time, end_time);
+				pushEvent(process_id-1, start_time, end_time, k);
 			}
 			past_event = k;
 		// 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
 		} else if (past_event != -1 & 
 					windowevent_event_type[k] == "Close" & 
 					windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
-			pushEvent(process_id, start_time, end_time);
+			pushEvent(process_id-1, start_time, end_time, k);
 			past_event = -1;
 		}
 	}
@@ -132,7 +151,7 @@ window.onload = function() {
 	
 	var earliest_time = Date.parse(windowevent_times[0]);
 	var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
-	var time_interval = 1800000; // 1.8m milliseconds = 30 minutes
+	var time_interval = 10 * 60000; // 60k milliseconds = 1 minute
 	
 	// ## The following big chunk of code is about finding the three most used activities per time_interval
 	
@@ -143,6 +162,11 @@ window.onload = function() {
 	var reset_start_time = 1;
 	var interval_start_time = 0;
 	
+	var activity_durations = [];
+	var activity_names = [];
+	
+	 // is this the only way to initialize arrays in JS?	
+	
 	// slicing time and searching for every interval
 	for(var i = earliest_time; i < latest_time; i  += time_interval){
 	    var tr=document.createElement('tr');
@@ -152,31 +176,53 @@ window.onload = function() {
 		if (reset_start_time == 1){
 			interval_start_time = i;
 			reset_start_time = 0;
+			for (var j = 0; j <= filtered_events_description; j++) { 
+				activity_durations[j] = 0;
+				activity_names[j] = 0; 
+			}
 		}
-	    
-		var process_with_duration = [];
 		
-		for (var j = 0; j <= processes_max; j++) { 
-			process_with_duration[j] = 0; 
-		} // is this the only way to initialize arrays in JS?	
+		function in_array(array, id) {
+		    for(var i=0;i<array.length;i++) {
+		        if (array[i] == id){
+					return i;
+		        }
+		    }
+		    return false;
+		}
+		
+		var index = 0;
+		
+		
+		function pushDuration(k, time){
+			var id = in_array(activity_names, filtered_events_description[k]);
+			if (id != false){
+				activity_durations[id] += time;
+			} else {
+				activity_durations[index] = time;
+				activity_names[index] = filtered_events_description[k];
+				index += 1;
+			}
+		}
+		
 		
 		// # figuring out what has been going on in the current time interval
 		// looking through all entries in the abstraction
-		for(var k = 0; k < filtered_events_decription.length; k++){
+		for(var k = 0; k < filtered_events_description.length; k++){
 			var start_time = filtered_events_start_time[k];
 			var end_time = filtered_events_end_time[k];
 			// either an event has started before and ended after the current interval
 			if (start_time <= i && end_time >= i + time_interval){
-				process_with_duration[filtered_events_decription[k]] += time_interval;
+				pushDuration(k, time_interval);
 			// or it starts in and ends in the interval
 			} else if (start_time > i && end_time < i+time_interval){
-				process_with_duration[filtered_events_decription[k]] += end_time - start_time;
+				pushDuration(k, end_time - start_time);
 			// or it ends in the interval but started earlier
 			} else if (end_time >= i && end_time <= i+time_interval) {
-				process_with_duration[filtered_events_decription[k]] += end_time - i;
+				pushDuration(k, end_time - i)
 			// or it starts in the interval but ends later
 			} else if (start_time >= i && start_time <= i+time_interval) {
-				process_with_duration[filtered_events_decription[k]] += i+time_interval - start_time;
+				pushDuration(k, i+time_interval - start_time);
 			}
 		}
 		
@@ -187,12 +233,12 @@ window.onload = function() {
 		var highest_3 = -1;
 		
 		for (var j = 0; j <= processes_max; j++) {
-			if ((highest_3 == -1 | process_with_duration[j] > process_with_duration[highest_3]) 
-					& process_with_duration[j] > 0){
+			if ((highest_3 == -1 | activity_durations[j] > activity_durations[highest_3]) 
+					& activity_durations[j] > 0){
 				if (highest_2 == -1 
-					| process_with_duration[j] > process_with_duration[highest_2]){
+					| activity_durations[j] > activity_durations[highest_2]){
 					if (highest_1 == -1 
-						| process_with_duration[j] > process_with_duration[highest_1]){
+						| activity_durations[j] > activity_durations[highest_1]){
 						highest_3 = highest_2;
 						highest_2 = highest_1;
 						highest_1 = j;
@@ -236,19 +282,19 @@ window.onload = function() {
 			// TODO that it's showing the old_highest here might make the whole thing off-by-one
 	    	var td=document.createElement('td');
 			if (old_highest_1 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_1-1]));
+				td.appendChild(document.createTextNode(activity_names[old_highest_1]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_2 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_2-1]));
+				td.appendChild(document.createTextNode(activity_names[old_highest_2]));
 				tr.appendChild(td);	
 			}
 			
 	    	var td=document.createElement('td');
 			if (old_highest_3 != -1){
-				td.appendChild(document.createTextNode(process_names[old_highest_3-1]));
+				td.appendChild(document.createTextNode(activity_names[old_highest_3]));
 				tr.appendChild(td);	
 			}
         	
