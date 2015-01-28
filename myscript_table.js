@@ -1,63 +1,54 @@
 window.onload = function() {
-	// ## generate table data
-	
-	// generating an abstraction of the activities in time
-	// TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
-	function generateAbstraction(){
-		// TODO this may not properly work anymore for multiple things that share the same process_id (e.g. browser tabs)
-		for (var k = 0; k < windowevent_window_ids.length; k++) {
-			var process_id = window_process_id[windowevent_window_ids[past_event]];
-			var start_time = Date.parse(windowevent_times[past_event]);
-			var end_time = Date.parse(windowevent_times[k]);
-			// 1 : We find an 'Active' Event
-			if (windowevent_event_type[k] == "Active") {
-				// 1.a : and we had an active event before
-				if (past_event != -1) {
-					pushEvent(process_id-1, start_time, end_time, k);
-				}
-				past_event = k;
-			// 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
-			} else if (past_event != -1 & 
-						windowevent_event_type[k] == "Close" & 
-						windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
-				pushEvent(process_id-1, start_time, end_time, k);
-				past_event = -1;
-			}
-		}
-	}
 	
 	
-	function pushEvent(process_id, start_time, end_time, window_id){
-		if (process_names[process_id] == "Google Chrome"){
-			
+	function getActivityNameFromWindowId(id){
+		var process_id = window_process_id[windowevent_window_ids[past_event]] - 1; // table is off by one
+		var name = process_names[process_id];
+		if (name == "Google Chrome" | name == "Safari"){
 			// get hostname from url
 			var getLocation = function(href) {
 			    var l = document.createElement("a");
 			    l.href = href;
 			    return l;
 			};
-			var l = getLocation(window_browser_url[window_id]);
-			
-			if (l.hostname != 'localhost' && l.hostname != 'newtab'){
-				filtered_events_description.push(l.hostname);
-			}
+			var l = getLocation(window_browser_url[windowevent_window_ids[past_event]]);
+			return l.hostname;
 		} else {
-			filtered_events_description.push(process_names[process_id]);
+			return name;
 		}
-		filtered_events_start_time.push(start_time);
-		filtered_events_end_time.push(end_time);
 	}
 	
 	
-	function pushDuration(k, time){
-		var id = inArray(activity_names, filtered_events_description[k]);
-		if (id != false){
-			activity_durations[id] += time;
-		} else {
-			activity_durations[index] = time;
-			activity_names[index] = filtered_events_description[k];
-			index += 1;
+	// generating an abstraction of the activities in time
+	// TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
+	function generateAbstraction(){
+		// TODO this may not properly work anymore for multiple things that share the same process_id (e.g. browser tabs)
+		for (var k = 0; k < windowevent_window_ids.length; k++) {
+			var activity_name = getActivityNameFromWindowId(past_event);
+			var start_time = Date.parse(windowevent_times[past_event]);
+			var end_time = Date.parse(windowevent_times[k]);
+			// 1 : We find an 'Active' Event
+			if (windowevent_event_type[k] == "Active") {
+				// 1.a : and we had an active event before
+				if (past_event != -1) {
+					pushEvent(activity_name, start_time, end_time, k);
+				}
+				past_event = k;
+			// 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
+			} else if (past_event != -1 & 
+						windowevent_event_type[k] == "Close" & 
+						windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
+				pushEvent(activity_name, start_time, end_time, k);
+				past_event = -1;
+			}
 		}
+	}
+	
+	
+	function pushEvent(activity_name, start_time, end_time, window_id){
+		filtered_events_description.push(activity_name);
+		filtered_events_start_time.push(start_time);
+		filtered_events_end_time.push(end_time);
 	}
 
 	
@@ -70,27 +61,32 @@ window.onload = function() {
 	    return false;
 	}
 	
+	
 	function getDurations(i){
 		// # figuring out what has been going on in the current time interval
 		// looking through all entries in the abstraction
 		for(var k = 0; k < filtered_events_description.length; k++){
-			var start_time = filtered_events_start_time[k];
-			var end_time = filtered_events_end_time[k];
-			// either an event has started before and ended after the current interval
-			if (start_time <= i && end_time >= i + time_interval){
-				pushDuration(k, time_interval);
-			// or it starts in and ends in the interval
-			} else if (start_time > i && end_time < i+time_interval){
-				pushDuration(k, end_time - start_time);
-			// or it ends in the interval but started earlier
-			} else if (end_time >= i && end_time <= i+time_interval) {
-				pushDuration(k, end_time - i)
-			// or it starts in the interval but ends later
-			} else if (start_time >= i && start_time <= i+time_interval) {
-				pushDuration(k, i+time_interval - start_time);
-			}
+			var start_time = Math.max.apply(null, [filtered_events_start_time[k], i]);
+			var end_time = Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]);
+			var duration = end_time - start_time;
+			if (duration > 0){
+				pushDuration(k, duration);
+			}	
 		}
 	}
+	
+	
+	function pushDuration(k, duration){
+		var id = inArray(activity_names, filtered_events_description[k]);
+		if (id != false){
+			activity_durations[id] += duration;
+		} else {
+			activity_durations[index] = duration;
+			activity_names[index] = filtered_events_description[k];
+			index += 1;
+		}
+	}
+	
 	
 	function findTop3(){
 		// find the top 3 apps. Self-implemented sorting. I hope there's no bug in it.
@@ -140,7 +136,6 @@ window.onload = function() {
 	
 	
 	function addNewRowToTable(tbdy, interval_start_time, i, time_interval, item1, item2, item3){
-
 		var tr=document.createElement('tr');
 
 		var start_time = convertUnixTimeToHumanReadable(interval_start_time);
@@ -222,7 +217,7 @@ window.onload = function() {
 	var index = 0;
 	var reset_start_time = 1;
 	var interval_start_time = 0;
-	var time_interval = 10 * 60000; // 60k milliseconds = 1 minute
+	var time_interval = 5 * 60000; // 60k milliseconds = 1 minute
 	
 	
 	generateAbstraction();
