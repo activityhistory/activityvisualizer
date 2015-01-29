@@ -82,32 +82,22 @@ function pushDuration(k, duration){
 }
 
 
-function findTop3(){ // TODO order does not matter
+function findTop(){ // TODO order does not matter
 	// find the top 3 apps. Self-implemented sorting. I hope there's no bug in it.
-	var highest_1 = -1;
-	var highest_2 = -1;
-	var highest_3 = -1;
+	var output = [];
 	
-	for (var j = 0; j <= activity_durations.length; j++) {
-		if ((highest_3 == -1 | activity_durations[j] > activity_durations[highest_3]) 
-				& activity_durations[j] > 0){
-			if (highest_2 == -1 
-				| activity_durations[j] > activity_durations[highest_2]){
-				if (highest_1 == -1 
-					| activity_durations[j] > activity_durations[highest_1]){
-					highest_3 = highest_2;
-					highest_2 = highest_1;
-					highest_1 = j;
-				} else {
-					highest_3 = highest_2;
-					highest_2 = j;
-				}
-			}  else {
-					highest_3 = j;
-			}
+	for (var j = 0; j <= number_of_top_elements; j++) {
+		var max = Math.max.apply(window, activity_durations);
+		if (max > 0){
+			var index = activity_durations.indexOf(max);
+			output.push(index);
+			activity_durations[index] = -1
+		} else {
+			output.push(-1);
 		}
 	}
-	return [highest_1, highest_2, highest_3]
+	
+	return output;
 }
 
 
@@ -158,15 +148,11 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
 	addTableTextCell(tr, start_time + " to " + end_time);
 	addTableTextCell(tr, "Minutes: " + duration);
 
-	if (items[0] != -1) {
-		addTableTextCell(tr, old_activity_names[items[0]]);
+	for(var i = 0; i < number_of_top_elements; i++){
+		if (items[i] != -1) {
+			addTableTextCell(tr, old_activity_names[items[i]]);
+		}
 	}
-	if (items[1] != -1) {
-		addTableTextCell(tr, old_activity_names[items[1]]);
-	}
-	if (items[2] != -1) {
-		addTableTextCell(tr, old_activity_names[items[2]]);
-	} // TODO do smarter
 
 	tbdy.appendChild(tr);
 }
@@ -193,7 +179,7 @@ function tableCreate(){
 		
 		getDurations(i);
 		
-		var top3 = findTop3();
+		var top3 = findTop();
 		// if anything has changed compared to the last table entry, then it's time for a new one!
 		if (isEqArrays(old_top3, top3) == false){
 			// things have changed, so we will start a new interval
@@ -236,7 +222,10 @@ var reset_start_time = 1;
 var interval_start_time = 0;
 var old_interval_start_time = -1;
 var old_i = -1;
-var time_interval = 5 * 60000; // 60k milliseconds = 1 minute
+
+// CONFIG
+var time_interval = 10 * 60000; // 60k milliseconds = 1 minute
+var number_of_top_elements = 3;
 
 window.onload = function() {
 	
