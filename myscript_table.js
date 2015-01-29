@@ -184,9 +184,11 @@ function tableCreate(){
 			// things have changed, so we will start a new interval
 			reset_start_time = 1;
 			
-			// TODO that it's showing the old_highest here might make the whole thing off-by-one
-			addNewRowToTable(tbdy, interval_start_time, i, time_interval, old_highest_1, old_highest_2, old_highest_3);
-			
+			if (old_i != -1){
+				addNewRowToTable(tbdy, old_interval_start_time, old_i, time_interval, old_highest_1, old_highest_2, old_highest_3);
+			}
+			old_interval_start_time = interval_start_time;
+			old_i = i;
 			old_highest_1 = highest_1;
 			old_highest_2 = highest_2;
 			old_highest_3 = highest_3;
@@ -194,6 +196,9 @@ function tableCreate(){
 			old_activity_names = activity_names;
 		}
 	}
+	// run it one more time, so the last interval does not get lost
+	addNewRowToTable(tbdy, interval_start_time, i, time_interval, highest_1, highest_2, highest_3);
+	
 	tbl.appendChild(tbdy);
 	body.appendChild(tbl)
 }
@@ -218,7 +223,9 @@ var old_highest_3 = -1;
 var past_event = -1;
 var reset_start_time = 1;
 var interval_start_time = 0;
-var time_interval = 30 * 60000; // 60k milliseconds = 1 minute
+var old_interval_start_time = -1;
+var old_i = -1;
+var time_interval = 5 * 60000; // 60k milliseconds = 1 minute
 
 window.onload = function() {
 	
