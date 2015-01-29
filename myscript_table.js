@@ -19,7 +19,6 @@ function getActivityNameFromWindowId(id){
 // generating an abstraction of the activities in time
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
 function generateAbstraction(){
-	// TODO this may not properly work anymore for multiple things that share the same process_id (e.g. browser tabs)
 	for (var k = 0; k < windowevent_window_ids.length; k++) {
 		var activity_name = getActivityNameFromWindowId(past_event);
 		var start_time = Date.parse(windowevent_times[past_event]);
@@ -128,7 +127,28 @@ function addTableTextCell(tr, text){
 }
 
 
-function addNewRowToTable(tbdy, interval_start_time, i, time_interval, item1, item2, item3){
+function inArray2(array, el) {
+  for ( var i = array.length; i--; ) {
+    if ( array[i] === el ) return true;
+  }
+  return false;
+}
+
+
+function isEqArrays(arr1, arr2) {
+  if ( arr1.length !== arr2.length ) {
+    return false;
+  }
+  for ( var i = arr1.length; i--; ) {
+    if ( !inArray2( arr2, arr1[i] ) ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
 	var tr=document.createElement('tr');
 
 	var start_time = convertUnixTimeToHumanReadable(interval_start_time);
@@ -138,14 +158,14 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, item1, it
 	addTableTextCell(tr, start_time + " to " + end_time);
 	addTableTextCell(tr, "Minutes: " + duration);
 
-	if (item1 != -1) {
-		addTableTextCell(tr, old_activity_names[item1]);
+	if (items[0] != -1) {
+		addTableTextCell(tr, old_activity_names[items[0]]);
 	}
-	if (item2 != -1) {
-		addTableTextCell(tr, old_activity_names[item2]);
+	if (items[1] != -1) {
+		addTableTextCell(tr, old_activity_names[items[1]]);
 	}
-	if (item3 != -1) {
-		addTableTextCell(tr, old_activity_names[item3]);
+	if (items[2] != -1) {
+		addTableTextCell(tr, old_activity_names[items[2]]);
 	} // TODO do smarter
 
 	tbdy.appendChild(tr);
@@ -174,30 +194,23 @@ function tableCreate(){
 		getDurations(i);
 		
 		var top3 = findTop3();
-		
-		var highest_1 = top3[0];
-		var highest_2 = top3[1];
-		var highest_3 = top3[2];
-    	
 		// if anything has changed compared to the last table entry, then it's time for a new one!
-		if (highest_1 != old_highest_1 | highest_2 != old_highest_2 | highest_3 != old_highest_3){
+		if (isEqArrays(old_top3, top3) == false){
 			// things have changed, so we will start a new interval
 			reset_start_time = 1;
 			
 			if (old_i != -1){
-				addNewRowToTable(tbdy, old_interval_start_time, old_i, time_interval, old_highest_1, old_highest_2, old_highest_3);
+				addNewRowToTable(tbdy, old_interval_start_time, old_i, time_interval, old_top3);
 			}
 			old_interval_start_time = interval_start_time;
 			old_i = i;
-			old_highest_1 = highest_1;
-			old_highest_2 = highest_2;
-			old_highest_3 = highest_3;
+			old_top3 = top3;
 			old_activity_durations = activity_durations;
 			old_activity_names = activity_names;
 		}
 	}
 	// run it one more time, so the last interval does not get lost
-	addNewRowToTable(tbdy, interval_start_time, i, time_interval, highest_1, highest_2, highest_3);
+	addNewRowToTable(tbdy, interval_start_time, i, time_interval, top3);
 	
 	tbl.appendChild(tbdy);
 	body.appendChild(tbl)
@@ -216,9 +229,7 @@ var old_activity_names = [];
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
 
-var old_highest_1 = -1;
-var old_highest_2 = -1;
-var old_highest_3 = -1;
+var old_top3 = [];
 
 var past_event = -1;
 var reset_start_time = 1;
