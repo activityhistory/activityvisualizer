@@ -45,7 +45,9 @@ function generateAbstraction(){
 function pushEvent(activity_name, start_time, end_time, window_id){
 	filtered_events_description.push(activity_name);
 	filtered_events_start_time.push(start_time);
-	filtered_events_end_time.push(end_time); // TODO make multidimensional arrays objects
+	filtered_events_end_time.push(end_time);
+	console.log("activity_name: ", activity_name);
+	console.log("length: ", filtered_events_description.length); // TODO make multidimensional arrays objects
 }
 
 
@@ -65,7 +67,7 @@ function getDurations(i){
 		var start_time = Math.max.apply(null, [filtered_events_start_time[k], i]);
 		var end_time = Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]);
 		var duration = end_time - start_time;
-		if (duration > 0 && filtered_events_description[k] != "localhost"){
+		if (duration > 0 && filtered_events_description[k] != "localhost" && filtered_events_description[k] != "NO_URL"){
 			pushDuration(k, duration);
 		}	
 	}
@@ -123,10 +125,9 @@ function convertUnixTimeToHumanReadable(unix_time){
 
 function addTableTextCell(tr, text){
 	var td=document.createElement('td');
-	if (text != -1){
-		td.appendChild(document.createTextNode(text));
-		tr.appendChild(td);	
-	}
+	console.log(text);
+	td.appendChild(document.createTextNode(text));
+	tr.appendChild(td);
 }
 
 
@@ -140,9 +141,16 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, item1, it
 	addTableTextCell(tr, start_time + " to " + end_time);
 	addTableTextCell(tr, "Minutes: " + duration);
 
-	addTableTextCell(tr, activity_names[item1]);
-	addTableTextCell(tr, activity_names[item2]);
-	addTableTextCell(tr, activity_names[item3]);
+	if (item1 != -1) {
+		addTableTextCell(tr, old_activity_names[item1]);
+	}
+	if (item2 != -1) {
+		console.log(item2);
+		addTableTextCell(tr, old_activity_names[item2]);
+	}
+	if (item3 != -1) {
+		addTableTextCell(tr, old_activity_names[item3]);
+	}
 
 	tbdy.appendChild(tr);
 }
@@ -169,26 +177,27 @@ function tableCreate(){
 		
 		getDurations(i);
 		
-		if (activity_durations.length >= 3){
+		console.log(activity_names);
+		
+		var top3 = findTop3();
+		
+		var highest_1 = top3[0];
+		var highest_2 = top3[1];
+		var highest_3 = top3[2];
+    	
+		// if anything has changed compared to the last table entry, then it's time for a new one!
+		if (highest_1 != old_highest_1 | highest_2 != old_highest_2 | highest_3 != old_highest_3){
+			// things have changed, so we will start a new interval
+			reset_start_time = 1;
 			
-			var top3 = findTop3();
+			// TODO that it's showing the old_highest here might make the whole thing off-by-one
+			addNewRowToTable(tbdy, interval_start_time, i, time_interval, old_highest_1, old_highest_2, old_highest_3);
 			
-			var highest_1 = top3[0];
-			var highest_2 = top3[1];
-			var highest_3 = top3[2];
-    		
-			// if anything has changed compared to the last table entry, then it's time for a new one!
-			if (highest_1 != old_highest_1 | highest_2 != old_highest_2 | highest_3 != old_highest_3){
-				// things have changed, so we will start a new interval
-				reset_start_time = 1;
-				
-				// TODO that it's showing the old_highest here might make the whole thing off-by-one
-				addNewRowToTable(tbdy, interval_start_time, i, time_interval, old_highest_1, old_highest_2, old_highest_3);
-				
-				old_highest_1 = highest_1;
-				old_highest_2 = highest_2;
-				old_highest_3 = highest_3;
-			}
+			old_highest_1 = highest_1;
+			old_highest_2 = highest_2;
+			old_highest_3 = highest_3;
+			old_activity_durations = activity_durations;
+			old_activity_names = activity_names;
 		}
 	}
 	tbl.appendChild(tbdy);
@@ -202,6 +211,8 @@ var filtered_events_end_time = [];
 
 var activity_durations = [];
 var activity_names = [];
+var old_activity_durations = [];
+var old_activity_names = [];
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
