@@ -86,12 +86,12 @@ function findTop(){ // TODO order does not matter
 	// find the top 3 apps. Self-implemented sorting. I hope there's no bug in it.
 	var output = [];
 	
-	for (var j = 0; j <= number_of_top_elements; j++) {
+	for (var j = 0; j < number_of_top_elements; j++) {
 		var max = Math.max.apply(window, activity_durations);
 		if (max > 0){
 			var index = activity_durations.indexOf(max);
-			output.push(index);
-			activity_durations[index] = -1
+			output.push(activity_names[index]);
+			activity_durations[index] = -1;
 		} else {
 			output.push(-1);
 		}
@@ -126,7 +126,7 @@ function inArray2(array, el) {
 
 
 function isEqArrays(arr1, arr2) {
-  if ( arr1.length !== arr2.length ) {
+  if ( arr1.length != arr2.length ) {
     return false;
   }
   for ( var i = arr1.length; i--; ) {
@@ -150,7 +150,7 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
 
 	for(var i = 0; i < number_of_top_elements; i++){
 		if (items[i] != -1) {
-			addTableTextCell(tr, old_activity_names[items[i]]);
+			addTableTextCell(tr, items[i]);
 		}
 	}
 
@@ -161,7 +161,7 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
 function tableCreate(){
 	var body=document.getElementsByTagName('body')[0];
 	var tbl=document.createElement('table');
-	//tbl.style.width='100%';
+	tbl.style.width='100%';
 	tbl.setAttribute('border','5');
 	var tbdy=document.createElement('tbody');
 	
@@ -179,24 +179,25 @@ function tableCreate(){
 		
 		getDurations(i);
 		
-		var top3 = findTop();
+		var top = findTop();
+		
 		// if anything has changed compared to the last table entry, then it's time for a new one!
-		if (isEqArrays(old_top3, top3) == false){
+		if (isEqArrays(top, old_top) == false){
 			// things have changed, so we will start a new interval
 			reset_start_time = 1;
 			
 			if (old_i != -1){
-				addNewRowToTable(tbdy, old_interval_start_time, old_i, time_interval, old_top3);
+				addNewRowToTable(tbdy, old_interval_start_time, old_i, time_interval, old_top);
 			}
 			old_interval_start_time = interval_start_time;
 			old_i = i;
-			old_top3 = top3;
+			old_top = top;
 			old_activity_durations = activity_durations;
 			old_activity_names = activity_names;
 		}
 	}
 	// run it one more time, so the last interval does not get lost
-	addNewRowToTable(tbdy, interval_start_time, i, time_interval, top3);
+	addNewRowToTable(tbdy, interval_start_time, i, time_interval, top);
 	
 	tbl.appendChild(tbdy);
 	body.appendChild(tbl)
@@ -215,7 +216,7 @@ var old_activity_names = [];
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
 
-var old_top3 = [];
+var old_top = [];
 
 var past_event = -1;
 var reset_start_time = 1;
@@ -225,7 +226,7 @@ var old_i = -1;
 
 // CONFIG
 var time_interval = 10 * 60000; // 60k milliseconds = 1 minute
-var number_of_top_elements = 3;
+var number_of_top_elements = 1;
 
 window.onload = function() {
 	
