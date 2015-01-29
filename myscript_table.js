@@ -46,8 +46,6 @@ function pushEvent(activity_name, start_time, end_time, window_id){
 	filtered_events_description.push(activity_name);
 	filtered_events_start_time.push(start_time);
 	filtered_events_end_time.push(end_time);
-	console.log("activity_name: ", activity_name);
-	console.log("length: ", filtered_events_description.length); // TODO make multidimensional arrays objects
 }
 
 
@@ -57,7 +55,7 @@ function inArray(array, id) {
 			return i;
         }
     }
-    return false;
+    return -1;
 }
 
 
@@ -76,7 +74,7 @@ function getDurations(i){
 
 function pushDuration(k, duration){
 	var id = inArray(activity_names, filtered_events_description[k]);
-	if (id != false){
+	if (id != -1){
 		activity_durations[id] += duration;
 	} else {
 		activity_durations.push(duration);
@@ -125,7 +123,6 @@ function convertUnixTimeToHumanReadable(unix_time){
 
 function addTableTextCell(tr, text){
 	var td=document.createElement('td');
-	console.log(text);
 	td.appendChild(document.createTextNode(text));
 	tr.appendChild(td);
 }
@@ -145,12 +142,11 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, item1, it
 		addTableTextCell(tr, old_activity_names[item1]);
 	}
 	if (item2 != -1) {
-		console.log(item2);
 		addTableTextCell(tr, old_activity_names[item2]);
 	}
 	if (item3 != -1) {
 		addTableTextCell(tr, old_activity_names[item3]);
-	}
+	} // TODO do smarter
 
 	tbdy.appendChild(tr);
 }
@@ -176,8 +172,6 @@ function tableCreate(){
 		activity_names = [];
 		
 		getDurations(i);
-		
-		console.log(activity_names);
 		
 		var top3 = findTop3();
 		
@@ -224,7 +218,7 @@ var old_highest_3 = -1;
 var past_event = -1;
 var reset_start_time = 1;
 var interval_start_time = 0;
-var time_interval = 100 * 60000; // 60k milliseconds = 1 minute
+var time_interval = 30 * 60000; // 60k milliseconds = 1 minute
 
 window.onload = function() {
 	
