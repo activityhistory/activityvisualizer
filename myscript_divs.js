@@ -110,8 +110,10 @@ function convertUnixTimeToHumanReadable(unix_time){
 }
 
 
-function addTableTextCell(tr, text){
-    var td=document.createElement('td');
+function addTableTextCell(tr, text, classname, height){
+    var td=document.createElement('div');
+	td.className = classname;
+	td.setAttribute("style", "height: " + height + "px;");
     td.appendChild(document.createTextNode(text));
     tr.appendChild(td);
 }
@@ -145,12 +147,12 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
     var end_time = convertUnixTimeToHumanReadable(i + time_interval);
     var duration = ((i + time_interval) - interval_start_time) / 60000; // 60000 milliseconds in a minute
 
-    addTableTextCell(tr, start_time + " to " + end_time);
-    addTableTextCell(tr, "Minutes: " + duration);
+    addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
+    addTableTextCell(tr, "Minutes: " + duration, "class_duration", 20);
 
     for(var i = 0; i < number_of_top_elements; i++){
         if (items[i] != -1) {
-            addTableTextCell(tr, items[i]);
+            addTableTextCell(tr, items[i], "class_elements", duration * 1);
         }
     }
 
@@ -161,7 +163,6 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
 function tableCreate(){
     var body=document.getElementsByTagName('body')[0];
     var tbl=document.createElement('table');
-    tbl.style.width='100%';
     tbl.setAttribute('border','5');
     var tbdy=document.createElement('tbody');
     
