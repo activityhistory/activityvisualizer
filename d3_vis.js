@@ -4,8 +4,8 @@ function drawD3(){
 	var w = 700;
 	var h = 4000;
 
-	var dataset = d3_durations.slice(0,30);
-	var apps = d3_items.slice(0,30);
+	var dataset = d3_durations;
+	var apps = d3_items;
 
 	//Create SVG element
 	var svg = d3.select("body")
@@ -51,7 +51,7 @@ function drawD3(){
 	   .enter()
 	   .append("text")
 	   .text(function(d, i) {
-	           return apps[i];
+	           return apps[i][0];
 	   })
 	   .attr("y", function(d, i) {
 	           return i * (180) + 100;
@@ -62,6 +62,12 @@ function drawD3(){
 	   .attr("font-family", "sans-serif").attr("font-size", "11px")
 	   .attr("fill", "black");
 
-
+	$("#windowSize").slider({ max: 600 },{min:200},{value:300},{slide: function( event, ui ) {
+            d3.selectAll('circle')
+               .attr("r", function(d) {
+	           return ui.value /30 * Math.pow(d, 1/4);
+	   });
+            document.getElementById('sizeText').innerHTML = 'Window Size: ' + ui.value
+        }});
 
 }

@@ -148,7 +148,7 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
     var duration = ((i + time_interval) - interval_start_time) / 60000; // 60000 milliseconds in a minute
 
     d3_durations.push(duration);
-    d3_items.push(items[0]);
+    d3_items.push(items);
 
     addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
     addTableTextCell(tr, "Minutes: " + duration, "class_duration", 20);
