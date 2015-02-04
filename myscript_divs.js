@@ -147,6 +147,9 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
     var end_time = convertUnixTimeToHumanReadable(i + time_interval);
     var duration = ((i + time_interval) - interval_start_time) / 60000; // 60000 milliseconds in a minute
 
+    d3_durations.push(duration);
+    d3_items.push(items[0]);
+
     addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
     addTableTextCell(tr, "Minutes: " + duration, "class_duration", 20);
 
@@ -201,7 +204,7 @@ function tableCreate(){
     addNewRowToTable(tbdy, interval_start_time, i, time_interval, top);
     
     tbl.appendChild(tbdy);
-    body.appendChild(tbl)
+    //body.appendChild(tbl)
 }
 
 
@@ -225,6 +228,9 @@ var interval_start_time = 0;
 var old_interval_start_time = -1;
 var old_i = -1;
 
+var d3_durations = [];
+var d3_items = [];
+
 // CONFIG
 var time_interval = 20 * 60000; // 60k milliseconds = 1 minute
 var number_of_top_elements = 2;
@@ -233,5 +239,6 @@ window.onload = function() {
     
     generateAbstraction();
     tableCreate();
+    drawD3();
 
 }
