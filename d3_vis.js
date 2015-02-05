@@ -4,9 +4,9 @@ function drawD3(){
 	var w = 700;
 	var h = 4000;
 
-	var border_left = 200;
+	var border_left = 0;
 	var border_top = 200;
-	var date_width = 150;
+	var date_width = 250;
 	var blob_width = 150;
 
 	//Create SVG element
@@ -103,6 +103,32 @@ function drawD3(){
 				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", date_width + border_left + blob_width)
+			.attr("font-family", "sans-serif").attr("font-size", "11px")
+			.attr("fill", "black");
+
+
+		// TEXT DATETIME (e.g. 23:42)
+
+		svg.selectAll(".text_time").remove();
+
+		var text_item = svg.selectAll("text_time")
+			.data(chunk_objects);
+
+		text_item.enter()
+			.append("text");
+
+		text_item.attr("class", "text_time")
+			.text(function(d, i) {
+				return new Date(d.start_time).toLocaleTimeString() + " to " + new Date(d.end_time).toLocaleTimeString();
+			})
+			.attr("y", function(d, i) {
+				var sum = 0;
+				for (var j = 0; j < i; j++){
+					sum += 2 * durationToRadius(chunk_objects[j].duration);
+				}
+				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
+			})
+			.attr("x", border_left)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
 			.attr("fill", "black");
 
