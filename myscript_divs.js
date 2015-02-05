@@ -164,6 +164,18 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
     }
 }
 
+function createChunkObjects(interval_start_time, i, time_interval, items){
+    var chunkobject = {
+        start_time : interval_start_time,
+        end_time : (i + time_interval),
+        duration : ((i + time_interval) - interval_start_time) / 60000, // 60000 milliseconds in a minute,
+        items : items
+    };
+
+
+    chunk_objects.push(chunkobject);
+}
+
 
 function tableCreate(){
     var body=document.getElementsByTagName('body')[0];
@@ -171,8 +183,18 @@ function tableCreate(){
     tbl.setAttribute('border','5');
     var tbdy=document.createElement('tbody');
 
-    // slicing time and searching for every interval
-    for(var i = earliest_time; i < latest_time; i  += time_interval){
+
+    addNewRowToTable(tbdy, interval_start_time, i, time_interval, top);
+
+    tbl.appendChild(tbdy);
+    //body.appendChild(tbl)
+
+}
+
+function generateChunks(){
+
+     // slicing time and searching for every interval
+    for(var i = earliest_time; i < latest_time; i += time_interval){
 
         // we only start with a new time_interval, if reset_start_time is set to 1
         if (reset_start_time == 1){
@@ -193,7 +215,7 @@ function tableCreate(){
             reset_start_time = 1;
 
             if (old_i != -1){
-                addNewRowToTable(tbdy, old_interval_start_time, old_i, time_interval, old_top);
+                createChunkObjects(old_interval_start_time, old_i, time_interval, old_top);
             }
             old_interval_start_time = interval_start_time;
             old_i = i;
@@ -203,12 +225,12 @@ function tableCreate(){
         }
     }
     // run it one more time, so the last interval does not get lost
-    addNewRowToTable(tbdy, interval_start_time, i, time_interval, top);
+    createChunkObjects(interval_start_time, i, time_interval, top);
 
     tbl.appendChild(tbdy);
     //body.appendChild(tbl)
-}
 
+}
 
 var filtered_events_description = [];
 var filtered_events_start_time = [];
@@ -218,6 +240,8 @@ var activity_durations = [];
 var activity_names = [];
 var old_activity_durations = [];
 var old_activity_names = [];
+
+var chunk_objects = [];
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
@@ -240,6 +264,7 @@ var number_of_top_elements = 2;
 window.onload = function() {
 
     generateAbstraction();
+    generateChunks();
     tableCreate();
     drawD3();
 
