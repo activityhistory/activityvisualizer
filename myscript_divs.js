@@ -140,23 +140,20 @@ function isEqArrays(arr1, arr2) {
 }
 
 
-function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
+function addNewRowToTable(tbdy, chunkobject){
     var tr=document.createElement('tr');
 
-    var start_time = convertUnixTimeToHumanReadable(interval_start_time);
-    var end_time = convertUnixTimeToHumanReadable(i + time_interval);
-    var duration = ((i + time_interval) - interval_start_time) / 60000; // 60000 milliseconds in a minute
+    var start_time = convertUnixTimeToHumanReadable(chunkobject.start_time);
+    var end_time = convertUnixTimeToHumanReadable(chunkobject.end_time);
 
-    if (duration > 0){
-        d3_durations.push(duration);
-        d3_items.push(items);
+    if (chunkobject.duration > 0){
 
         addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
-        addTableTextCell(tr, "Minutes: " + duration, "class_duration", 20);
+        addTableTextCell(tr, "Minutes: " + chunkobject.duration, "class_duration", 20);
 
         for(var i = 0; i < number_of_top_elements; i++){
-            if (items[i] != -1) {
-                addTableTextCell(tr, items[i], "class_elements", duration * 1);
+            if (chunkobject.items[i] != -1) {
+                addTableTextCell(tr, chunkobject.items[i], "class_elements", chunkobject.duration * 1);
             }
         }
 
@@ -184,10 +181,12 @@ function tableCreate(){
     var tbdy=document.createElement('tbody');
 
 
-    addNewRowToTable(tbdy, interval_start_time, i, time_interval, top);
+    for (var i = 0; i < chunk_objects.length; i++){
+        addNewRowToTable(tbdy, chunk_objects[i]);
+    }
 
     tbl.appendChild(tbdy);
-    //body.appendChild(tbl)
+    body.appendChild(tbl)
 
 }
 
@@ -227,9 +226,6 @@ function generateChunks(){
     // run it one more time, so the last interval does not get lost
     createChunkObjects(interval_start_time, i, time_interval, top);
 
-    tbl.appendChild(tbdy);
-    //body.appendChild(tbl)
-
 }
 
 var filtered_events_description = [];
@@ -266,6 +262,6 @@ window.onload = function() {
     generateAbstraction();
     generateChunks();
     tableCreate();
-    drawD3();
+    //drawD3();
 
 }
