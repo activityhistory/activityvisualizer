@@ -171,8 +171,9 @@ function createChunkObjects(interval_start_time, i, time_interval, items){
         items : items
     };
 
-
-    chunk_objects.push(chunkobject);
+    if (chunkobject.duration > 0 && chunkobject.items.length > 0 && chunkobject.items[0] != -1){
+        chunk_objects.push(chunkobject);
+    }
 }
 
 
@@ -194,7 +195,9 @@ function tableCreate(){
 
 function generateChunks(){
 
-     // slicing time and searching for every interval
+    chunk_objects = [];
+
+    // slicing time and searching for every interval
     for(var i = earliest_time; i < latest_time; i += time_interval){
 
         // we only start with a new time_interval, if reset_start_time is set to 1
@@ -252,12 +255,9 @@ var interval_start_time = 0;
 var old_interval_start_time = -1;
 var old_i = -1;
 
-var d3_durations = [];
-var d3_items = [];
-
 // CONFIG
-var time_interval = 20 * 60000; // 60k milliseconds = 1 minute
-var number_of_top_elements = 2;
+var time_interval = 120 * 60000; // 60k milliseconds = 1 minute
+var number_of_top_elements = 3;
 
 window.onload = function() {
 

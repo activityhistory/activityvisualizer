@@ -1,11 +1,11 @@
 function drawD3(){
 
 	//Width and height
-	var w = 700;
+	var w = 1400;
 	var h = 4000;
 
 	var border_left = 0;
-	var border_top = 200;
+	var border_top = 0;
 	var date_width = 250;
 	var blob_width = 150;
 
@@ -26,11 +26,7 @@ function drawD3(){
 		}
 	}
 
-	$("#windowSize").slider({ max: 100 },{min:1},{value:50},{slide: function( event, ui ) {
-
-		time_interval = ui.value * 60000;
-		chunk_objects = [];
-		generateChunks();
+	function updateAll(ui){
 
 		// TEXT BLOBS
 
@@ -48,10 +44,10 @@ function drawD3(){
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
+				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("r", function(d) {
-				return ui.value/50	 * durationToRadius(d.duration);
+				return ui.value/2	 * durationToRadius(d.duration);
 			})
 			.attr("fill", function(d) {
 				return "rgb(0, 0, " + (d.duration * 10) + ")";
@@ -74,7 +70,7 @@ function drawD3(){
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
+				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", border_left + date_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -93,14 +89,24 @@ function drawD3(){
 
 		text_item.attr("class", "text_labels")
 			.text(function(d, i) {
-				return d.items[0] + " and " + d.items[1];
+				var app_string = d.items[0];
+				for (var j = number_of_top_elements; j > 0; j--){
+					if (d.items.length = j){
+						for (var k = 1; k < j; k++){
+							if (d.items[k] != -1) app_string = app_string + " and " + d.items[k];
+						}
+						break;
+					}
+
+				}
+				return app_string;
 			})
 			.attr("y", function(d, i) {
 				var sum = 0;
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
+				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", date_width + border_left + blob_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -126,15 +132,32 @@ function drawD3(){
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
+				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", border_left)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
 			.attr("fill", "black");
 
 
+	}
 
-		document.getElementById('sizeText').innerHTML = 'Scaling Factor: ' + ui.value;
+	$("#timeGranularity").slider({ max: 4 },{min:1},{value:2},{slide: function( event, ui ) {
+
+		time_interval = ui.value * 10 * 60000;
+		generateChunks();
+		updateAll(ui);
+
+		document.getElementById('timeGranularityText').innerHTML = 'Time Granularity: ' + ui.value + "0";
+
+	}});
+
+	$("#numberApps").slider({ max: 5 },{min:1},{value:3},{slide: function( event, ui ) {
+
+		number_of_top_elements = ui.value;
+		generateChunks();
+		updateAll(ui);
+		document.getElementById('numberAppsText').innerHTML = 'Number of Apps: ' + ui.value;
+
 	}});
 
 }

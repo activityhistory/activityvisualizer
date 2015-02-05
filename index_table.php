@@ -15,13 +15,15 @@
 <body>
   
 <div style='float:left;padding:10px;width:200px;'>
-            <p id='sizeText'>Window Size: 300</p>
-            <div id='windowSize'></div>
-        </div>
+            <p id='timeGranularityText'>Time Granularity: 20</p>
+            <div id='timeGranularity'></div>
+</div>
+
+<div style='float:left;padding:10px;width:200px;'>
+            <p id='numberAppsText'>Number of Apps: 3</p>
+            <div id='numberApps'></div>
+</div>
 	
-  <div>
-    <div id="timeline5"></div>
-  </div>
   
 </body>
 </html>
