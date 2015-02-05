@@ -6,6 +6,8 @@ function drawD3(){
 
 	var border_left = 200;
 	var border_top = 200;
+	var date_width = 150;
+	var blob_width = 150;
 
 	//Create SVG element
 	var svg = d3.select("body")
@@ -30,8 +32,8 @@ function drawD3(){
 		chunk_objects = [];
 		generateChunks();
 
-		svg.selectAll(".text_dur").remove();
-		svg.selectAll(".text_labels").remove();
+		// TEXT BLOBS
+
 		svg.selectAll(".blob_class").remove();
 
 		var blobs = svg.selectAll("circle").data(chunk_objects);
@@ -39,7 +41,7 @@ function drawD3(){
 		blobs.enter()
 			.append("circle");
 
-		blobs.attr("cx", border_left)
+		blobs.attr("cx", border_left + date_width)
 			.attr("class", "blob_class")
 			.attr("cy", function(d, i) {
 				var sum = 0;
@@ -55,7 +57,9 @@ function drawD3(){
 				return "rgb(0, 0, " + (d.duration * 10) + ")";
 			});
 
-		//blobs.exit().remove();
+		// TEXT DURATION (e.g. 20min)
+
+		svg.selectAll(".text_dur").remove();
 
 		var text_dur = svg.selectAll("text_dur")
 			.data(chunk_objects);
@@ -72,21 +76,24 @@ function drawD3(){
 				}
 				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
 			})
-			.attr("x", border_left)
+			.attr("x", border_left + date_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
 			.attr("fill", "white");
 
 
-		document.getElementById('sizeText').innerHTML = 'Scaling Factor: ' + ui.value
+		// TEXT LABELS (e.g. Apps)
 
+		svg.selectAll(".text_labels").remove();
 
-		svg.selectAll("text_labels")
-			.data(chunk_objects)
-			.enter()
-			.append("text")
-			.attr("class", "text_labels")
+		var text_item = svg.selectAll("text_labels")
+			.data(chunk_objects);
+
+		text_item.enter()
+			.append("text");
+
+		text_item.attr("class", "text_labels")
 			.text(function(d, i) {
-				return d.items[0];
+				return d.items[0] + " and " + d.items[1];
 			})
 			.attr("y", function(d, i) {
 				var sum = 0;
@@ -95,11 +102,13 @@ function drawD3(){
 				}
 				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
 			})
-			.attr("x", function(d) {
-				return 2 * border_left;
-			})
+			.attr("x", date_width + border_left + blob_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
 			.attr("fill", "black");
+
+
+
+		document.getElementById('sizeText').innerHTML = 'Scaling Factor: ' + ui.value;
 	}});
 
 }

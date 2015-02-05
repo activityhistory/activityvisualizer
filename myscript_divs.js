@@ -66,6 +66,8 @@ function getDurations(i){
         var duration = end_time - start_time;
         if (duration > 0 && filtered_events_description[k] != "localhost" && filtered_events_description[k] != "NO_URL"){
             pushDuration(k, duration);
+        } else if (filtered_events_start_time[k] > i+time_interval){
+            break;
         }
     }
 }
