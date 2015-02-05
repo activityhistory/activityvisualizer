@@ -30,10 +30,10 @@ function generateAbstraction(){
                 pushEvent(activity_name, start_time, end_time, k);
             }
             past_event = k;
-        // 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
-        } else if (past_event != -1 & 
-                    windowevent_event_type[k] == "Close" & 
-                    windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
+            // 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
+        } else if (past_event != -1 &
+            windowevent_event_type[k] == "Close" &
+            windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
             pushEvent(activity_name, start_time, end_time, k);
             past_event = -1; // TODO in the very end push 2?
         }
@@ -66,7 +66,7 @@ function getDurations(i){
         var duration = end_time - start_time;
         if (duration > 0 && filtered_events_description[k] != "localhost" && filtered_events_description[k] != "NO_URL"){
             pushDuration(k, duration);
-        }    
+        }
     }
 }
 
@@ -85,7 +85,7 @@ function pushDuration(k, duration){
 function findTop(){ // TODO order does not matter
     // find the top 3 apps. Self-implemented sorting. I hope there's no bug in it.
     var output = [];
-    
+
     for (var j = 0; j < number_of_top_elements; j++) {
         var max = Math.max.apply(window, activity_durations);
         if (max > 0){
@@ -96,7 +96,7 @@ function findTop(){ // TODO order does not matter
             output.push(-1);
         }
     }
-    
+
     return output;
 }
 
@@ -112,31 +112,31 @@ function convertUnixTimeToHumanReadable(unix_time){
 
 function addTableTextCell(tr, text, classname, height){
     var td=document.createElement('div');
-	td.className = classname;
-	td.setAttribute("style", "height: " + height + "px;");
+    td.className = classname;
+    td.setAttribute("style", "height: " + height + "px;");
     td.appendChild(document.createTextNode(text));
     tr.appendChild(td);
 }
 
 
 function inArray2(array, el) {
-  for ( var i = array.length; i--; ) {
-    if ( array[i] === el ) return true;
-  }
-  return false;
+    for ( var i = array.length; i--; ) {
+        if ( array[i] === el ) return true;
+    }
+    return false;
 }
 
 
 function isEqArrays(arr1, arr2) {
-  if ( arr1.length != arr2.length ) {
-    return false;
-  }
-  for ( var i = arr1.length; i--; ) {
-    if ( !inArray2( arr2, arr1[i] ) ) {
-      return false;
+    if ( arr1.length != arr2.length ) {
+        return false;
     }
-  }
-  return true;
+    for ( var i = arr1.length; i--; ) {
+        if ( !inArray2( arr2, arr1[i] ) ) {
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -147,19 +147,21 @@ function addNewRowToTable(tbdy, interval_start_time, i, time_interval, items){
     var end_time = convertUnixTimeToHumanReadable(i + time_interval);
     var duration = ((i + time_interval) - interval_start_time) / 60000; // 60000 milliseconds in a minute
 
-    d3_durations.push(duration);
-    d3_items.push(items);
+    if (duration > 0){
+        d3_durations.push(duration);
+        d3_items.push(items);
 
-    addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
-    addTableTextCell(tr, "Minutes: " + duration, "class_duration", 20);
+        addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
+        addTableTextCell(tr, "Minutes: " + duration, "class_duration", 20);
 
-    for(var i = 0; i < number_of_top_elements; i++){
-        if (items[i] != -1) {
-            addTableTextCell(tr, items[i], "class_elements", duration * 1);
+        for(var i = 0; i < number_of_top_elements; i++){
+            if (items[i] != -1) {
+                addTableTextCell(tr, items[i], "class_elements", duration * 1);
+            }
         }
-    }
 
-    tbdy.appendChild(tr);
+        tbdy.appendChild(tr);
+    }
 }
 
 
@@ -168,28 +170,28 @@ function tableCreate(){
     var tbl=document.createElement('table');
     tbl.setAttribute('border','5');
     var tbdy=document.createElement('tbody');
-    
+
     // slicing time and searching for every interval
     for(var i = earliest_time; i < latest_time; i  += time_interval){
-        
+
         // we only start with a new time_interval, if reset_start_time is set to 1
         if (reset_start_time == 1){
             interval_start_time = i;
             reset_start_time = 0;
         }
-        
+
         activity_durations = [];
         activity_names = [];
-        
+
         getDurations(i);
-        
+
         var top = findTop();
-        
+
         // if anything has changed compared to the last table entry, then it's time for a new one!
         if (isEqArrays(top, old_top) == false){
             // things have changed, so we will start a new interval
             reset_start_time = 1;
-            
+
             if (old_i != -1){
                 addNewRowToTable(tbdy, old_interval_start_time, old_i, time_interval, old_top);
             }
@@ -202,7 +204,7 @@ function tableCreate(){
     }
     // run it one more time, so the last interval does not get lost
     addNewRowToTable(tbdy, interval_start_time, i, time_interval, top);
-    
+
     tbl.appendChild(tbdy);
     //body.appendChild(tbl)
 }
@@ -236,7 +238,7 @@ var time_interval = 20 * 60000; // 60k milliseconds = 1 minute
 var number_of_top_elements = 2;
 
 window.onload = function() {
-    
+
     generateAbstraction();
     tableCreate();
     drawD3();
