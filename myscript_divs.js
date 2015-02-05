@@ -260,8 +260,8 @@ var number_of_top_elements = 2;
 window.onload = function() {
 
     generateAbstraction();
-    generateChunks();
-    tableCreate();
-    //drawD3();
+    //generateChunks();
+    //tableCreate();
+    drawD3();
 
 }

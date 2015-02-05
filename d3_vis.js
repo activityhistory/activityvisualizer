@@ -27,15 +27,14 @@ function drawD3(){
 	$("#windowSize").slider({ max: 100 },{min:1},{value:50},{slide: function( event, ui ) {
 
 		time_interval = ui.value * 60000;
-		d3_durations = [];
-		d3_items = [];
-		tableCreate();
+		chunk_objects = [];
+		generateChunks();
 
 		svg.selectAll(".text_dur").remove();
 		svg.selectAll(".text_labels").remove();
-		//svg.selectAll(".blob_class").remove();
+		svg.selectAll(".blob_class").remove();
 
-		var blobs = svg.selectAll("circle").data(d3_durations);
+		var blobs = svg.selectAll("circle").data(chunk_objects);
 
 		blobs.enter()
 			.append("circle");
@@ -45,33 +44,33 @@ function drawD3(){
 			.attr("cy", function(d, i) {
 				var sum = 0;
 				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(d3_durations[j]);
+					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d));
+				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("r", function(d) {
-				return ui.value/50	 * durationToRadius(d);
+				return ui.value/50	 * durationToRadius(d.duration);
 			})
 			.attr("fill", function(d) {
-				return "rgb(0, 0, " + (d * 10) + ")";
+				return "rgb(0, 0, " + (d.duration * 10) + ")";
 			});
 
 		//blobs.exit().remove();
 
 		var text_dur = svg.selectAll("text_dur")
-			.data(d3_durations);
+			.data(chunk_objects);
 
 		text_dur.enter()
 			.append("text");
 
-		text_dur.text(function(d) { return d + "min"; })
+		text_dur.text(function(d) { return d.duration + "min"; })
 			.attr("class", "text_dur")
-			.attr("y", function(d, i) {
+			.attr("y", function(d, i){
 				var sum = 0;
 				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(d3_durations[j]);
+					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d));
+				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", border_left)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -82,19 +81,19 @@ function drawD3(){
 
 
 		svg.selectAll("text_labels")
-			.data(d3_durations)
+			.data(chunk_objects)
 			.enter()
 			.append("text")
 			.attr("class", "text_labels")
 			.text(function(d, i) {
-				return d3_items[i][0];
+				return d.items[0];
 			})
 			.attr("y", function(d, i) {
 				var sum = 0;
 				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(d3_durations[j]);
+					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d));
+				return border_top + ui.value/50	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", function(d) {
 				return 2 * border_left;

@@ -5,7 +5,7 @@
 	*/
 	
 	// Specify your sqlite database name and path //
-	$dir = 'sqlite:/Users/jonas/Downloads/selfspy.sqlite';
+	$dir = 'sqlite:/Users/jonas/Desktop/Uni/Dlab/cat.sqlite';
 
 	// Instantiate PDO connection object and failure msg //
 	$dbh = new PDO($dir) or die("cannot open database");
