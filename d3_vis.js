@@ -14,7 +14,7 @@ function drawD3(){
 		.attr("height", h);
 
 	function durationToRadius(duration){
-		var number = 20 * Math.pow(duration, 1/4);
+		var number = 20 * Math.pow(duration, 1/3);
 		if (number > 0){
 			return number;
 		} else {
@@ -33,6 +33,7 @@ function drawD3(){
 
 		svg.selectAll(".text_dur").remove();
 		svg.selectAll(".text_labels").remove();
+		//svg.selectAll(".blob_class").remove();
 
 		var blobs = svg.selectAll("circle").data(d3_durations);
 
@@ -40,6 +41,7 @@ function drawD3(){
 			.append("circle");
 
 		blobs.attr("cx", border_left)
+			.attr("class", "blob_class")
 			.attr("cy", function(d, i) {
 				var sum = 0;
 				for (var j = 0; j < i; j++){
@@ -54,26 +56,26 @@ function drawD3(){
 				return "rgb(0, 0, " + (d * 10) + ")";
 			});
 
-		blobs.exit().remove();
+		//blobs.exit().remove();
 
 		var text_dur = svg.selectAll("text_dur")
 			.data(d3_durations);
 
 		text_dur.enter()
-			.append("text")
+			.append("text");
+
+		text_dur.text(function(d) { return d + "min"; })
 			.attr("class", "text_dur")
 			.attr("y", function(d, i) {
 				var sum = 0;
-				for (var j = 2; j < i; j++){
+				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(d3_durations[j]);
 				}
-				return border_top + ui.value/50	 * (sum + durationToRadius(d))
+				return border_top + ui.value/50	 * (sum + durationToRadius(d));
 			})
 			.attr("x", border_left)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
 			.attr("fill", "white");
-
-		text_dur.text(function(d) { return d + "min"; });
 
 
 		document.getElementById('sizeText').innerHTML = 'Scaling Factor: ' + ui.value
@@ -89,10 +91,10 @@ function drawD3(){
 			})
 			.attr("y", function(d, i) {
 				var sum = 0;
-				for (var j = 2; j < i; j++){
+				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(d3_durations[j]);
 				}
-				return border_top + sum + durationToRadius(d);
+				return border_top + ui.value/50	 * (sum + durationToRadius(d));
 			})
 			.attr("x", function(d) {
 				return 2 * border_left;

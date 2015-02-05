@@ -111,9 +111,9 @@ function convertUnixTimeToHumanReadable(unix_time){
 
 
 function addTableTextCell(tr, text, classname, height){
-    var td=document.createElement('div');
-    td.className = classname;
-    td.setAttribute("style", "height: " + height + "px;");
+    var td=document.createElement('td');
+    //td.className = classname;
+    //td.setAttribute("style", "height: " + height + "px;");
     td.appendChild(document.createTextNode(text));
     tr.appendChild(td);
 }
