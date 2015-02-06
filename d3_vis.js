@@ -8,6 +8,7 @@ function drawD3(){
 	var border_top = 0;
 	var date_width = 250;
 	var blob_width = 150;
+	var blob_scaling_factor = 10;
 
 	//Create SVG element
 	var svg = d3.select("body")
@@ -16,7 +17,7 @@ function drawD3(){
 		.attr("height", h);
 
 	function durationToRadius(duration){
-		var number = 20 * Math.pow(duration, 1/3);
+		var number = 2 * Math.pow(duration, 1/6);
 		if (number > 0){
 			return number;
 		} else {
@@ -44,10 +45,10 @@ function drawD3(){
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
+				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("r", function(d) {
-				return ui.value/2	 * durationToRadius(d.duration);
+				return blob_scaling_factor * durationToRadius(d.duration);
 			})
 			.attr("fill", function(d) {
 				return "rgb(0, 0, " + (d.duration * 10) + ")";
@@ -70,7 +71,7 @@ function drawD3(){
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
+				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", border_left + date_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -106,7 +107,7 @@ function drawD3(){
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
+				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", date_width + border_left + blob_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -132,7 +133,7 @@ function drawD3(){
 				for (var j = 0; j < i; j++){
 					sum += 2 * durationToRadius(chunk_objects[j].duration);
 				}
-				return border_top + ui.value/2	 * (sum + durationToRadius(d.duration));
+				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
 			})
 			.attr("x", border_left)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -141,22 +142,35 @@ function drawD3(){
 
 	}
 
-	$("#timeGranularity").slider({ max: 4 },{min:1},{value:2},{slide: function( event, ui ) {
+	$("#timeGranularity").slider({ max: 240 },{min:1},{value:30},{slide: function( event, ui ) {
 
-		time_interval = ui.value * 10 * 60000;
+		time_interval = ui.value * 60000;
 		generateChunks();
 		updateAll(ui);
 
-		document.getElementById('timeGranularityText').innerHTML = 'Time Granularity: ' + ui.value + "0";
+		document.getElementById('timeGranularityText').innerHTML = 'Time Granularity: ' + ui.value;
 
 	}});
 
-	$("#numberApps").slider({ max: 5 },{min:1},{value:3},{slide: function( event, ui ) {
+	$("#numberApps").slider({ max: 20 },{min:1},{value:3},{slide: function( event, ui ) {
 
 		number_of_top_elements = ui.value;
 		generateChunks();
 		updateAll(ui);
+
 		document.getElementById('numberAppsText').innerHTML = 'Number of Apps: ' + ui.value;
+
+	}});
+
+	$("#dateRange").slider({ max: latest_time },{min:earliest_time},{values: [earliest_time, latest_time]},{slide: function( event, ui ) {
+
+
+		earliest_time = ui.values[0];
+		latest_time = ui.values[1];
+		generateChunks();
+		updateAll(ui);
+
+		document.getElementById('dateRangeText').innerHTML = 'Date Range: ' + new Date(ui.values[0]).toLocaleTimeString() + ' to ' + new Date(ui.values[1]).toLocaleTimeString();
 
 	}});
 

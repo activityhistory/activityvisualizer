@@ -23,6 +23,11 @@
             <p id='numberAppsText'>Number of Apps: 3</p>
             <div id='numberApps'></div>
 </div>
+
+<div style='float:left;padding:10px;width:200px;'>
+            <p id='dateRangeText'>Date Range:</p>
+            <div id='dateRange'></div>
+</div>
 	
   
 </body>
