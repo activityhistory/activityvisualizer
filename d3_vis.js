@@ -5,10 +5,12 @@ function drawD3(){
 	var h = 4000;
 
 	var border_left = 0;
-	var border_top = 0;
+	var border_top = 100;
 	var date_width = 250;
 	var blob_width = 150;
 	var blob_scaling_factor = 10;
+    var image_width = 400;
+    var image_height = 200;
 
 	//Create SVG element
 	var svg = d3.select("body")
@@ -41,11 +43,12 @@ function drawD3(){
 		blobs.attr("cx", border_left + date_width)
 			.attr("class", "blob_class")
 			.attr("cy", function(d, i) {
-				var sum = 0;
-				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(chunk_objects[j].duration);
-				}
-				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+				//var sum = 0;
+				//for (var j = 0; j < i; j++){
+				//	sum += 2 * durationToRadius(chunk_objects[j].duration);
+				//}
+				//return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+                return image_height * i + border_top;
 			})
 			.attr("r", function(d) {
 				return blob_scaling_factor * durationToRadius(d.duration);
@@ -67,11 +70,12 @@ function drawD3(){
 		text_dur.text(function(d) { return d.duration + "min"; })
 			.attr("class", "text_dur")
 			.attr("y", function(d, i){
-				var sum = 0;
-				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(chunk_objects[j].duration);
-				}
-				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+				//var sum = 0;
+				//for (var j = 0; j < i; j++){
+				//	sum += 2 * durationToRadius(chunk_objects[j].duration);
+				//}
+				//return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+                return image_height * i + border_top;
 			})
 			.attr("x", border_left + date_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -103,13 +107,14 @@ function drawD3(){
 				return app_string;
 			})
 			.attr("y", function(d, i) {
-				var sum = 0;
-				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(chunk_objects[j].duration);
-				}
-				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+				//var sum = 0;
+				//for (var j = 0; j < i; j++){
+				//	sum += 2 * durationToRadius(chunk_objects[j].duration);
+				//}
+				//return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+                return image_height * i + border_top;
 			})
-			.attr("x", date_width + border_left + blob_width)
+			.attr("x", date_width + border_left + blob_width + image_width)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
 			.attr("fill", "black");
 
@@ -129,11 +134,12 @@ function drawD3(){
 				return new Date(d.start_time).toLocaleTimeString() + " to " + new Date(d.end_time).toLocaleTimeString();
 			})
 			.attr("y", function(d, i) {
-				var sum = 0;
-				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(chunk_objects[j].duration);
-				}
-				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+				//var sum = 0;
+				//for (var j = 0; j < i; j++){
+				//	sum += 2 * durationToRadius(chunk_objects[j].duration);
+				//}
+				//return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+                return image_height * i + border_top;
 			})
 			.attr("x", border_left)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
@@ -152,16 +158,24 @@ function drawD3(){
 
 		image_class.attr("class", "image_class")
 			.attr("y", function(d, i) {
-				var sum = 0;
-				for (var j = 0; j < i; j++){
-					sum += 2 * durationToRadius(chunk_objects[j].duration);
-				}
-				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+				//var sum = 0;
+				//for (var j = 0; j < i; j++){
+				//	sum += 2 * durationToRadius(chunk_objects[j].duration);
+				//}
+				//return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+                return image_height * i
 			})
-			.attr("x", border_left)
-			.attr("width", 100)
-			.attr("height", 100)
-			.attr("xlink:href", "benchmarks.png");
+			.attr("x", date_width + border_left + blob_width)
+			.attr("width", image_width)
+			.attr("height", image_height)
+			.attr("xlink:href", function(d, i) {
+				for (var j = 0; j < screenshot_times.length; j++){
+					if (screenshot_times[j].unix_time >= d.start_time && screenshot_times[j].unix_time <= d.end_time){
+                        return "data/screenshots/" + screenshot_times[j].filename;
+                    }
+				}
+				return "benchmark.png";
+			});
 
 
 	}
