@@ -18,7 +18,7 @@ function drawD3(){
 
 	function durationToRadius(duration){
 		var number = 2 * Math.pow(duration, 1/6);
-		if (number > 0){
+		if (number > 0){ // TODO this is not the right place to fix broken data!
 			return number;
 		} else {
 			console.log("number: " + number);
@@ -92,7 +92,7 @@ function drawD3(){
 			.text(function(d, i) {
 				var app_string = d.items[0];
 				for (var j = number_of_top_elements; j > 0; j--){
-					if (d.items.length = j){
+					if (d.items.length = j){ // TODO this is not the right place to fix broken data!
 						for (var k = 1; k < j; k++){
 							if (d.items[k] != -1) app_string = app_string + " and " + d.items[k];
 						}
@@ -138,6 +138,30 @@ function drawD3(){
 			.attr("x", border_left)
 			.attr("font-family", "sans-serif").attr("font-size", "11px")
 			.attr("fill", "black");
+
+
+		// IMAGE
+
+		svg.selectAll(".image_class").remove();
+
+		var image_class = svg.selectAll("image_class")
+			.data(chunk_objects);
+
+		image_class.enter()
+			.append("svg:image");
+
+		image_class.attr("class", "image_class")
+			.attr("y", function(d, i) {
+				var sum = 0;
+				for (var j = 0; j < i; j++){
+					sum += 2 * durationToRadius(chunk_objects[j].duration);
+				}
+				return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
+			})
+			.attr("x", border_left)
+			.attr("width", 100)
+			.attr("height", 100)
+			.attr("xlink:href", "benchmarks.png");
 
 
 	}

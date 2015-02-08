@@ -1,3 +1,31 @@
+function parseScreenshotNames(){
+    for (var i = 0; i < screenshots.length; i++){
+        var object = {
+            filename : screenshots[i],
+            unix_time : Date.parse(screenshots[i].charAt(2)             //150206-221600413164_1021_601.jpg - > "02.06.2015 22:15:00")//month/day/year
+            + screenshots[i].charAt(3)
+            + "."
+            + screenshots[i].charAt(4)
+            + screenshots[i].charAt(5)
+            + ".20"
+            + screenshots[i].charAt(0)
+            + screenshots[i].charAt(1)
+            + " "
+            + screenshots[i].charAt(7)
+            + screenshots[i].charAt(8)
+            + ":"
+            + screenshots[i].charAt(9)
+            + screenshots[i].charAt(10)
+            + ":"
+            + screenshots[i].charAt(11)
+            + screenshots[i].charAt(12))
+
+        };
+        screenshot_times.push(object);
+    }
+}
+
+
 function getActivityNameFromWindowId(id){
     var process_id = window_process_id[windowevent_window_ids[past_event]] - 1; // table is off by one
     var name = process_names[process_id];
@@ -243,6 +271,7 @@ var old_activity_durations = [];
 var old_activity_names = [];
 
 var chunk_objects = [];
+var screenshot_times = [];
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
@@ -261,6 +290,8 @@ var number_of_top_elements = 3;
 
 window.onload = function() {
 
+    console.log(screenshots);
+    parseScreenshotNames();
     generateAbstraction();
     //generateChunks();
     //tableCreate();
