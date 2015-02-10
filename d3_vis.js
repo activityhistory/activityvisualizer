@@ -2,7 +2,7 @@ function drawD3(){
 
 	//Width and height
 	var w = 1400;
-	var h = 4000;
+	var h = 5000;
 
 	var border_left = 0;
 	var border_top = 100;
@@ -20,18 +20,12 @@ function drawD3(){
 
 	function durationToRadius(duration){
 		var number = 2 * Math.pow(duration, 1/6);
-		if (number > 0){ // TODO this is not the right place to fix broken data!
-			return number;
-		} else {
-			console.log("number: " + number);
-			console.log("duration: " + duration);
-			return 0
-		}
+		return number;
 	}
 
-	function updateAll(ui){
+	function updateAll(){
 
-		// TEXT BLOBS
+		// BLOBS
 
 		svg.selectAll(".blob_class").remove();
 
@@ -56,6 +50,7 @@ function drawD3(){
 			.attr("fill", function(d) {
 				return "rgb(0, 0, " + (d.duration * 10) + ")";
 			});
+
 
 		// TEXT DURATION (e.g. 20min)
 
@@ -96,7 +91,7 @@ function drawD3(){
 			.text(function(d, i) {
 				var app_string = d.items[0];
 				for (var j = number_of_top_elements; j > 0; j--){
-					if (d.items.length = j){ // TODO this is not the right place to fix broken data!
+					if (d.items.length = j){
 						for (var k = 1; k < j; k++){
 							if (d.items[k] != -1) app_string = app_string + " and " + d.items[k];
 						}
