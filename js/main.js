@@ -19,14 +19,15 @@ function toc(msg) {
 
 function loadAECdata() {
 	tic();
-	var windowevent_times = jsonSQL("SELECT created_at FROM windowevent");
-	var windowevent_window_ids = jsonSQL("SELECT window_id FROM windowevent");
-	var windowevent_event_type = jsonSQL("SELECT event_type FROM windowevent");
+	windowevent_times = jsonSQL("SELECT created_at FROM windowevent");
+	windowevent_window_ids = jsonSQL("SELECT window_id FROM windowevent");
+	windowevent_event_type = jsonSQL("SELECT event_type FROM windowevent");
 	
-	var window_process_id = jsonSQL("SELECT process_id FROM window");
+	window_process_id = jsonSQL("SELECT process_id FROM window");
 	
-	var process_names = jsonSQL("SELECT id FROM process");
-	var process_ids = jsonSQL("SELECT name FROM process");
+	process_names = jsonSQL("SELECT id FROM process");
+	process_ids = jsonSQL("SELECT name FROM process");
+
 	toc("Populating variables");
 	tic();
 }
