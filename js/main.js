@@ -1,9 +1,50 @@
-var execBtn = document.getElementById("execute");
-var outputElm = document.getElementById('output');
-var errorElm = document.getElementById('error');
-var commandsElm = document.getElementById('commands');
 var dbFileElm = document.getElementById('dbfile');
-var savedbElm = document.getElementById('savedb');
+
+function jsonSQL(query) {
+	tic();
+	var result = db.exec(query);
+	toc("Executing Query ("+query+")");
+	tic();
+	return JSON.stringify(result[0].values);
+}
+
+// Performance measurement functions
+ var tictime;
+if (!window.performance || !performance.now) {window.performance = {now:Date.now}}
+function tic () {tictime = performance.now()}
+function toc(msg) {
+	var dt = performance.now()-tictime;
+	console.log((msg||'toc') + ": " + dt + "ms");
+}
+
+function loadAECdata() {
+	tic();
+	var windowevent_times = jsonSQL("SELECT created_at FROM windowevent");
+	var windowevent_window_ids = jsonSQL("SELECT window_id FROM windowevent");
+	var windowevent_event_type = jsonSQL("SELECT event_type FROM windowevent");
+	
+	var window_process_id = jsonSQL("SELECT process_id FROM window");
+	
+	var process_names = jsonSQL("SELECT id FROM process");
+	var process_ids = jsonSQL("SELECT name FROM process");
+	toc("Populating variables");
+	tic();
+}
+
+dbFileElm.onchange = function() {
+	var f = dbFileElm.files[0];
+	var r = new FileReader();
+	r.onload = function() {
+		var Uints = new Uint8Array(r.result);
+        db = new SQL.Database(Uints);
+
+		loadAECdata();
+		}
+	r.readAsArrayBuffer(f);
+}
+
+
+/*
 
 // Start the worker in which sql.js will run
 var workerPath = "../bower_components/sql.js/js/worker.sql.js";
@@ -20,7 +61,7 @@ function print(text) {
     outputElm.innerHTML = text.replace(/\n/g, '<br>');
 }
 */
-
+/*
 function error(e) {
   console.log(e);
 }
@@ -30,7 +71,7 @@ function noerror() {
 		errorElm.style.height = '0';
 }
 */
-
+/*
 // Run a command in the database
 function execute(commands,prefix,func) {
 	// tic();
@@ -59,24 +100,88 @@ function execute(commands,prefix,func) {
 	// outputElm.textContent = "Fetching results...";
 }
 
-function exec(commands,callback) {
+function jsonSQL2(query,variable) {
 	worker.onmessage = function(event) {
 			var results = event.data.results;
+			var name = variable;
+			window[name] = JSON.stringify(results[0].values);
+			console.log("set "+window[name])
 	}
-		worker.postMessage({action:'exec', sql:commands});
-	callback(results)
+		worker.postMessage({action:'exec', sql:query});
 }
 
 function jsonify(data) {
 	// Returns JSON version of input
-	return JSON.stringify(data);
+	result = JSON.stringify(data);
+	console.log(result);
+	return result;
 }
 
+/*
 function jsonSQL(query) {
-	// Returns 
-	return jsonify(exec(query));
+	// Accepts SQL query and returns JSON string
+	result = exec(query+";");
+	//console.log(result);
+	return result;
 }
+*/
+/*
+function loadAECdata2() {
+var windowevent_times;
+var windowevent_window_ids;
+var windowevent_event_type;
+var window_process_id;
+var process_names;
+var process_ids;
 
+jsonSQL("SELECT created_at FROM windowevent","windowevent_times");
+
+
+jsonSQL("SELECT window_id FROM windowevent","windowevent_window_ids");
+
+jsonSQL("SELECT event_type FROM windowevent","windowevent_event_type")
+
+jsonSQL("SELECT process_id FROM window","window_process_id");
+
+jsonSQL("SELECT id FROM process","process_names");
+
+jsonSQL("SELECT name FROM process","process_ids");
+
+/*
+jsonSQL("SELECT created_at FROM windowevent", function(data) {
+   windowevent_times = data;
+});
+
+jsonSQL("SELECT window_id FROM windowevent", function(data) {
+   windowevent_window_ids = data;
+});
+
+jsonSQL("SELECT event_type FROM windowevent", function(data) {
+   windowevent_event_type = data;
+});
+
+jsonSQL("SELECT process_id FROM window", function(data) {
+   window_process_id = data;
+});
+
+jsonSQL("SELECT id FROM process", function(data) {
+   process_names = data;
+});
+
+jsonSQL("SELECT name FROM process", function(data) {
+   process_ids = data;
+   console.log(process_ids);
+});
+*/
+/*
+   console.log("Displaying: "+windowevent_times);
+   console.log("Displaying: "+windowevent_window_ids);
+   console.log("Displaying: "+windowevent_event_type);
+   console.log("Displaying: "+window_process_id);
+   console.log("Displaying: "+process_names);
+   console.log("Displaying: "+process_ids);
+
+}
 
 function jsonCreate() {
 	// SELECT * from windowevent
@@ -128,7 +233,7 @@ We want to jsonify that column and encode it as a variable.
 */
 
 
-
+/*
 var tableCreate = function () {
   function valconcat(vals, tagName) {
     if (vals.length === 0) return '';
@@ -154,16 +259,9 @@ function execEditorContents () {
 }
 execBtn.addEventListener("click", execEditorContents, true);
 
-// Performance measurement functions
-/* var tictime;
-if (!window.performance || !performance.now) {window.performance = {now:Date.now}}
-function tic () {tictime = performance.now()}
-function toc(msg) {
-	var dt = performance.now()-tictime;
-	console.log((msg||'toc') + ": " + dt + "ms");
-}
-*/
 
+
+/*
 // Load a db from a file
 dbFileElm.onchange = function() {
 	var f = dbFileElm.files[0];
@@ -173,7 +271,8 @@ dbFileElm.onchange = function() {
 			// toc("Loading database from file");
 			// Show the schema of the loaded database 
 			// editor.setValue("SELECT `name`, `sql`\n  FROM `sqlite_master`\n  WHERE type='table';");
-			execEditorContents();
+			// execEditorContents();
+			loadAECdata();
 		};
 		// tic();
 		try {
@@ -185,6 +284,9 @@ dbFileElm.onchange = function() {
 	}
 	r.readAsArrayBuffer(f);
 }
+*/
+
+/*
 
 // Save the db to a file
 function savedb () {
@@ -277,3 +379,4 @@ var filebuffer = fs.readFileSync('test.sqlite');
 // Load the db
 var db = new SQL.Database(filebuffer);
 */
+

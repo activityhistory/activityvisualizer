@@ -33,22 +33,8 @@
 
         -->
 
-        <main>
-    <label for='commands'>Enter some SQL</label>
-    <br>
+ <input type='file' id='dbfile' value='Load SQLite DB'>Load SQLite DB</label>
 
-    <textarea id="commands"></textarea>
-
-<button id="execute" class="button">Execute</button>
-<button id='savedb'  class="button">Save the db</button>
-<label class="button">Load an SQLite database file: <input type='file' id='dbfile' ></label>
-
-<div id="error" class="error"></div>
-
-<pre id="output">Results will be displayed here</pre>
-</main>
-
-         
           <!-- bower:js -->
           <script src="bower_components/d3/d3.js"></script>
           <script src="bower_components/d3-timeline/src/d3-timeline.js"></script>
