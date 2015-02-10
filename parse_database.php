@@ -5,7 +5,7 @@
 	*/
 	
 	// Specify your sqlite database name and path //
-	$dir = 'sqlite:/Users/jonas/Desktop/Uni/Dlab/cat.sqlite';
+	$dir = 'sqlite:/Applications/MAMP/htdocs/activityvisualizer/data/selfspy.sqlite';
 
 	// Instantiate PDO connection object and failure msg //
 	$dbh = new PDO($dir) or die("cannot open database");
@@ -71,5 +71,30 @@
 
 	echo "var process_names = ".json_encode($process_names).";\n";
 	echo "var process_ids = ".json_encode($process_ids).";\n";
+	
+	
+	// Get screenshot Filenames
+	
+	// create an array to hold directory list
+    $results = array();
+
+    // create a handler for the directory
+    $handler = opendir("/Applications/MAMP/htdocs/activityvisualizer/data/screenshots");
+
+    // open directory and walk through the filenames
+    while ($file = readdir($handler)) {
+
+      // if file isn't this directory or its parent, add it to the results
+      if ($file != "." && $file != "..") {
+        $results[] = $file;
+      }
+
+    }
+
+    // tidy up: close the handler
+    closedir($handler);
+
+    // done!
+    echo "var screenshots = ".json_encode($results).";\n";
 
 	?>
