@@ -290,7 +290,6 @@ var number_of_top_elements = 3;
 
 window.onload = function() {
 
-    console.log(screenshots);
     parseScreenshotNames();
     generateAbstraction();
     //generateChunks();
