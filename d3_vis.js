@@ -37,17 +37,9 @@ function drawD3(){
         blobs.attr("cx", border_left + date_width)
             .attr("class", "blob_class")
             .attr("cy", function(d, i) {
-                //var sum = 0;
-                //for (var j = 0; j < i; j++){
-                //	sum += 2 * durationToRadius(chunk_objects[j].duration);
-                //}
-                //return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
                 return image_height * i + border_top;
             })
             .attr("r", function(d) {
-                //console.log(blob_scaling_factor * durationToRadius(d.duration));
-                //console.log(durationToRadius(d.duration));
-                //console.log(d.duration);
                 return blob_scaling_factor * durationToRadius(d.duration);
             })
             .attr("fill", function(d) {
@@ -68,11 +60,6 @@ function drawD3(){
         text_dur.text(function(d) { return d.duration + "min"; })
             .attr("class", "text_dur")
             .attr("y", function(d, i){
-                //var sum = 0;
-                //for (var j = 0; j < i; j++){
-                //	sum += 2 * durationToRadius(chunk_objects[j].duration);
-                //}
-                //return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
                 return image_height * i + border_top;
             })
             .attr("x", border_left + date_width)
@@ -100,11 +87,6 @@ function drawD3(){
                     return app_string;
                 })
                 .attr("y", function(d, i) {
-                    //var sum = 0;
-                    //for (var j = 0; j < i; j++){
-                    //	sum += 2 * durationToRadius(chunk_objects[j].duration);
-                    //}
-                    //return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
                     return image_height * i + border_top;
                 })
                 .attr("x", date_width + border_left + blob_width + image_width)
@@ -127,11 +109,6 @@ function drawD3(){
                 return new Date(d.start_time).toLocaleTimeString() + " to " + new Date(d.end_time).toLocaleTimeString();
             })
             .attr("y", function(d, i) {
-                //var sum = 0;
-                //for (var j = 0; j < i; j++){
-                //	sum += 2 * durationToRadius(chunk_objects[j].duration);
-                //}
-                //return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
                 return image_height * i + border_top;
             })
             .attr("x", border_left)
@@ -151,11 +128,6 @@ function drawD3(){
 
         image_class.attr("class", "image_class")
             .attr("y", function(d, i) {
-                //var sum = 0;
-                //for (var j = 0; j < i; j++){
-                //	sum += 2 * durationToRadius(chunk_objects[j].duration);
-                //}
-                //return border_top + blob_scaling_factor	 * (sum + durationToRadius(d.duration));
                 return image_height * i
             })
             .attr("x", date_width + border_left + blob_width)

@@ -1,31 +1,3 @@
-function parseScreenshotNames(){
-    for (var i = 0; i < screenshots.length; i++){
-        var object = {
-            filename : screenshots[i],
-            unix_time : Date.parse(screenshots[i].charAt(2)             //150206-221600413164_1021_601.jpg - > "02.06.2015 22:15:00")//month/day/year
-            + screenshots[i].charAt(3)
-            + "."
-            + screenshots[i].charAt(4)
-            + screenshots[i].charAt(5)
-            + ".20"
-            + screenshots[i].charAt(0)
-            + screenshots[i].charAt(1)
-            + " "
-            + screenshots[i].charAt(7)
-            + screenshots[i].charAt(8)
-            + ":"
-            + screenshots[i].charAt(9)
-            + screenshots[i].charAt(10)
-            + ":"
-            + screenshots[i].charAt(11)
-            + screenshots[i].charAt(12))
-
-        };
-        screenshot_times.push(object);
-    }
-}
-
-
 function getActivityNameFromWindowId(id){
     var process_id = window_process_id[windowevent_window_ids[past_event]] - 1; // table is off by one
     var name = process_names[process_id];
@@ -81,23 +53,13 @@ function pushEvent(activity_name, start_time, end_time){
 }
 
 
-function inArray(array, id) {
-    for(var i=0;i<array.length;i++) {
-        if (array[i].name == id){
-            return i;
-        }
-    }
-    return -1;
-}
-
-
-function getDurations(i){
+function getDurationsForGivenInterval(i){
     // looking through all entries in the abstraction
     for(var k = 0; k < filtered_events.length; k++){
         var start_time = Math.max.apply(null, [filtered_events[k].start_time, i]);
         var end_time = Math.min.apply(null, [filtered_events[k].end_time, i+time_interval]);
         var duration = end_time - start_time;
-        if (duration > 0 && filtered_events[k].description != "localhost" && filtered_events[k].description != "NO_URL"){
+        if (duration > 0 && filtered_events[k].description != "localhost" && filtered_events[k].description != "NO_URL"){ //TODO maybe not the best place to filter
             pushDuration(k, duration);
         } else if (filtered_events[k].start_time > i+time_interval){
             break;
@@ -121,47 +83,14 @@ function pushDuration(k, duration){
 
 
 function findNMostUsedActivities(){
-    var output = activities.sort(function (a, b){ return b.duration - a.duration; }).slice(0,number_of_top_elements);
-    return output;
+    return activities.sort(function (a, b){ return b.duration - a.duration; }).slice(0,number_of_top_elements);
 }
 
 
-function convertUnixTimeToHumanReadable(unix_time){
-    var date = new Date(unix_time);
-    var hours = date.getHours();
-    var minutes = "0" + date.getMinutes();
-    var seconds = "0" + date.getSeconds();
-    return hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
-}
-
-
-function addTableTextCell(tr, text, classname, height){
+function addTableTextCell(tr, text){
     var td=document.createElement('td');
-    //td.className = classname;
-    //td.setAttribute("style", "height: " + height + "px;");
     td.appendChild(document.createTextNode(text));
     tr.appendChild(td);
-}
-
-
-function inArray2(array, el) { //TODO not very nice
-    for ( var i = array.length; i--; ) {
-        if ( array[i].name === el ) return true;
-    }
-    return false;
-}
-
-
-function isEqArrays(arr1, arr2) { //TODO not very nice
-    if ( arr1.length != arr2.length ) {
-        return false;
-    }
-    for ( var i = arr1.length; i--; ) {
-        if ( !inArray2( arr2, arr1[i].name ) ) {
-            return false;
-        }
-    }
-    return true;
 }
 
 
@@ -177,7 +106,7 @@ function addNewRowToTable(tbdy, chunkobject){
         addTableTextCell(tr, "Minutes: " + chunkobject.duration, "class_duration", 20);
 
         for(var i = 0; i < chunkobject.items.length; i++){
-                addTableTextCell(tr, chunkobject.items[i].name, "class_elements", chunkobject.duration * 1);
+                addTableTextCell(tr, chunkobject.items[i].name, "class_elements", chunkobject.duration);
         }
 
         tbdy.appendChild(tr);
@@ -228,7 +157,7 @@ function generateChunks(){
 
         activities = [];
 
-        getDurations(i);
+        getDurationsForGivenInterval(i);
 
         top = findNMostUsedActivities();
 
@@ -282,8 +211,8 @@ window.onload = function() {
 
     parseScreenshotNames();
     generateAbstraction();
-    generateChunks();
-    tableCreate();
-    //drawD3();
+    //generateChunks();
+    //tableCreate();
+    drawD3();
 
 }
