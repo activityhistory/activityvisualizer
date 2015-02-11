@@ -199,9 +199,7 @@ function createChunkObjects(interval_start_time, i, time_interval, items){
         items : items
     };
 
-    if (chunkobject.duration > 0 && chunkobject.items.length > 0 && chunkobject.items[0] != -1){
-        chunk_objects.push(chunkobject);
-    }
+    chunk_objects.push(chunkobject);
 }
 
 
@@ -246,7 +244,8 @@ function generateChunks(){
             // things have changed, so we will start a new interval
             reset_start_time = 1;
 
-            if (old_i != -1){
+            var duration = old_i + time_interval - old_interval_start_time;
+            if (old_i != -1 && duration > 0){
                 createChunkObjects(old_interval_start_time, old_i, time_interval, old_top);
             }
             old_interval_start_time = interval_start_time;
