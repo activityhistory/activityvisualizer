@@ -257,10 +257,10 @@ function generateChunks(){
         }
     }
     // run it one more time, so the last interval does not get lost
-    var end_time = Math.min.apply(window, [(i + time_interval), latest_time]);
-    var duration = (end_time - interval_start_time) / 60000; // 60000 milliseconds in a minute
-    if (old_i != -1 && duration > 0){
-        createChunkObjects(interval_start_time, end_time, top, duration);
+    var final_end_time = Math.min.apply(window, [(i + time_interval), latest_time]);
+    var final_duration = (final_end_time - interval_start_time) / 60000; // 60000 milliseconds in a minute
+    if (old_i != -1 && final_duration > 0){
+        createChunkObjects(interval_start_time, final_end_time, top, final_duration);
     }
 
 }
