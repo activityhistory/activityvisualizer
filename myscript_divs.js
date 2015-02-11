@@ -1,7 +1,7 @@
-function getActivityNameFromWindowId(id){
+function getActivityNameFromWindowId(){
     var process_id = window_process_id[windowevent_window_ids[past_event]] - 1; // table is off by one
     var name = process_names[process_id];
-    if (name == "Google Chrome" | name == "Safari"){
+    if (name == "Google Chrome" || name == "Safari"){
         // get hostname from url
         var getLocation = function(href) {
             var l = document.createElement("a");
@@ -32,7 +32,7 @@ function generateAbstraction(){
             past_event = k;
             // 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
         } else if (past_event != -1 &
-            windowevent_event_type[k] == "Close" &
+            windowevent_event_type[k] == "Close" &&
             windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
             pushEvent(activity_name, start_time, end_time, k);
             past_event = -1;
@@ -147,7 +147,6 @@ var filtered_events = [];
 var activities = [];
 var old_activities = [];
 var chunk_objects = [];
-var screenshot_times = [];
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
@@ -172,4 +171,4 @@ window.onload = function() {
     //tableCreate();
     drawD3();
 
-}
+};

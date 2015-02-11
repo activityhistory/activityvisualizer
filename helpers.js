@@ -1,3 +1,5 @@
+var screenshot_times = [];
+
 function parseScreenshotNames(){
     for (var i = 0; i < screenshots.length; i++){
         var object = {

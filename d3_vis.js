@@ -19,8 +19,7 @@ function drawD3(){
         .attr("height", h);
 
     function durationToRadius(duration){
-        var number = 2 * Math.pow(duration, 1/6);
-        return number;
+        return 2 * Math.pow(duration, 1/6);
     }
 
     function updateAll(){
@@ -98,13 +97,13 @@ function drawD3(){
 
         svg.selectAll(".text_time").remove();
 
-        var text_item = svg.selectAll("text_time")
+        var text_date = svg.selectAll("text_time")
             .data(chunk_objects);
 
-        text_item.enter()
+        text_date.enter()
             .append("text");
 
-        text_item.attr("class", "text_time")
+        text_date.attr("class", "text_time")
             .text(function(d, i) {
                 return new Date(d.start_time).toLocaleTimeString() + " to " + new Date(d.end_time).toLocaleTimeString();
             })
