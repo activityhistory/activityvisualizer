@@ -144,20 +144,20 @@ function addTableTextCell(tr, text, classname, height){
 }
 
 
-function inArray2(array, el) {
+function inArray2(array, el) { //TODO not very nice
     for ( var i = array.length; i--; ) {
-        if ( array[i] === el ) return true;
+        if ( array[i].name === el ) return true;
     }
     return false;
 }
 
 
-function isEqArrays(arr1, arr2) {
+function isEqArrays(arr1, arr2) { //TODO not very nice
     if ( arr1.length != arr2.length ) {
         return false;
     }
     for ( var i = arr1.length; i--; ) {
-        if ( !inArray2( arr2, arr1[i] ) ) {
+        if ( !inArray2( arr2, arr1[i].name ) ) {
             return false;
         }
     }
