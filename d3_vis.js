@@ -92,11 +92,11 @@ function drawD3(){
 
 		text_item.attr("class", "text_labels")
 			.text(function(d, i) {
-				var app_string = d.items[0];
+				var app_string = d.items[0].name;
 				for (var j = number_of_top_elements; j > 0; j--){
 					if (d.items.length = j){
 						for (var k = 1; k < j; k++){
-							if (d.items[k] != -1) app_string = app_string + " and " + d.items[k];
+							if (d.items[k] != -1) app_string = app_string + " and " + d.items[k].name;
 						}
 						break;
 					}

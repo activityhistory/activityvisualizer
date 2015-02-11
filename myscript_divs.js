@@ -69,16 +69,21 @@ function generateAbstraction(){
 }
 
 
-function pushEvent(activity_name, start_time, end_time, window_id){
-    filtered_events_description.push(activity_name);
-    filtered_events_start_time.push(start_time);
-    filtered_events_end_time.push(end_time);
+function pushEvent(activity_name, start_time, end_time){
+    var filtered_events_object = {
+        description : activity_name,
+        start_time : start_time,
+        end_time : end_time
+    };
+
+    filtered_events.push(filtered_events_object);
+
 }
 
 
 function inArray(array, id) {
     for(var i=0;i<array.length;i++) {
-        if (array[i] == id){
+        if (array[i].name == id){
             return i;
         }
     }
@@ -88,13 +93,13 @@ function inArray(array, id) {
 
 function getDurations(i){
     // looking through all entries in the abstraction
-    for(var k = 0; k < filtered_events_description.length; k++){
-        var start_time = Math.max.apply(null, [filtered_events_start_time[k], i]);
-        var end_time = Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]);
+    for(var k = 0; k < filtered_events.length; k++){
+        var start_time = Math.max.apply(null, [filtered_events[k].start_time, i]);
+        var end_time = Math.min.apply(null, [filtered_events[k].end_time, i+time_interval]);
         var duration = end_time - start_time;
-        if (duration > 0 && filtered_events_description[k] != "localhost" && filtered_events_description[k] != "NO_URL"){
+        if (duration > 0 && filtered_events[k].description != "localhost" && filtered_events[k].description != "NO_URL"){
             pushDuration(k, duration);
-        } else if (filtered_events_start_time[k] > i+time_interval){
+        } else if (filtered_events[k].start_time > i+time_interval){
             break;
         }
     }
@@ -102,30 +107,36 @@ function getDurations(i){
 
 
 function pushDuration(k, duration){
-    var id = inArray(activity_names, filtered_events_description[k]);
+    var id = inArray(activities, filtered_events[k].description);
     if (id != -1){
-        activity_durations[id] += duration;
+        activities[id].duration += duration;
     } else {
-        activity_durations.push(duration);
-        activity_names.push(filtered_events_description[k]);
+        var activity_object = {
+            duration : duration,
+            name : filtered_events[k].description
+        };
+        activities.push(activity_object);
     }
 }
 
 
 function findTop(){ // TODO order does not matter
-    // find the top 3 apps. Self-implemented sorting. I hope there's no bug in it.
-    var output = [];
+    // find the top used apps. Self-implemented sorting. I hope there's no bug in it.
+    //var output = [];
+    //
+    //for (var j = 0; j < number_of_top_elements; j++) {
+    //    var max = Math.max.apply(window, activity_durations);
+    //    if (max > 0){
+    //        var index = activity_durations.indexOf(max);
+    //        output.push(activity_names[index]);
+    //        activity_durations[index] = -1;
+    //    } else {
+    //        output.push(-1);
+    //    }
+    //}
+    //
 
-    for (var j = 0; j < number_of_top_elements; j++) {
-        var max = Math.max.apply(window, activity_durations);
-        if (max > 0){
-            var index = activity_durations.indexOf(max);
-            output.push(activity_names[index]);
-            activity_durations[index] = -1;
-        } else {
-            output.push(-1);
-        }
-    }
+    var output = activities.sort(function (a, b){ return b.duration - a.duration; }).slice(0,number_of_top_elements);
 
     return output;
 }
@@ -232,8 +243,7 @@ function generateChunks(){
             reset_start_time = 0;
         }
 
-        activity_durations = [];
-        activity_names = [];
+        activities = [];
 
         getDurations(i);
 
@@ -252,8 +262,7 @@ function generateChunks(){
             old_interval_start_time = interval_start_time;
             old_i = i;
             old_top = top;
-            old_activity_durations = activity_durations;
-            old_activity_names = activity_names;
+            old_activities = activities;
         }
     }
     // run it one more time, so the last interval does not get lost
@@ -265,14 +274,11 @@ function generateChunks(){
 
 }
 
-var filtered_events_description = [];
-var filtered_events_start_time = [];
-var filtered_events_end_time = [];
+var filtered_events = [];
 
-var activity_durations = [];
-var activity_names = [];
-var old_activity_durations = [];
-var old_activity_names = [];
+var activities = [];
+
+var old_activities = [];
 
 var chunk_objects = [];
 var screenshot_times = [];
