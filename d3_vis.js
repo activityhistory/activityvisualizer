@@ -80,17 +80,17 @@ function drawD3(){
             .text(function(d, i) {
                 var app_string = d.items[0].name;
 
-                    for (var k = 1; k < d.items.length; k++){
-                        if (d.items[k] != -1) app_string = app_string + " and " + d.items[k].name;
-                    }
-                    return app_string;
-                })
-                .attr("y", function(d, i) {
-                    return image_height * i + border_top;
-                })
-                .attr("x", date_width + border_left + blob_width + image_width)
-                .attr("font-family", "sans-serif").attr("font-size", "11px")
-                .attr("fill", "black");
+                for (var k = 1; k < d.items.length; k++){
+                    if (d.items[k] != -1) app_string = app_string + " and " + d.items[k].name;
+                }
+                return app_string;
+            })
+            .attr("y", function(d, i) {
+                return image_height * i + border_top;
+            })
+            .attr("x", date_width + border_left + blob_width + image_width)
+            .attr("font-family", "sans-serif").attr("font-size", "11px")
+            .attr("fill", "black");
 
 
         // TEXT DATETIME (e.g. 23:42)
@@ -147,6 +147,7 @@ function drawD3(){
     $("#timeGranularity").slider({ max: 240 },{min:1},{value:30},{slide: function( event, ui ) {
 
         time_interval = ui.value * 60000;
+
         generateChunks();
         updateAll(ui);
 

@@ -101,6 +101,7 @@ function createChunkObjects(interval_start_time, end_time, items, duration){
 function generateChunks(){
 
     chunk_objects = [];
+    old_i = -1;
     var top = [];
 
     // slicing time and searching for every interval
@@ -123,10 +124,10 @@ function generateChunks(){
             // things have changed, so we will start a new interval
             reset_start_time = 1;
 
-            var end_time = Math.min.apply(window, [(old_i + time_interval), latest_time]);
-            var duration = (end_time - old_interval_start_time) / 60000; // 60000 milliseconds in a minute
+            var old_end_time = Math.min.apply(window, [(old_i + time_interval), latest_time]);
+            var duration = (old_end_time - old_interval_start_time) / 60000; // 60000 milliseconds in a minute
             if (old_i != -1 && duration > 0){
-                createChunkObjects(old_interval_start_time, end_time, old_top, duration);
+                createChunkObjects(old_interval_start_time, old_end_time, old_top, duration);
             }
             old_interval_start_time = interval_start_time;
             old_i = i;
@@ -134,6 +135,7 @@ function generateChunks(){
             old_activities = activities;
         }
     }
+
     // run it one more time, so the last interval does not get lost
     var final_end_time = Math.min.apply(window, [(i + time_interval), latest_time]);
     var final_duration = (final_end_time - interval_start_time) / 60000; // 60000 milliseconds in a minute
