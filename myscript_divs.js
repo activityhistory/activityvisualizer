@@ -63,7 +63,7 @@ function generateAbstraction(){
             windowevent_event_type[k] == "Close" &
             windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
             pushEvent(activity_name, start_time, end_time, k);
-            past_event = -1; // TODO in the very end push 2?
+            past_event = -1;
         }
     }
 }
@@ -120,24 +120,8 @@ function pushDuration(k, duration){
 }
 
 
-function findTop(){ // TODO order does not matter
-    // find the top used apps. Self-implemented sorting. I hope there's no bug in it.
-    //var output = [];
-    //
-    //for (var j = 0; j < number_of_top_elements; j++) {
-    //    var max = Math.max.apply(window, activity_durations);
-    //    if (max > 0){
-    //        var index = activity_durations.indexOf(max);
-    //        output.push(activity_names[index]);
-    //        activity_durations[index] = -1;
-    //    } else {
-    //        output.push(-1);
-    //    }
-    //}
-    //
-
+function findNMostUsedActivities(){
     var output = activities.sort(function (a, b){ return b.duration - a.duration; }).slice(0,number_of_top_elements);
-
     return output;
 }
 
@@ -192,10 +176,8 @@ function addNewRowToTable(tbdy, chunkobject){
         addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
         addTableTextCell(tr, "Minutes: " + chunkobject.duration, "class_duration", 20);
 
-        for(var i = 0; i < number_of_top_elements; i++){
-            if (chunkobject.items[i] != -1) {
-                addTableTextCell(tr, chunkobject.items[i], "class_elements", chunkobject.duration * 1);
-            }
+        for(var i = 0; i < chunkobject.items.length; i++){
+                addTableTextCell(tr, chunkobject.items[i].name, "class_elements", chunkobject.duration * 1);
         }
 
         tbdy.appendChild(tr);
@@ -233,6 +215,7 @@ function tableCreate(){
 function generateChunks(){
 
     chunk_objects = [];
+    var top = [];
 
     // slicing time and searching for every interval
     for(var i = earliest_time; i < latest_time; i += time_interval){
@@ -247,7 +230,7 @@ function generateChunks(){
 
         getDurations(i);
 
-        var top = findTop();
+        top = findNMostUsedActivities();
 
         // if anything has changed compared to the last table entry, then it's time for a new one!
         if (isEqArrays(top, old_top) == false){
@@ -275,11 +258,8 @@ function generateChunks(){
 }
 
 var filtered_events = [];
-
 var activities = [];
-
 var old_activities = [];
-
 var chunk_objects = [];
 var screenshot_times = [];
 
@@ -295,15 +275,15 @@ var old_interval_start_time = -1;
 var old_i = -1;
 
 // CONFIG
-var time_interval = 120 * 60000; // 60k milliseconds = 1 minute
-var number_of_top_elements = 3;
+var time_interval = 10 * 60000; // 60k milliseconds = 1 minute
+var number_of_top_elements = 1;
 
 window.onload = function() {
 
     parseScreenshotNames();
     generateAbstraction();
-    //generateChunks();
-    //tableCreate();
-    drawD3();
+    generateChunks();
+    tableCreate();
+    //drawD3();
 
 }
