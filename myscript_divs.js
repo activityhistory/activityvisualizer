@@ -191,11 +191,11 @@ function addNewRowToTable(tbdy, chunkobject){
     }
 }
 
-function createChunkObjects(interval_start_time, i, time_interval, items){
+function createChunkObjects(interval_start_time, end_time, items, duration){
     var chunkobject = {
         start_time : interval_start_time,
-        end_time : (i + time_interval),
-        duration : ((i + time_interval) - interval_start_time) / 60000, // 60000 milliseconds in a minute,
+        end_time : end_time,
+        duration : duration,
         items : items
     };
 
@@ -244,9 +244,10 @@ function generateChunks(){
             // things have changed, so we will start a new interval
             reset_start_time = 1;
 
-            var duration = old_i + time_interval - old_interval_start_time;
+            var end_time = Math.min.apply(window, [(old_i + time_interval), latest_time]);
+            var duration = (end_time - old_interval_start_time) / 60000; // 60000 milliseconds in a minute
             if (old_i != -1 && duration > 0){
-                createChunkObjects(old_interval_start_time, old_i, time_interval, old_top);
+                createChunkObjects(old_interval_start_time, end_time, old_top, duration);
             }
             old_interval_start_time = interval_start_time;
             old_i = i;
@@ -256,7 +257,11 @@ function generateChunks(){
         }
     }
     // run it one more time, so the last interval does not get lost
-    createChunkObjects(interval_start_time, i, time_interval, top);
+    var end_time = Math.min.apply(window, [(i + time_interval), latest_time]);
+    var duration = (end_time - interval_start_time) / 60000; // 60000 milliseconds in a minute
+    if (old_i != -1 && duration > 0){
+        createChunkObjects(interval_start_time, end_time, top, duration);
+    }
 
 }
 

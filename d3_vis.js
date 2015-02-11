@@ -45,6 +45,9 @@ function drawD3(){
                 return image_height * i + border_top;
 			})
 			.attr("r", function(d) {
+                //console.log(blob_scaling_factor * durationToRadius(d.duration));
+                //console.log(durationToRadius(d.duration));
+                //console.log(d.duration);
 				return blob_scaling_factor * durationToRadius(d.duration);
 			})
 			.attr("fill", function(d) {
