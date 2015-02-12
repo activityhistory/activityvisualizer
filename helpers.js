@@ -69,10 +69,28 @@ function isSimilarArrays(arr1, arr2) { //TODO not very nice
             number_of_same_elements++;
         }
     }
-    if (number_of_same_elements / (number_of_same_elements + number_of_different_elements) > 0.5){
+    if (number_of_same_elements / (number_of_same_elements + number_of_different_elements) >= 0.5){
         return true;
     } else {
         return false;
     }
+
+}
+
+function getEqualItems(a, b){
+
+    console.log("a: ", a);
+    console.log("b: ", b);
+
+    var t;
+    if (b.length > a.length) t = b, b = a, a = t; // indexOf to loop over shorter
+    return a.filter(function (e) {
+        for (var i = 0; i < b.length; b++){
+            if (b[i].name === e.name) {
+                return true;
+            }
+        }
+        return false;
+    });
 
 }

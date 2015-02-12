@@ -147,6 +147,9 @@ function generateChunks(){
                 //update previous
                 prev_end_time = i + time_interval;
                 prev_duration = (prev_end_time - prev_start_time) / 60000;
+                var old_length = prev_top_apps.length;
+                //prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
+                console.log(prev_top_apps);
             }
             else{
                 //write previous
