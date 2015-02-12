@@ -109,7 +109,7 @@ function generateChunks(){
     var skipped = 0;
 
     // slicing time and searching for every interval
-    for(var i = earliest_time; i <= latest_time - time_interval; i += time_interval){
+    for(var i = earliest_time; i < latest_time; i += time_interval){
 
         // we only start with a new time_interval, if reset_start_time is set to 1
         if (reset_start_time == 1){
@@ -133,8 +133,14 @@ function generateChunks(){
             // things have changed, so we will start a new interval
             reset_start_time = 1;
 
-            var old_end_time = Math.min.apply(window, [(old_start_time + time_interval), latest_time]);
+            var old_end_time = old_start_time + time_interval;
+
+            console.log("old_end_time : " + old_end_time);
+            console.log("old_interval_start_time : " + old_interval_start_time);
             var duration = (old_end_time - old_interval_start_time) / 60000; // 60000 milliseconds in a minute
+
+            console.log("old_start_time: " + old_start_time);
+            console.log("duration: " + duration);
 
             if (old_start_time != -1 && duration > 0){
                 console.log("2. old_start_time existed, writing out chunk object for old stuff");
