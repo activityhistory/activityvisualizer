@@ -56,14 +56,23 @@ function inArray2(array, el) { //TODO not very nice
 }
 
 
-function isEqArrays(arr1, arr2) { //TODO not very nice
-    if ( arr1.length != arr2.length ) {
-        return false;
-    }
+function isSimilarArrays(arr1, arr2) { //TODO not very nice
+    //if ( arr1.length != arr2.length ) {
+    //    return false;
+    //}
+    var number_of_different_elements = 0;
+    var number_of_same_elements = 0;
     for ( var i = arr1.length; i--; ) {
         if ( !inArray2( arr2, arr1[i].name ) ) {
-            return false;
+            number_of_different_elements++;
+        } else {
+            number_of_same_elements++;
         }
     }
-    return true;
+    if (number_of_same_elements / (number_of_same_elements + number_of_different_elements) > 0.5){
+        return true;
+    } else {
+        return false;
+    }
+
 }

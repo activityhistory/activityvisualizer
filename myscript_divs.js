@@ -124,7 +124,7 @@ function generateChunks(){
 
         // if the last chunk
         else if( i + time_interval >= latest_time ){
-            if(isEqArrays(prev_top_apps, current_top_apps)){
+            if(isSimilarArrays(prev_top_apps, current_top_apps)){
                 // update previous
                 prev_end_time = latest_time;
                 prev_duration = (latest_time - prev_start_time) / 60000;
@@ -143,7 +143,7 @@ function generateChunks(){
 
         // if any intermediate chunk
         else{
-            if(isEqArrays(prev_top_apps, current_top_apps)){
+            if(isSimilarArrays(prev_top_apps, current_top_apps)){
                 //update previous
                 prev_end_time = i + time_interval;
                 prev_duration = (prev_end_time - prev_start_time) / 60000;
