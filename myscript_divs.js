@@ -140,7 +140,7 @@ function generateChunks(){
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
 
                 //write current
-                createChunkObjects(i, latest_time, current_top_apps, latest_time - i);
+                createChunkObjects(i, latest_time, current_top_apps, (latest_time - i)/60000);
             }
         }
 
