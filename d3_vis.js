@@ -148,11 +148,7 @@ function drawD3(){
 
         time_interval = ui.value * 60000;
 
-        console.log("BEFORE:");
-        console.log(chunk_objects);
         generateChunks();
-        console.log("AFTER:");
-        console.log(chunk_objects);
         updateAll(ui);
 
         document.getElementById('timeGranularityText').innerHTML = 'Time Granularity: ' + ui.value;
