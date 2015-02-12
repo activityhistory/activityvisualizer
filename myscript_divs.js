@@ -98,49 +98,71 @@ function createChunkObjects(interval_start_time, end_time, items, duration){
     chunk_objects.push(chunkobject);
 }
 
+
 function generateChunks(){
+    chunk_objects = []
+    prev_top_apps = []
+    prev_start_time = 0
+    prev_end_time = 0
+    prev_duration = 0
 
-    chunk_objects = [];
-    old_i = -1;
-    var top = [];
 
-    // slicing time and searching for every interval
-    for(var i = earliest_time; i < latest_time; i += time_interval){
+    for(var i = earliest_time; i < latest_time; i+= time_interval){
 
-        // we only start with a new time_interval, if reset_start_time is set to 1
-        if (reset_start_time == 1){
-            interval_start_time = i;
-            reset_start_time = 0;
-        }
 
         activities = [];
 
         getDurationsForGivenInterval(i);
 
-        top = findNMostUsedActivities();
+        current_top_apps = findNMostUsedActivities();
 
-        // if anything has changed compared to the last table entry, then it's time for a new one!
-        if (isEqArrays(top, old_top) == false){
-            // things have changed, so we will start a new interval
-            reset_start_time = 1;
+        // if the first chunk
 
-            var old_end_time = Math.min.apply(window, [(old_i + time_interval), latest_time]);
-            var duration = (old_end_time - old_interval_start_time) / 60000; // 60000 milliseconds in a minute
-            if (old_i != -1 && duration > 0){
-                createChunkObjects(old_interval_start_time, old_end_time, old_top, duration);
-            }
-            old_interval_start_time = interval_start_time;
-            old_i = i;
-            old_top = top;
-            old_activities = activities;
+        if(prev_top_apps.length == 0){
+            prev_top_apps = current_top_apps;
+            prev_start_time = i;
+            prev_end_time = i + time_interval;
+            prev_duration = (prev_end_time - prev_start_time) / 60000;
         }
-    }
 
-    // run it one more time, so the last interval does not get lost
-    var final_end_time = Math.min.apply(window, [(i + time_interval), latest_time]);
-    var final_duration = (final_end_time - interval_start_time) / 60000; // 60000 milliseconds in a minute
-    if (old_i != -1 && final_duration > 0){
-        createChunkObjects(interval_start_time, final_end_time, top, final_duration);
+        // if the last chunk
+        else if( i + time_interval >= latest_time ){
+            if(isEqArrays(prev_top_apps, current_top_apps)){
+                // update previous
+                prev_end_time = latest_time;
+                prev_duration = (latest_time - prev_start_time) / 60000;
+
+                //write previous
+                createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
+            }
+            else{
+                //write previous
+                createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
+
+                //write current
+                createChunkObjects(i, latest_time, current_top_apps, latest_time - i);
+            }
+        }
+
+        // if any intermediate chunk
+        else{
+            if(isEqArrays(prev_top_apps, current_top_apps)){
+                //update previous
+                prev_end_time = i + time_interval;
+                prev_duration = (prev_end_time - prev_start_time) / 60000;
+            }
+            else{
+                //write previous
+                createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
+                //console.log(prev_top_apps)
+
+                //update previous = current
+                prev_start_time = i;
+                prev_end_time = i + time_interval;
+                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                prev_top_apps = current_top_apps;
+            }
+        }
     }
 
 }
