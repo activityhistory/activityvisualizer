@@ -100,12 +100,16 @@ function createChunkObjects(interval_start_time, end_time, items, duration){
 
 function generateChunks(){
 
+    console.log("\n\n\nGENERATE CHUNKS\n\n");
+
     chunk_objects = [];
-    old_i = -1;
+    old_start_time = -1;
+    old_top = [];
     var top = [];
+    var skipped = 0;
 
     // slicing time and searching for every interval
-    for(var i = earliest_time; i < latest_time; i += time_interval){
+    for(var i = earliest_time; i <= latest_time - time_interval; i += time_interval){
 
         // we only start with a new time_interval, if reset_start_time is set to 1
         if (reset_start_time == 1){
@@ -116,31 +120,43 @@ function generateChunks(){
         activities = [];
 
         getDurationsForGivenInterval(i);
-
         top = findNMostUsedActivities();
 
         // if anything has changed compared to the last table entry, then it's time for a new one!
-        if (isEqArrays(top, old_top) == false){
+        console.log("top: ", top);
+        console.log("old_top: ", old_top);
+
+        if (isEqArrays(top, old_top) == false){ // are apps the same?
+
+
+            console.log("1. New Top Apps are different, from old ones, in if block");
             // things have changed, so we will start a new interval
             reset_start_time = 1;
 
-            var old_end_time = Math.min.apply(window, [(old_i + time_interval), latest_time]);
+            var old_end_time = Math.min.apply(window, [(old_start_time + time_interval), latest_time]);
             var duration = (old_end_time - old_interval_start_time) / 60000; // 60000 milliseconds in a minute
-            if (old_i != -1 && duration > 0){
+
+            if (old_start_time != -1 && duration > 0){
+                console.log("2. old_start_time existed, writing out chunk object for old stuff");
                 createChunkObjects(old_interval_start_time, old_end_time, old_top, duration);
             }
+
             old_interval_start_time = interval_start_time;
-            old_i = i;
+            old_start_time = i;
             old_top = top;
             old_activities = activities;
+        } else {
+            skipped += 1;
         }
     }
 
     // run it one more time, so the last interval does not get lost
+    var start_time = interval_start_time - skipped * time_interval;
     var final_end_time = Math.min.apply(window, [(i + time_interval), latest_time]);
-    var final_duration = (final_end_time - interval_start_time) / 60000; // 60000 milliseconds in a minute
-    if (old_i != -1 && final_duration > 0){
-        createChunkObjects(interval_start_time, final_end_time, top, final_duration);
+    var final_duration = (final_end_time - interval_start_time + skipped * time_interval) / 60000; // 60000 milliseconds in a minute
+    if (old_start_time != -1 && final_duration > 0){
+        console.log("3. writing out the last one");
+        createChunkObjects(start_time, final_end_time, top, final_duration);
     }
 
 }
@@ -159,7 +175,7 @@ var past_event = -1;
 var reset_start_time = 1;
 var interval_start_time = 0;
 var old_interval_start_time = -1;
-var old_i = -1;
+var old_start_time = -1;
 
 // CONFIG
 var time_interval = 10 * 60000; // 60k milliseconds = 1 minute
