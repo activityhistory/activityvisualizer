@@ -168,7 +168,7 @@ function drawD3(){
         generateChunks();
         updateAll(ui);
 
-        document.getElementById('dateRangeText').innerHTML = 'Date Range: ' + new Date(ui.values[0]).toLocaleTimeString() + ' to ' + new Date(ui.values[1]).toLocaleTimeString();
+        document.getElementById('dateRangeText').innerHTML = new Date(ui.values[0]).toLocaleTimeString() + ' to ' + new Date(ui.values[1]).toLocaleTimeString();
 
     }});
 
