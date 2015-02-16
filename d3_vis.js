@@ -4,10 +4,11 @@ function drawD3(){
     var w = 2000;
     var h = 5000;
 
-    var border_left = 0;
-    var border_top = 100;
-    var date_width = 250;
-    var blob_width = 150;
+    //
+    var border_left = 5;
+    var border_top = 10;
+    var date_width = 100;
+    var blob_width = 50;
     var blob_scaling_factor = 10;
     var image_width = 400;
     var image_height = 200;
@@ -25,7 +26,6 @@ function drawD3(){
     function updateAll(){
 
         // BLOBS
-
         svg.selectAll(".blob_class").remove();
 
         var blobs = svg.selectAll("circle").data(chunk_objects);
@@ -36,18 +36,17 @@ function drawD3(){
         blobs.attr("cx", border_left + date_width)
             .attr("class", "blob_class")
             .attr("cy", function(d, i) {
-                return image_height * i + border_top;
+                return image_height * i + border_top + 50;
             })
             .attr("r", function(d) {
                 return blob_scaling_factor * durationToRadius(d.duration);
             })
-            .attr("fill", function(d) {
-                return "rgb(0, 0, " + (d.duration * 10) + ")";
+            .attr("fill", function(d) { return "steelblue"
+                //return "rgb(0, 0, " + (d.duration * 10) + ")";
             });
 
 
         // TEXT DURATION (e.g. 20min)
-
         svg.selectAll(".text_dur").remove();
 
         var text_dur = svg.selectAll("text_dur")
@@ -59,15 +58,14 @@ function drawD3(){
         text_dur.text(function(d) { return d.duration + "min"; })
             .attr("class", "text_dur")
             .attr("y", function(d, i){
-                return image_height * i + border_top;
+                return (image_height * i + border_top) + 54 ;
             })
-            .attr("x", border_left + date_width)
+            .attr("x", border_left + date_width - 12)
             .attr("font-family", "sans-serif").attr("font-size", "11px")
             .attr("fill", "white");
 
 
         // TEXT LABELS (e.g. Apps)
-
         svg.selectAll(".text_labels").remove();
 
         var text_item = svg.selectAll("text_labels")
@@ -79,7 +77,6 @@ function drawD3(){
         text_item.attr("class", "text_labels")
             .text(function(d, i) {
                 var app_string = d.items[0].name;
-
                 for (var k = 1; k < d.items.length; k++){
                     if (d.items[k] != -1) app_string = app_string + " and " + d.items[k].name;
                 }
@@ -89,12 +86,11 @@ function drawD3(){
                 return image_height * i + border_top;
             })
             .attr("x", date_width + border_left + blob_width + image_width)
-            .attr("font-family", "sans-serif").attr("font-size", "11px")
-            .attr("fill", "black");
+            //.attr("font-family", "sans-serif").attr("font-size", "11px")
+            //.attr("fill", "black");
 
 
         // TEXT DATETIME (e.g. 23:42)
-
         svg.selectAll(".text_time").remove();
 
         var text_date = svg.selectAll("text_time")
@@ -105,18 +101,17 @@ function drawD3(){
 
         text_date.attr("class", "text_time")
             .text(function(d, i) {
-                return new Date(d.start_time).toLocaleTimeString() + " to " + new Date(d.end_time).toLocaleTimeString();
+                return new Date(d.start_time).toLocaleTimeString().substring(0,5) + new Date(d.start_time).toLocaleTimeString().substring(9,11) //+ " to " + new Date(d.end_time).toLocaleTimeString();
             })
             .attr("y", function(d, i) {
                 return image_height * i + border_top;
             })
             .attr("x", border_left)
-            .attr("font-family", "sans-serif").attr("font-size", "11px")
+            //.attr("font-family", "sans-serif").attr("font-size", "11px")
             .attr("fill", "black");
 
 
         // IMAGE
-
         svg.selectAll(".image_class").remove();
 
         var image_class = svg.selectAll("image_class")
@@ -144,7 +139,7 @@ function drawD3(){
 
     }
 
-    $("#timeGranularity").slider({ max: 240 },{min:1},{value:30},{slide: function( event, ui ) {
+    $("#timeGranularity").slider({max:60},{min:5},{value:30},{step:5},{slide: function( event, ui ) {
 
         time_interval = ui.value * 60000;
 
@@ -155,7 +150,7 @@ function drawD3(){
 
     }});
 
-    $("#numberApps").slider({ max: 20 },{min:1},{value:3},{slide: function( event, ui ) {
+    $("#numberApps").slider({max:7},{min:1},{value:3},{slide: function( event, ui ) {
 
         number_of_top_elements = ui.value;
         generateChunks();
