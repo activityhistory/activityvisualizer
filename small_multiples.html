@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<!--
+Adam Rule
+2.22.2014
+
+Webpage showing screenshots and video for AEC study
+
+Helpful Websites
+https://developer.apple.com/library/mac/documentation/QuickTime/Conceptual/QTScripting_JavaScript/aQTScripting_Javascro_AIntro/Introduction%20to%20JavaScript%20QT.html
+http://stackoverflow.com/questions/13595113/html-javascript-iterate-through-all-elements-of-local-server-side-folder
+http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-event-for-an-html-element
+-->
+
+<head>
+    <title>Multiples</title>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+</head>
+
+<body onload="callForImages()">
+
+    <div id="header">
+        <h1>Activity Visualizer: Multiples</h1>
+
+        <div style='float:left;padding:10px;width:200px;'>
+            <p id='sizeText'>Thumbnail Size: 100</p>
+            <div id='windowSize'></div>
+        </div>
+    </div>
+
+    <div id="images"></div>
+
+    <!-- Main script to display images -->
+    <script language="javascript" type="text/javascript">
+
+        // Set size of image
+        var imgW = 576;
+        var imgH = 360;
+
+        var imageContainer = document.getElementById("images");
+
+        //Makes an asynchronous request, loading the getimages.php file
+        function callForImages() {
+
+            //Create the request object
+            var httpReq = (window.XMLHttpRequest)?new XMLHttpRequest():new ActiveXObject("Microsoft.XMLHTTP");
+
+            //When it loads,
+            httpReq.onload = function() {
+
+                //Convert the result back into JSON
+                var result = JSON.parse(httpReq.responseText);
+                var img_data = [];
+                for(var i = 0; i < result.length; i++){
+                    var filename_elements = result[i].split("_");
+                    var x = filename_elements[1];
+                    var y = filename_elements[2].split(".")[0];
+                    img_data.push([result[i], x, y]);
+                }
+
+                //Show the images
+                loadImages(img_data);
+            }
+
+            //Request the page
+            try {
+                httpReq.open("GET", "small_multiples.php", true);
+                httpReq.send(null);
+            } catch(e) {
+                console.log(e);
+            }
+        }
+
+        //Generates the images and sticks them in the container
+        function loadImages(images) {
+
+            var reduced_images = [];
+
+            for(var i = 0; i < images.length; i=i+50) {
+                    reduced_images.push(images[i])
+            }
+
+
+            // //For each image
+            // for(var i = 0; i < images.length; i=i+100) {
+            //
+            //     //Make a new image element, setting the source to the source in the array
+            //     var newImage = document.createElement("img");
+            //     newImage.setAttribute("src", images[i][0]);
+            //     newImage.setAttribute("data-id", i)
+            //     newImage.setAttribute("height", "300px")
+            //     newImage.className = "thumbnail";
+            //
+            //     //Add it to the container
+            //     imageContainer.appendChild(newImage);
+            //
+            // }
+
+            width = 960;
+            height = 100;
+            imgW = 100;
+            imgH = 100;
+            op = 0.5;
+            colors = ['black','#2c96ba','#aac3ce','#8cb65d','#e7a100','#e75b0a']
+
+            xScale = d3.scale.linear()
+                .domain([0,905])
+                .range([0,width]);
+
+            xAxis = d3.svg.axis().scale(xScale).ticks(10)
+
+            d3.select('#images').selectAll('div')
+                .data(reduced_images)
+                .enter().append('div')
+                .attr('class', 'clickDiv')
+                .append('img')
+                    .attr('class', 'clickImg')
+                    .style('position', 'absolute')
+                    .style('top', function(d){return -d[2] + imgH/2 + 'px'})
+                    .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
+                    .attr('src', function(d){return d[0]});
+
+            $("#windowSize").slider({ max: 800 },{min:50},{value:100},{slide: function( event, ui ) {
+                d3.selectAll('.clickDiv')
+                    .style('width', function(){return ui.value+'px'})
+                    .style('height', function(){return ui.value+'px'})
+                    .selectAll('.clickImg')
+                    .style('top', function(d){return -d[4] + ui.value/2 + 'px'})
+                    .style('left', function(d){return  -d[3] + ui.value/2 + 'px'})
+
+                document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
+
+            }});
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
