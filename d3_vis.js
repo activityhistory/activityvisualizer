@@ -171,5 +171,15 @@ function drawD3(){
         document.getElementById('dateRangeText').innerHTML = new Date(ui.values[0]).toLocaleTimeString() + ' to ' + new Date(ui.values[1]).toLocaleTimeString();
 
     }});
+	
+    $("#appSimilarity").slider({max:1.0},{min:0.0},{value:1.0},{step:0.1},{slide: function( event, ui ) {
+
+        app_similarity_ratio = ui.value;
+        generateChunks();
+        updateAll(ui);
+
+        document.getElementById('appSimilarityText').innerHTML = 'App Similarity: ' + ui.value;
+
+    }});
 
 }
