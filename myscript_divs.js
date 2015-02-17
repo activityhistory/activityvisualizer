@@ -1,35 +1,7 @@
-function parseScreenshotNames(){
-    for (var i = 0; i < screenshots.length; i++){
-        var object = {
-            filename : screenshots[i],
-            unix_time : Date.parse(screenshots[i].charAt(2)             //150206-221600413164_1021_601.jpg - > "02.06.2015 22:15:00")//month/day/year
-            + screenshots[i].charAt(3)
-            + "."
-            + screenshots[i].charAt(4)
-            + screenshots[i].charAt(5)
-            + ".20"
-            + screenshots[i].charAt(0)
-            + screenshots[i].charAt(1)
-            + " "
-            + screenshots[i].charAt(7)
-            + screenshots[i].charAt(8)
-            + ":"
-            + screenshots[i].charAt(9)
-            + screenshots[i].charAt(10)
-            + ":"
-            + screenshots[i].charAt(11)
-            + screenshots[i].charAt(12))
-
-        };
-        screenshot_times.push(object);
-    }
-}
-
-
-function getActivityNameFromWindowId(id){
+function getActivityNameFromWindowId(){
     var process_id = window_process_id[windowevent_window_ids[past_event]] - 1; // table is off by one
     var name = process_names[process_id];
-    if (name == "Google Chrome" | name == "Safari"){
+    if (name == "Google Chrome" || name == "Safari"){
         // get hostname from url
         var getLocation = function(href) {
             var l = document.createElement("a");
@@ -60,41 +32,36 @@ function generateAbstraction(){
             past_event = k;
             // 2 : We have a 'Close' Event and before that an 'Active' Event with the same process id
         } else if (past_event != -1 &
-            windowevent_event_type[k] == "Close" &
+            windowevent_event_type[k] == "Close" &&
             windowevent_window_ids[past_event] == windowevent_window_ids[k]) {
             pushEvent(activity_name, start_time, end_time, k);
-            past_event = -1; // TODO in the very end push 2?
+            past_event = -1;
         }
     }
 }
 
 
-function pushEvent(activity_name, start_time, end_time, window_id){
-    filtered_events_description.push(activity_name);
-    filtered_events_start_time.push(start_time);
-    filtered_events_end_time.push(end_time);
+function pushEvent(activity_name, start_time, end_time){
+    var filtered_events_object = {
+        description : activity_name,
+        start_time : start_time,
+        end_time : end_time
+    };
+
+    filtered_events.push(filtered_events_object);
+
 }
 
 
-function inArray(array, id) {
-    for(var i=0;i<array.length;i++) {
-        if (array[i] == id){
-            return i;
-        }
-    }
-    return -1;
-}
-
-
-function getDurations(i){
+function getDurationsForGivenInterval(i){
     // looking through all entries in the abstraction
-    for(var k = 0; k < filtered_events_description.length; k++){
-        var start_time = Math.max.apply(null, [filtered_events_start_time[k], i]);
-        var end_time = Math.min.apply(null, [filtered_events_end_time[k], i+time_interval]);
+    for(var k = 0; k < filtered_events.length; k++){
+        var start_time = Math.max.apply(null, [filtered_events[k].start_time, i]);
+        var end_time = Math.min.apply(null, [filtered_events[k].end_time, i+time_interval]);
         var duration = end_time - start_time;
-        if (duration > 0 && filtered_events_description[k] != "localhost" && filtered_events_description[k] != "NO_URL"){
+        if (duration > 0 && filtered_events[k].description != "localhost" && filtered_events[k].description != "NO_URL"){ //TODO maybe not the best place to filter
             pushDuration(k, duration);
-        } else if (filtered_events_start_time[k] > i+time_interval){
+        } else if (filtered_events[k].start_time > i+time_interval){
             break;
         }
     }
@@ -102,176 +69,116 @@ function getDurations(i){
 
 
 function pushDuration(k, duration){
-    var id = inArray(activity_names, filtered_events_description[k]);
+    var id = inArray(activities, filtered_events[k].description);
     if (id != -1){
-        activity_durations[id] += duration;
+        activities[id].duration += duration;
     } else {
-        activity_durations.push(duration);
-        activity_names.push(filtered_events_description[k]);
+        var activity_object = {
+            duration : duration,
+            name : filtered_events[k].description
+        };
+        activities.push(activity_object);
     }
 }
 
 
-function findTop(){ // TODO order does not matter
-    // find the top 3 apps. Self-implemented sorting. I hope there's no bug in it.
-    var output = [];
-
-    for (var j = 0; j < number_of_top_elements; j++) {
-        var max = Math.max.apply(window, activity_durations);
-        if (max > 0){
-            var index = activity_durations.indexOf(max);
-            output.push(activity_names[index]);
-            activity_durations[index] = -1;
-        } else {
-            output.push(-1);
-        }
-    }
-
-    return output;
+function findNMostUsedActivities(){
+    return activities.sort(function (a, b){ return b.duration - a.duration; }).slice(0,number_of_top_elements);
 }
 
 
-function convertUnixTimeToHumanReadable(unix_time){
-    var date = new Date(unix_time);
-    var hours = date.getHours();
-    var minutes = "0" + date.getMinutes();
-    var seconds = "0" + date.getSeconds();
-    return hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
-}
-
-
-function addTableTextCell(tr, text, classname, height){
-    var td=document.createElement('td');
-    //td.className = classname;
-    //td.setAttribute("style", "height: " + height + "px;");
-    td.appendChild(document.createTextNode(text));
-    tr.appendChild(td);
-}
-
-
-function inArray2(array, el) {
-    for ( var i = array.length; i--; ) {
-        if ( array[i] === el ) return true;
-    }
-    return false;
-}
-
-
-function isEqArrays(arr1, arr2) {
-    if ( arr1.length != arr2.length ) {
-        return false;
-    }
-    for ( var i = arr1.length; i--; ) {
-        if ( !inArray2( arr2, arr1[i] ) ) {
-            return false;
-        }
-    }
-    return true;
-}
-
-
-function addNewRowToTable(tbdy, chunkobject){
-    var tr=document.createElement('tr');
-
-    var start_time = convertUnixTimeToHumanReadable(chunkobject.start_time);
-    var end_time = convertUnixTimeToHumanReadable(chunkobject.end_time);
-
-    if (chunkobject.duration > 0){
-
-        addTableTextCell(tr, start_time + " to " + end_time, "class_timestamp", 20);
-        addTableTextCell(tr, "Minutes: " + chunkobject.duration, "class_duration", 20);
-
-        for(var i = 0; i < number_of_top_elements; i++){
-            if (chunkobject.items[i] != -1) {
-                addTableTextCell(tr, chunkobject.items[i], "class_elements", chunkobject.duration * 1);
-            }
-        }
-
-        tbdy.appendChild(tr);
-    }
-}
-
-function createChunkObjects(interval_start_time, i, time_interval, items){
+function createChunkObjects(interval_start_time, end_time, items, duration){
     var chunkobject = {
         start_time : interval_start_time,
-        end_time : (i + time_interval),
-        duration : ((i + time_interval) - interval_start_time) / 60000, // 60000 milliseconds in a minute,
+        end_time : end_time,
+        duration : duration,
         items : items
     };
 
-    if (chunkobject.duration > 0 && chunkobject.items.length > 0 && chunkobject.items[0] != -1){
-        chunk_objects.push(chunkobject);
-    }
+    chunk_objects.push(chunkobject);
 }
 
-
-function tableCreate(){
-    var body=document.getElementsByTagName('body')[0];
-    var tbl=document.createElement('table');
-    tbl.setAttribute('border','5');
-    var tbdy=document.createElement('tbody');
-
-
-    for (var i = 0; i < chunk_objects.length; i++){
-        addNewRowToTable(tbdy, chunk_objects[i]);
-    }
-
-    tbl.appendChild(tbdy);
-    body.appendChild(tbl)
-
-}
 
 function generateChunks(){
-
     chunk_objects = [];
 
-    // slicing time and searching for every interval
-    for(var i = earliest_time; i < latest_time; i += time_interval){
+    var prev_top_apps = [];
+    var prev_start_time = 0;
+    var prev_end_time = 0;
+    var prev_duration = 0;
+    var first_similar = 1;
 
-        // we only start with a new time_interval, if reset_start_time is set to 1
-        if (reset_start_time == 1){
-            interval_start_time = i;
-            reset_start_time = 0;
+    for(var i = earliest_time; i < latest_time; i+= time_interval){
+
+        activities = [];
+        getDurationsForGivenInterval(i);
+        var current_top_apps = findNMostUsedActivities();
+
+        // if the first chunk
+        //TODO check if chunk other than the first has 0 apps
+        if(prev_top_apps.length == 0){
+            prev_top_apps = current_top_apps;
+            prev_start_time = i;
+            prev_end_time = i + time_interval;
+            prev_duration = (prev_end_time - prev_start_time) / 60000;
         }
 
-        activity_durations = [];
-        activity_names = [];
+        // if the last chunk
+        else if( i + time_interval >= latest_time ){
+            if(isSimilarArrays(prev_top_apps, current_top_apps)){
+                // update previous
+                prev_end_time = latest_time;
+                prev_duration = (latest_time - prev_start_time) / 60000;
 
-        getDurations(i);
-
-        var top = findTop();
-
-        // if anything has changed compared to the last table entry, then it's time for a new one!
-        if (isEqArrays(top, old_top) == false){
-            // things have changed, so we will start a new interval
-            reset_start_time = 1;
-
-            if (old_i != -1){
-                createChunkObjects(old_interval_start_time, old_i, time_interval, old_top);
+                //write previous
+                createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
             }
-            old_interval_start_time = interval_start_time;
-            old_i = i;
-            old_top = top;
-            old_activity_durations = activity_durations;
-            old_activity_names = activity_names;
+            else{
+                //write previous
+                createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
+
+                //write current
+                createChunkObjects(i, latest_time, current_top_apps, (latest_time - i)/60000);
+            }
+        }
+
+        // if any intermediate chunk
+        else{
+            if(isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 1){
+                first_similar = 0;
+                //update previous
+                prev_end_time = i + time_interval;
+                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                // var old_length = prev_top_apps.length;
+                prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
+            }
+            else if (isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 0){
+                first_similar = 0;
+                //update previous
+                prev_end_time = i + time_interval;
+                prev_duration = (prev_end_time - prev_start_time) / 60000;
+            }
+            else{
+                first_similar = 1;
+                //write previous
+                createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
+                //console.log(prev_top_apps)
+
+                //update previous = current
+                prev_start_time = i;
+                prev_end_time = i + time_interval;
+                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                prev_top_apps = current_top_apps;
+            }
         }
     }
-    // run it one more time, so the last interval does not get lost
-    createChunkObjects(interval_start_time, i, time_interval, top);
 
 }
 
-var filtered_events_description = [];
-var filtered_events_start_time = [];
-var filtered_events_end_time = [];
-
-var activity_durations = [];
-var activity_names = [];
-var old_activity_durations = [];
-var old_activity_names = [];
-
+var filtered_events = [];
+var activities = [];
+var old_activities = [];
 var chunk_objects = [];
-var screenshot_times = [];
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
@@ -285,8 +192,9 @@ var old_interval_start_time = -1;
 var old_i = -1;
 
 // CONFIG
-var time_interval = 120 * 60000; // 60k milliseconds = 1 minute
+var time_interval = 25 * 60000; // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
+var app_similarity_ratio = 1.0;
 
 window.onload = function() {
 
@@ -296,4 +204,4 @@ window.onload = function() {
     //tableCreate();
     drawD3();
 
-}
+};
