@@ -69,11 +69,7 @@ function isSimilarArrays(arr1, arr2) { //TODO not very nice
             number_of_same_elements++;
         }
     }
-    if (number_of_same_elements / (number_of_same_elements + number_of_different_elements) >= 0.5){
-        return true;
-    } else {
-        return false;
-    }
+    return number_of_same_elements / (number_of_same_elements + number_of_different_elements) >= 0.5;
 
 }
 

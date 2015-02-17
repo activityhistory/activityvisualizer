@@ -102,16 +102,16 @@ function createChunkObjects(interval_start_time, end_time, items, duration){
 function generateChunks(){
     chunk_objects = [];
 
-    prev_top_apps = [];
-    prev_start_time = 0;
-    prev_end_time = 0;
-    prev_duration = 0;
+    var prev_top_apps = [];
+    var prev_start_time = 0;
+    var prev_end_time = 0;
+    var prev_duration = 0;
 
     for(var i = earliest_time; i < latest_time; i+= time_interval){
 
         activities = [];
         getDurationsForGivenInterval(i);
-        current_top_apps = findNMostUsedActivities();
+        var current_top_apps = findNMostUsedActivities();
 
         // if the first chunk
         //TODO check if chunk other than the first has 0 apps
@@ -147,7 +147,7 @@ function generateChunks(){
                 //update previous
                 prev_end_time = i + time_interval;
                 prev_duration = (prev_end_time - prev_start_time) / 60000;
-                var old_length = prev_top_apps.length;
+                // var old_length = prev_top_apps.length;
                 //prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
                 console.log(prev_top_apps);
             }
