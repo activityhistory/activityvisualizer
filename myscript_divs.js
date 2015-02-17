@@ -192,8 +192,9 @@ var old_interval_start_time = -1;
 var old_i = -1;
 
 // CONFIG
-var time_interval = 10 * 60000; // 60k milliseconds = 1 minute
-var number_of_top_elements = 1;
+var time_interval = 25 * 60000; // 60k milliseconds = 1 minute
+var number_of_top_elements = 3;
+var app_similarity_ratio = 1.0;
 
 window.onload = function() {
 
