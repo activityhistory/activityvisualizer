@@ -100,12 +100,12 @@ function createChunkObjects(interval_start_time, end_time, items, duration){
 
 
 function generateChunks(){
-    chunk_objects = []
+    chunk_objects = [];
 
-    prev_top_apps = []
-    prev_start_time = 0
-    prev_end_time = 0
-    prev_duration = 0
+    prev_top_apps = [];
+    prev_start_time = 0;
+    prev_end_time = 0;
+    prev_duration = 0;
 
     for(var i = earliest_time; i < latest_time; i+= time_interval){
 
