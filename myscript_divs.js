@@ -106,6 +106,7 @@ function generateChunks(){
     var prev_start_time = 0;
     var prev_end_time = 0;
     var prev_duration = 0;
+    var first_similar = 1;
 
     for(var i = earliest_time; i < latest_time; i+= time_interval){
 
@@ -143,15 +144,22 @@ function generateChunks(){
 
         // if any intermediate chunk
         else{
-            if(isSimilarArrays(prev_top_apps, current_top_apps)){
+            if(isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 1){
+                first_similar = 0;
                 //update previous
                 prev_end_time = i + time_interval;
                 prev_duration = (prev_end_time - prev_start_time) / 60000;
                 // var old_length = prev_top_apps.length;
-                //prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
-                console.log(prev_top_apps);
+                prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
+            }
+            else if (isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 0){
+                first_similar = 0;
+                //update previous
+                prev_end_time = i + time_interval;
+                prev_duration = (prev_end_time - prev_start_time) / 60000;
             }
             else{
+                first_similar = 1;
                 //write previous
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
                 //console.log(prev_top_apps)

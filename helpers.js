@@ -75,13 +75,10 @@ function isSimilarArrays(arr1, arr2) { //TODO not very nice
 
 function getEqualItems(a, b){
 
-    console.log("a: ", a);
-    console.log("b: ", b);
-
     var t;
     if (b.length > a.length) t = b, b = a, a = t; // indexOf to loop over shorter
     return a.filter(function (e) {
-        for (var i = 0; i < b.length; b++){
+        for (var i = 0; i < b.length; i++){
             if (b[i].name === e.name) {
                 return true;
             }
