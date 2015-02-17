@@ -3,6 +3,7 @@ body{
     font-size: 10pt;
     margin: 0px;
     padding: 0px;
+    background-color: #555;
 }
 
 h1{
@@ -48,4 +49,8 @@ h1{
     border-style: solid;
     border-width: 1px;
     border-color: #DDD;
+}
+
+.clickImg{
+    position: absolute;
 }

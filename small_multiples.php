@@ -1,7 +1,7 @@
 <?php
 
 // Adam Rule
-// 2.11.2014
+// 02.16.2015
 // Code copied from http://stackoverflow.com/questions/13595113
 
     //The directory that holds the images

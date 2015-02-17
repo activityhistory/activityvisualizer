@@ -2,12 +2,11 @@
 
 <!--
 Adam Rule
-2.22.2014
+02.16.2015
 
 Webpage showing screenshots and video for AEC study
 
 Helpful Websites
-https://developer.apple.com/library/mac/documentation/QuickTime/Conceptual/QTScripting_JavaScript/aQTScripting_Javascro_AIntro/Introduction%20to%20JavaScript%20QT.html
 http://stackoverflow.com/questions/13595113/html-javascript-iterate-through-all-elements-of-local-server-side-folder
 http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-event-for-an-html-element
 -->
@@ -30,10 +29,16 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
     <div id="header">
         <h1>Activity Visualizer: Multiples</h1>
 
-        <div style='float:left;padding:10px;width:200px;'>
+        <div class="slider-block">
             <p id='sizeText'>Thumbnail Size: 100</p>
             <div id='windowSize'></div>
         </div>
+
+        <div class="slider-block">
+            <p id='numImageText'># of images: 20</p>
+            <div id='numOfImages'></div>
+        </div>
+
     </div>
 
     <div id="images"></div>
@@ -41,11 +46,11 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
     <!-- Main script to display images -->
     <script language="javascript" type="text/javascript">
 
-        // Set size of image
-        var imgW = 576;
-        var imgH = 360;
+        var img_data = []
 
-        var imageContainer = document.getElementById("images");
+        // starting image size
+        imgW = 100;
+        imgH = 100;
 
         //Makes an asynchronous request, loading the getimages.php file
         function callForImages() {
@@ -58,7 +63,7 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 
                 //Convert the result back into JSON
                 var result = JSON.parse(httpReq.responseText);
-                var img_data = [];
+                // var img_data = [];
                 for(var i = 0; i < result.length; i++){
                     var filename_elements = result[i].split("_");
                     var x = filename_elements[1];
@@ -82,68 +87,69 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
         //Generates the images and sticks them in the container
         function loadImages(images) {
 
+            // only grab 20 images
             var reduced_images = [];
-
-            for(var i = 0; i < images.length; i=i+50) {
-                    reduced_images.push(images[i])
+            var jump_by = parseInt(images.length/20)
+            for(var i = 0; i < images.length; i=i+jump_by) {
+                    reduced_images.push(images[i]);
             }
 
-
-            // //For each image
-            // for(var i = 0; i < images.length; i=i+100) {
-            //
-            //     //Make a new image element, setting the source to the source in the array
-            //     var newImage = document.createElement("img");
-            //     newImage.setAttribute("src", images[i][0]);
-            //     newImage.setAttribute("data-id", i)
-            //     newImage.setAttribute("height", "300px")
-            //     newImage.className = "thumbnail";
-            //
-            //     //Add it to the container
-            //     imageContainer.appendChild(newImage);
-            //
-            // }
-
-            width = 960;
-            height = 100;
-            imgW = 100;
-            imgH = 100;
-            op = 0.5;
-            colors = ['black','#2c96ba','#aac3ce','#8cb65d','#e7a100','#e75b0a']
-
-            xScale = d3.scale.linear()
-                .domain([0,905])
-                .range([0,width]);
-
-            xAxis = d3.svg.axis().scale(xScale).ticks(10)
-
+            // add images to page in a div used for cropping
             d3.select('#images').selectAll('div')
                 .data(reduced_images)
                 .enter().append('div')
                 .attr('class', 'clickDiv')
                 .append('img')
                     .attr('class', 'clickImg')
-                    .style('position', 'absolute')
                     .style('top', function(d){return -d[2] + imgH/2 + 'px'})
                     .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
                     .attr('src', function(d){return d[0]});
 
-            $("#windowSize").slider({ max: 800 },{min:50},{value:100},{slide: function( event, ui ) {
+            // resize and reposition images on change of image size
+            $("#windowSize").slider({max:800},{min:50},{value:100},{slide: function( event, ui ) {
                 d3.selectAll('.clickDiv')
                     .style('width', function(){return ui.value+'px'})
                     .style('height', function(){return ui.value+'px'})
                     .selectAll('.clickImg')
-                    .style('top', function(d){return -d[4] + ui.value/2 + 'px'})
-                    .style('left', function(d){return  -d[3] + ui.value/2 + 'px'})
+                        .style('top', function(d){return -d[2] + ui.value/2 + 'px'})
+                        .style('left', function(d){return  -d[1] + ui.value/2 + 'px'});
 
                 document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
+                imgW = ui.value;
+                imgH = ui.value;
+            }});
 
+            $("#numOfImages").slider({max:100},{min:10},{step:5},{value:20},{slide: function( event, ui ) {
+                var reduced_images = [];
+                var jump_by = parseInt(img_data.length/ui.value)
+                for(var i = 0; i < img_data.length; i=i+jump_by) {
+                        reduced_images.push(img_data[i]);
+                }
+
+                multiples = d3.select('#images').selectAll('.clickDiv')
+                    .data([]);
+
+                multiples.exit().remove();
+
+                multiples = d3.select('#images').selectAll('img')
+                    .data(reduced_images);
+
+                multiples.enter().append('div')
+                    .attr('class', 'clickDiv')
+                    .append('img')
+                        .attr('class', 'clickImg')
+                        .style('top', function(d){return -d[2] + imgH/2 + 'px'})
+                        .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
+                        .attr('src', function(d){return d[0]});
+
+                multiples.exit().remove();
+
+                document.getElementById('numImageText').innerHTML = '# of images: ' + ui.value;
             }});
 
         }
 
     </script>
-
 
 </body>
 
