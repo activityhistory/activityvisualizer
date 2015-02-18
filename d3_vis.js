@@ -6,6 +6,7 @@ function drawD3(){
 
     var border_left = 5;
     var border_top = 10;
+    var weekday_label_height = 20;
     var date_width = 60;
     var timeline_width = 20;
 
@@ -33,9 +34,27 @@ function drawD3(){
             return new Date(d).getHours();
         })
         .attr("y", function(d) {
-            return  pixel_per_minute * millisecondsToMinutes(d % minutesToMilliseconds(60 * 24)) + border_top;
+            return  pixel_per_minute * millisecondsToMinutes(d % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
         })
         .attr("x", border_left)
+        //.attr("font-family", "sans-serif").attr("font-size", "11px")
+        .attr("fill", "black");
+
+    var weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    var weekday_labels = svg.selectAll(".weekday_label_class").data(weekdays);
+
+    weekday_labels.enter()
+        .append("text");
+
+    weekday_labels.attr("class", "weekday_label_class")
+        .text(function(d) {
+            return d;
+        })
+        .attr("y", border_top)
+        .attr("x", function(d, i) {
+            return  border_left + date_width + timeline_width + i * 3 * timeline_width;
+        })
         //.attr("font-family", "sans-serif").attr("font-size", "11px")
         .attr("fill", "black");
 
@@ -62,7 +81,7 @@ function drawD3(){
         })
             .attr("class", "clicks_class")
             .attr("y", function(d) {
-                return  pixel_per_minute * millisecondsToMinutes(d.minute_start_time % minutesToMilliseconds(60 * 24)) + border_top;
+                return  pixel_per_minute * millisecondsToMinutes(d.minute_start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
             })
             .attr("height", pixel_per_minute)
             .attr("width", timeline_width)
@@ -88,7 +107,7 @@ function drawD3(){
         })
             .attr("class", "rect_class")
             .attr("y", function(d) {
-                return  pixel_per_minute * millisecondsToMinutes(d.start_time % minutesToMilliseconds(60 * 24)) + border_top;
+                return  pixel_per_minute * millisecondsToMinutes(d.start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
             })
             .attr("height", function(d) {
                 return durationToHeight(d.duration);
