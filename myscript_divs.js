@@ -120,7 +120,7 @@ function generateChunks(){
             prev_top_apps = current_top_apps;
             prev_start_time = i;
             prev_end_time = i + time_interval;
-            prev_duration = (prev_end_time - prev_start_time) / 60000;
+            prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
         }
 
         // if the last chunk
@@ -128,7 +128,7 @@ function generateChunks(){
             if(isSimilarArrays(prev_top_apps, current_top_apps)){
                 // update previous
                 prev_end_time = latest_time;
-                prev_duration = (latest_time - prev_start_time) / 60000;
+                prev_duration = millisecondsToMinutes(latest_time - prev_start_time);
 
                 //write previous
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
@@ -138,7 +138,7 @@ function generateChunks(){
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
 
                 //write current
-                createChunkObjects(i, latest_time, current_top_apps, (latest_time - i)/60000);
+                createChunkObjects(i, latest_time, current_top_apps, millisecondsToMinutes(latest_time - i));
             }
         }
 
@@ -148,7 +148,7 @@ function generateChunks(){
                 first_similar = 0;
                 //update previous
                 prev_end_time = i + time_interval;
-                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
                 // var old_length = prev_top_apps.length;
                 prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
             }
@@ -156,7 +156,7 @@ function generateChunks(){
                 first_similar = 0;
                 //update previous
                 prev_end_time = i + time_interval;
-                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
             }
             else{
                 first_similar = 1;
@@ -167,7 +167,7 @@ function generateChunks(){
                 //update previous = current
                 prev_start_time = i;
                 prev_end_time = i + time_interval;
-                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
                 prev_top_apps = current_top_apps;
             }
         }
@@ -177,22 +177,15 @@ function generateChunks(){
 
 var filtered_events = [];
 var activities = [];
-var old_activities = [];
 var chunk_objects = [];
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
 
-var old_top = [];
-
 var past_event = -1;
-var reset_start_time = 1;
-var interval_start_time = 0;
-var old_interval_start_time = -1;
-var old_i = -1;
 
 // CONFIG
-var time_interval = 25 * 60000; // 60k milliseconds = 1 minute
+var time_interval = minutesToMilliSeconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
 var app_similarity_ratio = 1.0;
 
@@ -200,7 +193,7 @@ window.onload = function() {
 
     parseScreenshotNames();
     generateAbstraction();
-    //generateChunks();
+    generateChunks();
     //tableCreate();
     drawD3();
 
