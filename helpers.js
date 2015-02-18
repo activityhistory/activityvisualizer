@@ -99,6 +99,6 @@ function millisecondsToMinutes(x){
 }
 
 
-function minutesToMilliSeconds(x){
+function minutesToMilliseconds(x){
     return x * 60000
 }

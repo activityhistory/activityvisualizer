@@ -17,7 +17,7 @@ function getActivityNameFromWindowId(){
 
 
 function calculateClicksPerMinute(){
-    for (var i = earliest_time; i < latest_time; i += minutesToMilliSeconds(1)){
+    for (var i = earliest_time; i < latest_time; i += minutesToMilliseconds(1)){
         var minute_click_object = {
             minute_start_time : i,
             number_of_clicks : 0
@@ -34,6 +34,12 @@ function calculateClicksPerMinute(){
             }
         }
     }
+
+    $.each(minutes_with_clicks, function(key, element) {
+
+        if (element.number_of_clicks > highest_numner_of_clicks_per_minute) highest_numner_of_clicks_per_minute = element.number_of_clicks;
+
+    });
 }
 
 
@@ -199,6 +205,7 @@ var filtered_events = [];
 var activities = [];
 var chunk_objects = [];
 var minutes_with_clicks = [];
+var highest_numner_of_clicks_per_minute = 0;
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
@@ -206,7 +213,7 @@ var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
 var past_event = -1;
 
 // CONFIG
-var time_interval = minutesToMilliSeconds(20); // 60k milliseconds = 1 minute
+var time_interval = minutesToMilliseconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
 var app_similarity_ratio = 1.0;
 
