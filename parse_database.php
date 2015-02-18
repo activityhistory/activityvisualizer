@@ -11,6 +11,8 @@
 	$dbh = new PDO($dir) or die("cannot open database");
 
 
+
+
 	// ## PARSE WINDOWEVENT - Get words for wordcloud
 
 	// Define your SQL statement //
@@ -35,6 +37,8 @@
 	echo "var windowevent_event_type = ".json_encode($windowevent_event_type).";\n";
 	
 	
+	
+	
 	// ## PARSE WINDOW - Get process_ids, urls and stuff
 	$query_words = "SELECT * FROM window";
 
@@ -52,6 +56,8 @@
 
 	echo "var window_process_id = ".json_encode($window_process_id).";\n";
 	echo "var window_browser_url = ".json_encode($window_browser_url).";\n";
+	
+	
 	
 	
 	// ## PARSE PROCESS - Get processes for labels //
@@ -73,7 +79,27 @@
 	echo "var process_ids = ".json_encode($process_ids).";\n";
 	
 	
-	// Get screenshot Filenames
+	
+	
+	// ## PARSE CLICK - Get processes for labels //
+	$query = "SELECT * FROM click";
+
+	$click_times = array();
+
+	// Iterate through the results and pass into JSON encoder //
+
+	foreach ($dbh->query($query) as $row) {
+
+		array_push($click_times, $row[1]);
+
+	}
+
+	echo "var click_times = ".json_encode($click_times).";\n";
+	
+	
+	
+	
+	// ## Get screenshot Filenames
 	
 	// create an array to hold directory list
     $results = array();

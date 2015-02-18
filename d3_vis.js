@@ -8,10 +8,11 @@ function drawD3(){
     var border_top = 10;
     var date_width = 60;
     var timeline_width = 20;
+    var color_multiplier = 20;
 
     var full_height = 500;
     var full_duration = latest_time - earliest_time;
-    var pixel_per_second = full_height / millisecondsToMinutes(full_duration);
+    var pixel_per_minutes = full_height / millisecondsToMinutes(full_duration);
 
     //Create SVG element
     var svg = d3.select("body")
@@ -20,15 +21,53 @@ function drawD3(){
         .attr("height", h);
 
     function durationToHeight(duration){
-        return pixel_per_second * duration;
+        return pixel_per_minutes * duration;
     }
 
     function updateAll(){
 
+
+        // CLICKS RECTANGLES
+        svg.selectAll(".clicks_class").remove();
+
+        var click_rects = svg.selectAll(".clicks_class").data(minutes_with_clicks);
+
+        click_rects.enter()
+            .append("rect");
+
+        click_rects.attr("x", border_left + date_width + timeline_width)
+            .attr("class", "clicks_class")
+            .attr("y", function(d, i) {
+                return  pixel_per_minutes * i + border_top;
+            })
+            .attr("height", function(d) {
+                return pixel_per_minutes * 1;
+            })
+            .attr("width", timeline_width)
+            .attr("fill", function(d) {
+                var number_of_clicks = d.number_of_clicks;
+
+                var highest = 0;
+
+                $.each(minutes_with_clicks, function(key, element) {
+
+                    if (element.number_of_clicks > highest) highest = element.number_of_clicks;
+
+                });
+
+                var color = Math.floor((number_of_clicks * 255) / highest);
+
+                console.log(color);
+
+                return "rgb(" + 255 + ", " + (255 - color) + ", " + (255 - color) + ")";
+            });
+
+
+
         // TIMELINE RECTANGLES
         svg.selectAll(".rect_class").remove();
 
-        var blobs = svg.selectAll("circle").data(chunk_objects);
+        var blobs = svg.selectAll(".rect_class").data(chunk_objects);
 
         blobs.enter()
             .append("rect");
@@ -36,13 +75,14 @@ function drawD3(){
         blobs.attr("x", border_left + date_width)
             .attr("class", "rect_class")
             .attr("y", function(d) {
-                return  pixel_per_second * millisecondsToMinutes(d.start_time - earliest_time) + border_top;
+                return  pixel_per_minutes * millisecondsToMinutes(d.start_time - earliest_time) + border_top;
             })
             .attr("height", function(d) {
                 return durationToHeight(d.duration);
             })
             .attr("width", timeline_width)
             .attr("fill", function(d) {
+
                 return "rgb(0, 0, " + (d.duration * 10) + ")";
             });
 
@@ -65,7 +105,7 @@ function drawD3(){
                 }
             })
             .attr("y", function(d) {
-                return  pixel_per_second * millisecondsToMinutes(d.start_time - earliest_time) + border_top;
+                return  pixel_per_minutes * millisecondsToMinutes(d.start_time - earliest_time) + border_top;
             })
             .attr("x", border_left)
             //.attr("font-family", "sans-serif").attr("font-size", "11px")

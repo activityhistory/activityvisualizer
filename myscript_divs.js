@@ -16,6 +16,27 @@ function getActivityNameFromWindowId(){
 }
 
 
+function calculateClicksPerMinute(){
+    for (var i = earliest_time; i < latest_time; i += minutesToMilliSeconds(1)){
+        var minute_click_object = {
+            minute_start_time : i,
+            number_of_clicks : 0
+        };
+        minutes_with_clicks.push(minute_click_object);
+    }
+
+    for (var k = 0; k < click_times.length; k++) {
+        var time = Date.parse(click_times[k]);
+        for (var j = 0; j < minutes_with_clicks.length; j++){
+            if (time < minutes_with_clicks[j].minute_start_time){
+                minutes_with_clicks[j].number_of_clicks++;
+                break;
+            }
+        }
+    }
+}
+
+
 // generating an abstraction of the activities in time
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
 function generateAbstraction(){
@@ -149,7 +170,6 @@ function generateChunks(){
                 //update previous
                 prev_end_time = i + time_interval;
                 prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
-                // var old_length = prev_top_apps.length;
                 prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
             }
             else if (isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 0){
@@ -178,6 +198,7 @@ function generateChunks(){
 var filtered_events = [];
 var activities = [];
 var chunk_objects = [];
+var minutes_with_clicks = [];
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
@@ -192,6 +213,7 @@ var app_similarity_ratio = 1.0;
 window.onload = function() {
 
     parseScreenshotNames();
+    calculateClicksPerMinute();
     generateAbstraction();
     generateChunks();
     //tableCreate();
