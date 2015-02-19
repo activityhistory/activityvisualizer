@@ -287,7 +287,7 @@ function drawD3(){
         svg.remove();
 
         //Create SVG element
-        svg = d3.select("body")
+            svg = d3.select("body")
             .append("svg")
             .attr("width", w)
             .attr("height", h);
@@ -303,7 +303,7 @@ function drawD3(){
             updateAllWeekView();
         }
         if ($('input[name=radio]:checked', '#myForm').val() == "small_multiples"){
-            updateAllSmallMultiplesView();
+            window.location.href = "small_multiples.html";
         }
 
     }
