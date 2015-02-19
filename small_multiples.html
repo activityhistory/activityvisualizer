@@ -52,6 +52,17 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
         imgW = 100;
         imgH = 100;
 
+        var tooltip = d3.select("body")
+            .append("div")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden")
+            .text("a simple tooltip");
+
+        var multiples = d3.select('#images').selectAll('.clickDiv');
+
+        multiples.data([]);
+
         //Makes an asynchronous request, loading the getimages.php file
         function callForImages() {
 
@@ -126,10 +137,12 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                         reduced_images.push(img_data[i]);
                 }
 
-                multiples = d3.select('#images').selectAll('.clickDiv')
+                multipleDivs = d3.select('#images').selectAll('.clickDiv')
                     .data([]);
 
-                multiples.exit().remove();
+                multipleDivs.exit().remove();
+
+                // multiples.data(reduced_images);
 
                 multiples = d3.select('#images').selectAll('img')
                     .data(reduced_images);
@@ -140,12 +153,17 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                         .attr('class', 'clickImg')
                         .style('top', function(d){return -d[2] + imgH/2 + 'px'})
                         .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
-                        .attr('src', function(d){return d[0]});
+                        .attr('src', function(d){return d[0]})
+                        .on("mouseover", function(){return tooltip.style("visibility", "visible");})
+                        .on("mousemove", function(){return tooltip.style("top", (this.pageY-10)+"px").style("left",(this.pageX+10)+"px");})
+                        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
                 multiples.exit().remove();
 
                 document.getElementById('numImageText').innerHTML = '# of images: ' + ui.value;
             }});
+
+
 
         }
 
