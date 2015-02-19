@@ -11,7 +11,11 @@ function drawD3(){
     var timeline_width = 20;
 
     var full_height = 500;
+    var full_width = 1300;
     var pixel_per_minute = full_height / (60 * 24);
+
+    var image_width = (full_width / 7) - 2 * timeline_width;
+    var image_height = 100;
 
     //Create SVG element
     var svg = d3.select("body")
@@ -53,7 +57,7 @@ function drawD3(){
         })
         .attr("y", border_top)
         .attr("x", function(d, i) {
-            return  border_left + date_width + timeline_width + i * 3 * timeline_width;
+            return  border_left + date_width + timeline_width + i * (full_width / 7);
         })
         //.attr("font-family", "sans-serif").attr("font-size", "11px")
         .attr("fill", "black");
@@ -77,7 +81,7 @@ function drawD3(){
 
         click_rects.attr("x", function(d) {
             var day = new Date(d.minute_start_time).getDay();
-            return  border_left + date_width + timeline_width + day * 3 * timeline_width;
+            return  border_left + date_width + day * (full_width / 7);
         })
             .attr("class", "clicks_class")
             .attr("y", function(d) {
@@ -103,11 +107,11 @@ function drawD3(){
 
         blobs.attr("x", function(d) {
             var day = new Date(d.start_time).getDay();
-            return  border_left + date_width + day * 3 * timeline_width;
+            return border_left + date_width + timeline_width + day * (full_width / 7);
         })
             .attr("class", "rect_class")
             .attr("y", function(d) {
-                return  pixel_per_minute * millisecondsToMinutes(d.start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
+                return pixel_per_minute * millisecondsToMinutes(d.start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
             })
             .attr("height", function(d) {
                 return durationToHeight(d.duration);
@@ -116,6 +120,38 @@ function drawD3(){
             .attr("fill", function(d) {
 
                 return "rgb(0, 0, " + (d.duration * 10) + ")";
+            });
+
+
+
+        // IMAGE
+        svg.selectAll(".image_class").remove();
+
+        var image_class = svg.selectAll("image_class")
+            .data(chunk_objects);
+
+        image_class.enter()
+            .append("svg:image");
+
+        image_class.attr("class", "image_class")
+            .attr("y", function(d, i) {
+                return pixel_per_minute * millisecondsToMinutes(d.start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
+            })
+            .attr("x", function(d) {
+                var day = new Date(d.start_time).getDay();
+                return border_left + date_width + 2 * timeline_width + day * (full_width / 7);
+            })
+            .attr("width", image_width)
+            .attr("height", function(d) {
+                return durationToHeight(d.duration);
+            })
+            .attr("xlink:href", function(d, i) {
+                for (var j = 0; j < screenshot_times.length; j++){
+                    if (screenshot_times[j].unix_time >= d.start_time && screenshot_times[j].unix_time <= d.end_time){
+                        return "data/screenshots/" + screenshot_times[j].filename;
+                    }
+                }
+                return "benchmark.png";
             });
 
     }
