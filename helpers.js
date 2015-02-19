@@ -73,10 +73,15 @@ function isSimilarArrays(arr1, arr2) { //TODO not very nice
 
 }
 
+
 function getEqualItems(a, b){
 
     var t;
-    if (b.length > a.length) t = b, b = a, a = t; // indexOf to loop over shorter
+    if (b.length > a.length) {
+        t = b;
+        b = a;
+        a = t;
+    } // indexOf to loop over shorter
     return a.filter(function (e) {
         for (var i = 0; i < b.length; i++){
             if (b[i].name === e.name) {
@@ -86,4 +91,14 @@ function getEqualItems(a, b){
         return false;
     });
 
+}
+
+
+function millisecondsToMinutes(x){
+    return x / 60000
+}
+
+
+function minutesToMilliseconds(x){
+    return x * 60000
 }

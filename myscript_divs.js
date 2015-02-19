@@ -16,6 +16,33 @@ function getActivityNameFromWindowId(){
 }
 
 
+function calculateClicksPerMinute(){
+    for (var i = earliest_time; i < latest_time; i += minutesToMilliseconds(1)){
+        var minute_click_object = {
+            minute_start_time : i,
+            number_of_clicks : 0
+        };
+        minutes_with_clicks.push(minute_click_object);
+    }
+
+    for (var k = 0; k < click_times.length; k++) {
+        var time = Date.parse(click_times[k]);
+        for (var j = 0; j < minutes_with_clicks.length; j++){
+            if (time < minutes_with_clicks[j].minute_start_time){
+                minutes_with_clicks[j].number_of_clicks++;
+                break;
+            }
+        }
+    }
+
+    $.each(minutes_with_clicks, function(key, element) {
+
+        if (element.number_of_clicks > highest_numner_of_clicks_per_minute) highest_numner_of_clicks_per_minute = element.number_of_clicks;
+
+    });
+}
+
+
 // generating an abstraction of the activities in time
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
 function generateAbstraction(){
@@ -120,7 +147,7 @@ function generateChunks(){
             prev_top_apps = current_top_apps;
             prev_start_time = i;
             prev_end_time = i + time_interval;
-            prev_duration = (prev_end_time - prev_start_time) / 60000;
+            prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
         }
 
         // if the last chunk
@@ -128,7 +155,7 @@ function generateChunks(){
             if(isSimilarArrays(prev_top_apps, current_top_apps)){
                 // update previous
                 prev_end_time = latest_time;
-                prev_duration = (latest_time - prev_start_time) / 60000;
+                prev_duration = millisecondsToMinutes(latest_time - prev_start_time);
 
                 //write previous
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
@@ -138,7 +165,7 @@ function generateChunks(){
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
 
                 //write current
-                createChunkObjects(i, latest_time, current_top_apps, (latest_time - i)/60000);
+                createChunkObjects(i, latest_time, current_top_apps, millisecondsToMinutes(latest_time - i));
             }
         }
 
@@ -148,15 +175,14 @@ function generateChunks(){
                 first_similar = 0;
                 //update previous
                 prev_end_time = i + time_interval;
-                prev_duration = (prev_end_time - prev_start_time) / 60000;
-                // var old_length = prev_top_apps.length;
+                prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
                 prev_top_apps = getEqualItems(prev_top_apps, current_top_apps);
             }
             else if (isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 0){
                 first_similar = 0;
                 //update previous
                 prev_end_time = i + time_interval;
-                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
             }
             else{
                 first_similar = 1;
@@ -167,7 +193,7 @@ function generateChunks(){
                 //update previous = current
                 prev_start_time = i;
                 prev_end_time = i + time_interval;
-                prev_duration = (prev_end_time - prev_start_time) / 60000;
+                prev_duration = millisecondsToMinutes(prev_end_time - prev_start_time);
                 prev_top_apps = current_top_apps;
             }
         }
@@ -177,30 +203,26 @@ function generateChunks(){
 
 var filtered_events = [];
 var activities = [];
-var old_activities = [];
 var chunk_objects = [];
+var minutes_with_clicks = [];
+var highest_numner_of_clicks_per_minute = 0;
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
 
-var old_top = [];
-
 var past_event = -1;
-var reset_start_time = 1;
-var interval_start_time = 0;
-var old_interval_start_time = -1;
-var old_i = -1;
 
 // CONFIG
-var time_interval = 25 * 60000; // 60k milliseconds = 1 minute
+var time_interval = minutesToMilliseconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
 var app_similarity_ratio = 1.0;
 
 window.onload = function() {
 
     parseScreenshotNames();
+    calculateClicksPerMinute();
     generateAbstraction();
-    //generateChunks();
+    generateChunks();
     //tableCreate();
     drawD3();
 
