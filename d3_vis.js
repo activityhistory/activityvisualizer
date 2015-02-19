@@ -22,7 +22,7 @@ function drawD3(){
     var blob_width = 50;
 
     function durationToRadius(duration){
-        return 2 * Math.pow(duration, 1/6);
+        return Math.pow(duration, 1/2) / 4.0;
     }
 
     //Create SVG element
