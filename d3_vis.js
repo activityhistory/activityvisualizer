@@ -199,6 +199,13 @@ function drawD3(){
 
     }});
 
+
+    $('#myForm input').on('change', function() {
+        alert($('input[name=radio]:checked', '#myForm').val());
+    });
+
+
+
     updateAll();
 
 }
