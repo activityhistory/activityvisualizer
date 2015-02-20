@@ -21,21 +21,30 @@ function drawD3(){
     var blob_scaling_factor = 10;
     var blob_width = 50;
 
-    function durationToRadius(duration){
-        return Math.pow(duration, 1/2) / 4.0;
-    }
-
     //Create SVG element
     var svg = d3.select("body")
         .append("svg")
         .attr("width", w)
         .attr("height", h);
 
+    var tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        // .text("a simple tooltip");
+        .append("img")
+            .attr("height", "300px")
+            .attr("src", "benchmark.png")
+            .attr("id", "tooltip_image");
+
+    function durationToRadius(duration){
+        return Math.pow(duration, 1/2) / 4.0;
+    }
 
     function durationToHeight(duration){
         return pixel_per_minute * duration;
     }
-
 
     function updateAllDayView(){
 
@@ -100,11 +109,9 @@ function drawD3(){
                 return image_height * i + border_top;
             })
             .attr("x", date_width + border_left + blob_width + image_width)
-        //.attr("font-family", "sans-serif").attr("font-size", "11px")
-        //.attr("fill", "black");
 
 
-        // TEXT DATETIME (e.g. 23:42)
+        // TEXT DATETIME (e.g. 8:42 AM)
         svg.selectAll(".text_time").remove();
 
         var text_date = svg.selectAll("text_time")
@@ -115,14 +122,14 @@ function drawD3(){
 
         text_date.attr("class", "text_time")
             .text(function(d, i) {
-                return new Date(d.start_time).toLocaleTimeString().substring(0,5) + new Date(d.start_time).toLocaleTimeString().substring(9,11) //+ " to " + new Date(d.end_time).toLocaleTimeString();
+                date_string = new Date(d.start_time).toLocaleTimeString()
+                split_string = date_string.split(":")
+                trimmed_time =  split_string[0] + ":" + split_string[1] + " " + split_string[2].substring(3,5)
+                return trimmed_time
             })
-            .attr("y", function(d, i) {
-                return image_height * i + border_top;
-            })
+            .attr("y", function(d, i) {return image_height * i + border_top;})
             .attr("x", border_left)
-            //.attr("font-family", "sans-serif").attr("font-size", "11px")
-            .attr("fill", "black");
+            .attr("fill", "#CCC");
 
 
         // IMAGE
@@ -142,14 +149,26 @@ function drawD3(){
             .attr("width", image_width)
             .attr("height", image_height)
             .attr("xlink:href", function(d, i) {
+                imgs_in_interval = []
                 for (var j = 0; j < screenshot_times.length; j++){
                     if (screenshot_times[j].unix_time >= d.start_time && screenshot_times[j].unix_time <= d.end_time){
-                        return "data/screenshots/" + screenshot_times[j].filename;
+                        imgs_in_interval.push(j)
                     }
                 }
+                if (imgs_in_interval.length > 0){
+                    k = parseInt(imgs_in_interval.length/2)
+                    return "data/screenshots/" + screenshot_times[imgs_in_interval[k]].filename;
+                }
                 return "benchmark.png";
-            });
-
+            })
+            .on("mouseover", function(){
+                tooltip.style("visibility", "visible")
+                var imgsrc = this.getAttribute("href")
+                console.log(imgsrc)
+                d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
+            })
+            .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+            .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
     }
 
