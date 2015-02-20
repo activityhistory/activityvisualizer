@@ -359,8 +359,6 @@ function drawD3(){
 
     }});
 
-
-
     $('#myForm input').on('change', function() {
         if ($('input[name=radio]:checked', '#myForm').val() == "dayview"){
             deleteEverything();
