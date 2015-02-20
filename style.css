@@ -18,6 +18,18 @@ h1{
     margin-bottom: 10px;
 }
 
+#tooltip{
+    padding: 2px;
+    background-color: #CCC;
+    position: absolute;
+    z-index: 10;
+    visibility: hidden;
+}
+
+#tooltip_image{
+    max-width: 600px;
+    max-height: 400px;
+}
 
 .clear{
     clear: both;
