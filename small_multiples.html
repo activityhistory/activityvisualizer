@@ -38,7 +38,7 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
             <p id='numImageText'># of images: 20</p>
             <div id='numOfImages'></div>
         </div>
-		
+
 		<div id="myForm" style="float: right;">
 		    <input type="radio" value="dayview" name="radio" disabled="disabled"><label for="radio1">Day View</label>
 		    <input type="radio" value="weekview" name="radio"><label for="radio2">Week View</label>
@@ -60,10 +60,12 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 
         var tooltip = d3.select("body")
             .append("div")
-            .style("position", "absolute")
-            .style("z-index", "10")
-            .style("visibility", "hidden")
-            .text("a simple tooltip");
+            .attr("id", "tooltip")
+            // .text("a simple tooltip");
+
+        tooltip.append("img")
+                .attr("src", "benchmark.png")
+                .attr("id", "tooltip_image");
 
         var multiples = d3.select('#images').selectAll('.clickDiv');
 
@@ -118,9 +120,10 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                 .attr('class', 'clickDiv')
                 .append('img')
                     .attr('class', 'clickImg')
-                    .style('top', function(d){return -d[2] + imgH/2 + 'px'})
-                    .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
-                    .attr('src', function(d){return d[0]});
+                    .attr('src', function(d){return d[0]})
+                    .style('top', function(d){return -( this.clientHeight - d[2]) + imgH/2 + 'px'})
+                    .style('left', function(d){return  -d[1] + imgW/2 + 'px'});
+
 
             // resize and reposition images on change of image size
             $("#windowSize").slider({max:800},{min:50},{value:100},{slide: function( event, ui ) {
@@ -128,7 +131,7 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                     .style('width', function(){return ui.value+'px'})
                     .style('height', function(){return ui.value+'px'})
                     .selectAll('.clickImg')
-                        .style('top', function(d){return -d[2] + ui.value/2 + 'px'})
+                        .style('top', function(d){return -( this.clientHeight - d[2]) + imgH/2 + 'px'})
                         .style('left', function(d){return  -d[1] + ui.value/2 + 'px'});
 
                 document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
@@ -157,18 +160,23 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                     .attr('class', 'clickDiv')
                     .append('img')
                         .attr('class', 'clickImg')
-                        .style('top', function(d){return -d[2] + imgH/2 + 'px'})
+                        .style('top', function(d){return -( this.clientHeight - d[2]) + imgH/2 + 'px'})
                         .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
                         .attr('src', function(d){return d[0]})
-                        .on("mouseover", function(){return tooltip.style("visibility", "visible");})
-                        .on("mousemove", function(){return tooltip.style("top", (this.pageY-10)+"px").style("left",(this.pageX+10)+"px");})
+                        .on("mouseover", function(){
+                            tooltip.style("visibility", "visible")
+                            var imgsrc = this.getAttribute("src")
+                            d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
+                            var rect = this.parentNode.getBoundingClientRect();
+                            tooltip.style("top", (rect.bottom + 10)+"px").style("left",(rect.left)+"px");
+                        })
                         .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
                 multiples.exit().remove();
 
                 document.getElementById('numImageText').innerHTML = '# of images: ' + ui.value;
             }});
-			
+
 			$('#myForm input').on('change', function() {
 			        if ($('input[name=radio]:checked', '#myForm').val() == "dayview"){
 			            window.location.href = "index.html";

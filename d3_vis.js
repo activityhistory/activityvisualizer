@@ -164,10 +164,8 @@ function drawD3(){
                 var imgsrc = this.getAttribute("href")
                 d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
                 var rect = this.getBoundingClientRect();
-                console.log(rect.top)
                 tooltip.style("top", (rect.top)+"px").style("left",(rect.right+10)+"px");
             })
-            //.on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
             .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
     }
