@@ -69,6 +69,9 @@ h1{
     position: absolute;
 }
 
+#aspectForm {
+    margin-top: 20px;
+}
 /* Radio button styling */
 
 input[type=radio] {
