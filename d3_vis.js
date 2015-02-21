@@ -10,7 +10,7 @@ function drawD3(){
     var date_width = 60;
     var timeline_width = 20;
 
-    var full_height = 500;
+    var full_height = 600;
     var full_width = 1300;
     var pixel_per_minute = full_height / (60 * 24);
 
@@ -33,8 +33,8 @@ function drawD3(){
         // .text("a simple tooltip");
 
     tooltip.append("img")
-            .attr("src", "benchmark.png")
-            .attr("id", "tooltip_image");
+        .attr("src", "benchmark.png")
+        .attr("id", "tooltip_image");
 
     function durationToRadius(duration){
         return Math.pow(duration, 1/2) / 4.0;
@@ -46,56 +46,37 @@ function drawD3(){
 
     function updateAllDayView(){
 
-        // BLOBS
-        svg.selectAll(".blob_class").remove();
+        // draw activity circles
+        svg.selectAll(".activityCircles").remove();
 
-        var blobs = svg.selectAll("circle").data(chunk_objects);
-
-        blobs.enter()
-            .append("circle");
-
-        blobs.attr("cx", border_left + date_width)
-            .attr("class", "blob_class")
-            .attr("cy", function(d, i) {
-                return image_height * i + border_top + 50;
-            })
-            .attr("r", function(d) {
-                return blob_scaling_factor * durationToRadius(d.duration);
-            })
-            .attr("fill", function(d) { return "steelblue"
-                //return "rgb(0, 0, " + (d.duration * 10) + ")";
-            });
+        var circles = svg.selectAll("circle")
+            .data(chunk_objects)
+            .enter().append("circle")
+            .attr("class", "activityCircles")
+            .attr("cx", border_left + date_width)
+            .attr("cy", function(d, i) { return image_height * i + border_top + 50; })
+            .attr("r", function(d) { return blob_scaling_factor * durationToRadius(d.duration); })
 
 
-        // TEXT DURATION (e.g. 20min)
+        // label activity circles with duration in minutes
         svg.selectAll(".text_dur").remove();
 
-        var text_dur = svg.selectAll("text_dur")
-            .data(chunk_objects);
-
-        text_dur.enter()
-            .append("text");
-
-        text_dur.text(function(d) { return d.duration + "min"; })
-            .attr("class", "text_dur")
-            .attr("y", function(d, i){
-                return (image_height * i + border_top) + 54 ;
-            })
+        var text_dur = svg.selectAll("activityDurationText")
+            .data(chunk_objects)
+            .enter().append("text")
+            .attr("class", "activityDurationText")
+            .text(function(d) { return d.duration + "min"; })
             .attr("x", border_left + date_width - 12)
-            .attr("font-family", "sans-serif").attr("font-size", "11px")
-            .attr("fill", "white");
+            .attr("y", function(d, i){ return (image_height * i + border_top) + 54 ; });
 
 
-        // TEXT LABELS (e.g. Apps)
+        // draw labels of most used apps
         svg.selectAll(".text_labels").remove();
 
         var text_item = svg.selectAll("text_labels")
-            .data(chunk_objects);
-
-        text_item.enter()
-            .append("text");
-
-        text_item.attr("class", "text_labels")
+            .data(chunk_objects)
+            .enter().append("text")
+            .attr("class", "text_labels labelText")
             .text(function(d, i) {
                 var app_string = d.items[0].name;
                 for (var k = 1; k < d.items.length; k++){
@@ -103,47 +84,39 @@ function drawD3(){
                 }
                 return app_string;
             })
-            .attr("y", function(d, i) {
-                return image_height * i + border_top;
-            })
             .attr("x", date_width + border_left + blob_width + image_width)
+            .attr("y", function(d, i) { return image_height * i + border_top; });
 
 
-        // TEXT DATETIME (e.g. 8:42 AM)
+        // draw activity start-time labels
         svg.selectAll(".text_time").remove();
 
         var text_date = svg.selectAll("text_time")
-            .data(chunk_objects);
-
-        text_date.enter()
-            .append("text");
-
-        text_date.attr("class", "text_time")
+            .data(chunk_objects)
+            .enter().append("text")
+            .attr("class", "text_time labelText")
             .text(function(d, i) {
                 date_string = new Date(d.start_time).toLocaleTimeString()
                 split_string = date_string.split(":")
                 trimmed_time =  split_string[0] + ":" + split_string[1] + " " + split_string[2].substring(3,5)
                 return trimmed_time
             })
-            .attr("y", function(d, i) {return image_height * i + border_top;})
             .attr("x", border_left)
+            .attr("y", function(d, i) {return image_height * i + border_top;})
             .attr("fill", "#CCC");
 
 
-        // IMAGE
+        // draw representative image for each activity
         svg.selectAll(".image_class").remove();
 
         var image_class = svg.selectAll("image_class")
-            .data(chunk_objects);
-
-        image_class.enter()
-            .append("svg:image");
-
-        image_class.attr("class", "image_class")
+            .data(chunk_objects)
+            .enter().append("svg:image")
+            .attr("class", "image_class")
+            .attr("x", date_width + border_left + blob_width)
             .attr("y", function(d, i) {
                 return image_height * i
             })
-            .attr("x", date_width + border_left + blob_width)
             .attr("width", image_width)
             .attr("height", image_height)
             .attr("xlink:href", function(d, i) {
@@ -164,7 +137,7 @@ function drawD3(){
                 var imgsrc = this.getAttribute("href")
                 d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
                 var rect = this.getBoundingClientRect();
-                tooltip.style("top", (rect.top)+"px").style("left",(rect.right+10)+"px");
+                tooltip.style("top", (rect.top + document.body.scrollTop)+"px").style("left",(rect.right+10)+"px");
             })
             .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
@@ -173,116 +146,100 @@ function drawD3(){
 
     function updateAllWeekView(){
 
-
+        // get list of hours in the day
         var times = [];
-        for (var i = 0; i < minutesToMilliseconds(60 * 24); i += minutesToMilliseconds(60)) {
+        for (var i=0; i<=24; i=i+3) {
             times.push(i);
         }
 
-        var time_labels = svg.selectAll(".time_label_class").data(times);
-
-        time_labels.enter()
-            .append("text");
-
-        time_labels.attr("class", "time_label_class")
+        // draw labels for hours
+        var time_labels = svg.selectAll(".time_label_class")
+            .data(times)
+            .enter().append("text")
+            .attr('class', 'labelText')
             .text(function(d) {
-                return new Date(d).getHours();
-            })
-            .attr("y", function(d) {
-                return  pixel_per_minute * millisecondsToMinutes(d % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
-            })
+                var t = d % 12;
+                if (t==0){ return 12 } else{ return t } })
             .attr("x", border_left)
-            //.attr("font-family", "sans-serif").attr("font-size", "11px")
-            .attr("fill", "black");
+            .attr("y", function(d) {
+                return  (d * 60 * pixel_per_minute) + border_top + weekday_label_height;
+            });
 
+
+        // draw labels for weekdays
         var weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-        var weekday_labels = svg.selectAll(".weekday_label_class").data(weekdays);
-
-        weekday_labels.enter()
-            .append("text");
-
-        weekday_labels.attr("class", "weekday_label_class")
-            .text(function(d) {
-                return d;
-            })
+        var weekday_labels = svg.selectAll(".weekday_label_class")
+            .data(weekdays)
+            .enter().append("text")
+            .text(function(d) { return d; })
+            .attr("class", "weekday_label_class labelText")
             .attr("y", border_top)
             .attr("x", function(d, i) {
                 return  border_left + date_width + timeline_width + i * (full_width / 7);
             })
-            //.attr("font-family", "sans-serif").attr("font-size", "11px")
-            .attr("fill", "black");
 
 
-        // CLICKS RECTANGLES
+        // draw rectangles for click activity
         svg.selectAll(".clicks_class").remove();
 
-        var click_rects = svg.selectAll(".clicks_class").data(minutes_with_clicks);
-
-        click_rects.enter()
-            .append("rect");
-
-        click_rects.attr("x", function(d) {
-            var day = new Date(d.minute_start_time).getDay();
-            return  border_left + date_width + day * (full_width / 7);
-        })
+        var click_rects = svg.selectAll(".clicks_class")
+            .data(minutes_with_clicks)
+            .enter().append("rect")
             .attr("class", "clicks_class")
+            .attr("x", function(d) {
+                var day = new Date(d.minute_start_time-24*60*60*1000).getDay();
+                return  border_left + date_width + day * (full_width / 7);
+            })
             .attr("y", function(d) {
-                return  pixel_per_minute * millisecondsToMinutes(d.minute_start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
+                return  pixel_per_minute * millisecondsToMinutes((d.minute_start_time-32*60*60*1000) % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
             })
             .attr("height", pixel_per_minute)
             .attr("width", timeline_width)
             .attr("fill", function(d) {
                 var color = Math.floor((d.number_of_clicks * 255) / highest_numner_of_clicks_per_minute);
-
                 return "rgb(" + 255 + ", " + (255 - color) + ", " + (255 - color) + ")";
             });
 
 
 
-        // TIMELINE RECTANGLES
+        // draw rectangles for activities
         svg.selectAll(".rect_class").remove();
 
-        var blobs = svg.selectAll(".rect_class").data(chunk_objects);
-
-        blobs.enter()
-            .append("rect");
-
-        blobs.attr("x", function(d) {
-            var day = new Date(d.start_time).getDay();
-            return border_left + date_width + timeline_width + day * (full_width / 7);
-        })
+        var blobs = svg.selectAll(".rect_class")
+            .data(chunk_objects)
+            .enter().append("rect")
             .attr("class", "rect_class")
+            .attr("x", function(d) {
+                var day = new Date(d.start_time-24*60*60*1000).getDay();
+                return border_left + date_width + timeline_width + day * (full_width / 7);
+            })
             .attr("y", function(d) {
-                return pixel_per_minute * millisecondsToMinutes(d.start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
+                return pixel_per_minute * millisecondsToMinutes((d.start_time-32*60*60*1000) % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
             })
             .attr("height", function(d) {
                 return durationToHeight(d.duration);
             })
             .attr("width", timeline_width)
             .attr("fill", function(d) {
-
-                return "rgb(0, 0, " + (d.duration * 10) + ")";
+                c = Math.min(d.duration*10, 255)
+                return "rgb(" + (255-c) + "," + (255-c) + "," + c + ")";
             });
 
 
-
-        // IMAGE
+        // draw represnetative image for each activity
         svg.selectAll(".image_class").remove();
 
         var image_class = svg.selectAll("image_class")
-            .data(chunk_objects);
-
-        image_class.enter()
-            .append("svg:image");
-
-        image_class.attr("class", "image_class")
-            .attr("y", function(d, i) {
-                return pixel_per_minute * millisecondsToMinutes(d.start_time % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
-            })
+            .data(chunk_objects)
+            .enter().append("svg:image")
+            .attr("class", "image_class")
             .attr("x", function(d) {
-                var day = new Date(d.start_time).getDay();
+                var day = new Date(d.start_time-24*60*60*1000).getDay();
                 return border_left + date_width + 2 * timeline_width + day * (full_width / 7);
+            })
+            .attr("y", function(d, i) {
+                return pixel_per_minute * millisecondsToMinutes((d.start_time-32*60*60*1000) % minutesToMilliseconds(60 * 24)) + border_top + weekday_label_height;
             })
             .attr("width", image_width)
             .attr("height", function(d) {
@@ -304,11 +261,10 @@ function drawD3(){
         svg.remove();
 
         //Create SVG element
-            svg = d3.select("body")
-            .append("svg")
-            .attr("width", w)
-            .attr("height", h);
-
+        svg = d3.select("body")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
     }
 
     function updateAll(){
@@ -344,7 +300,7 @@ function drawD3(){
 
     }});
 
-    $("#numberApps").slider({max:7},{min:1},{value:3},{slide: function( event, ui ) {
+    $("#numberApps").slider({max:5},{min:1},{value:3},{slide: function( event, ui ) {
 
         number_of_top_elements = ui.value;
         generateChunks();
@@ -355,7 +311,6 @@ function drawD3(){
     }});
 
     $("#dateRange").slider({ max: latest_time },{min:earliest_time},{values: [earliest_time, latest_time]},{slide: function( event, ui ) {
-
 
         earliest_time = ui.values[0];
         latest_time = ui.values[1];
@@ -378,21 +333,9 @@ function drawD3(){
 
 
     $('#myForm input').on('change', function() {
-        if ($('input[name=radio]:checked', '#myForm').val() == "dayview"){
-            deleteEverything();
-            updateAll();
-        }
-        if ($('input[name=radio]:checked', '#myForm').val() == "weekview"){
-            deleteEverything();
-            updateAll();
-        }
-        if ($('input[name=radio]:checked', '#myForm').val() == "small_multiples"){
-            deleteEverything();
-            updateAll();
-        }
+        deleteEverything();
+        updateAll();
     });
-
-
 
     updateAll();
 

@@ -54,22 +54,19 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 
         var img_data = []
 
-        // starting image size
-        imgW = 100;
-        imgH = 100;
+        // starting snippet image size
+        var imgW = 100;
 
         var tooltip = d3.select("body")
             .append("div")
             .attr("id", "tooltip")
-            // .text("a simple tooltip");
 
         tooltip.append("img")
                 .attr("src", "benchmark.png")
                 .attr("id", "tooltip_image");
 
-        var multiples = d3.select('#images').selectAll('.clickDiv');
-
-        multiples.data([]);
+        var multiples = d3.select('#images').selectAll('.clickDiv')
+            .data([]);
 
         //Makes an asynchronous request, loading the getimages.php file
         function callForImages() {
@@ -106,7 +103,7 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
         //Generates the images and sticks them in the container
         function loadImages(images) {
 
-            // only grab 20 images
+            // only grab 20 images to start
             var reduced_images = [];
             var jump_by = parseInt(images.length/20)
             for(var i = 0; i < images.length; i=i+jump_by) {
@@ -121,8 +118,16 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                 .append('img')
                     .attr('class', 'clickImg')
                     .attr('src', function(d){return d[0]})
-                    .style('top', function(d){return -( this.clientHeight - d[2]) + imgH/2 + 'px'})
-                    .style('left', function(d){return  -d[1] + imgW/2 + 'px'});
+                    .style('top', function(d){return -( this.clientHeight - d[2]) + imgW/2 + 'px'})
+                    .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
+                    .on("mouseover", function(){
+                        tooltip.style("visibility", "visible")
+                        var imgsrc = this.getAttribute("src");
+                        d3.select("#tooltip_image").attr("src", function(){ return imgsrc});
+                        var rect = this.parentNode.getBoundingClientRect();
+                        tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
+                    })
+                    .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
 
             // resize and reposition images on change of image size
@@ -131,14 +136,14 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                     .style('width', function(){return ui.value+'px'})
                     .style('height', function(){return ui.value+'px'})
                     .selectAll('.clickImg')
-                        .style('top', function(d){return -( this.clientHeight - d[2]) + imgH/2 + 'px'})
+                        .style('top', function(d){return -( this.clientHeight - d[2]) + ui.value/2 + 'px'})
                         .style('left', function(d){return  -d[1] + ui.value/2 + 'px'});
 
                 document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
                 imgW = ui.value;
-                imgH = ui.value;
             }});
 
+            // get new set of images when slider for # of images changes
             $("#numOfImages").slider({max:100},{min:10},{step:5},{value:20},{slide: function( event, ui ) {
                 var reduced_images = [];
                 var jump_by = parseInt(img_data.length/ui.value)
@@ -147,36 +152,33 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                 }
 
                 multipleDivs = d3.select('#images').selectAll('.clickDiv')
-                    .data([]);
-
-                multipleDivs.exit().remove();
-
-                // multiples.data(reduced_images);
+                    .data([])
+                    .exit().remove();
 
                 multiples = d3.select('#images').selectAll('img')
-                    .data(reduced_images);
-
-                multiples.enter().append('div')
+                    .data(reduced_images)
+                    .enter().append('div')
                     .attr('class', 'clickDiv')
+                    .attr('width', imgW)
+                    .attr('height', imgW)
                     .append('img')
                         .attr('class', 'clickImg')
-                        .style('top', function(d){return -( this.clientHeight - d[2]) + imgH/2 + 'px'})
-                        .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
                         .attr('src', function(d){return d[0]})
+                        .style('top', function(d){return -( this.clientHeight - d[2]) + imgW/2 + 'px'})
+                        .style('left', function(d){return -d[1] + imgW/2 + 'px'})
                         .on("mouseover", function(){
                             tooltip.style("visibility", "visible")
                             var imgsrc = this.getAttribute("src")
                             d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
                             var rect = this.parentNode.getBoundingClientRect();
-                            tooltip.style("top", (rect.bottom + 10)+"px").style("left",(rect.left)+"px");
+                            tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
                         })
                         .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-
-                multiples.exit().remove();
 
                 document.getElementById('numImageText').innerHTML = '# of images: ' + ui.value;
             }});
 
+            // Go to the index page if the page selection changes
 			$('#myForm input').on('change', function() {
 			        if ($('input[name=radio]:checked', '#myForm').val() == "dayview"){
 			            window.location.href = "index.html";
@@ -185,8 +187,6 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 			            window.location.href = "index.html";
 			        }
 			    });
-
-
 
         }
 

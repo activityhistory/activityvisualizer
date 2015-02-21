@@ -35,11 +35,31 @@ h1{
     clear: both;
 }
 
+.activityCircles{
+    fill: steelblue;
+}
+
+.activityDurationText{
+    font-family: "sans-serif";
+    font-size: 11px;
+    fill: white;
+}
+
+.labelText{
+    fill: #CCC;
+    color: #CCC;
+}
+
 
 .slider-block{
     float:left;
     padding-right: 20px;
     width:200px;
+}
+
+.rect_class{
+    border-width: 0px;
+
 }
 
 .thumbnail{
