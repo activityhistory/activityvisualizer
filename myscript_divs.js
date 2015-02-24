@@ -215,7 +215,7 @@ var past_event = -1;
 // CONFIG
 var time_interval = minutesToMilliseconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
-var app_similarity_ratio = 1.0;
+var app_similarity_ratio = 0.5;
 
 window.onload = function() {
 

@@ -46,11 +46,13 @@ function drawD3(){
 
     function updateAllDayView(){
 
+        reverse_chunk_objects = chunk_objects.reverse()
+
         // draw activity circles
         svg.selectAll(".activityCircles").remove();
 
         var circles = svg.selectAll("circle")
-            .data(chunk_objects)
+            .data(reverse_chunk_objects)
             .enter().append("circle")
             .attr("class", "activityCircles")
             .attr("cx", border_left + date_width)
@@ -62,7 +64,7 @@ function drawD3(){
         svg.selectAll(".text_dur").remove();
 
         var text_dur = svg.selectAll("activityDurationText")
-            .data(chunk_objects)
+            .data(reverse_chunk_objects)
             .enter().append("text")
             .attr("class", "activityDurationText")
             .text(function(d) { return d.duration + "min"; })
@@ -74,7 +76,7 @@ function drawD3(){
         svg.selectAll(".text_labels").remove();
 
         var text_item = svg.selectAll("text_labels")
-            .data(chunk_objects)
+            .data(reverse_chunk_objects)
             .enter().append("text")
             .attr("class", "text_labels labelText")
             .text(function(d, i) {
@@ -84,7 +86,7 @@ function drawD3(){
                 }
                 return app_string;
             })
-            .attr("x", date_width + border_left + blob_width + image_width)
+            .attr("x", date_width + border_left + blob_width + image_width + 10)
             .attr("y", function(d, i) { return image_height * i + border_top; });
 
 
@@ -92,7 +94,7 @@ function drawD3(){
         svg.selectAll(".text_time").remove();
 
         var text_date = svg.selectAll("text_time")
-            .data(chunk_objects)
+            .data(reverse_chunk_objects)
             .enter().append("text")
             .attr("class", "text_time labelText")
             .text(function(d, i) {
@@ -110,7 +112,7 @@ function drawD3(){
         svg.selectAll(".image_class").remove();
 
         var image_class = svg.selectAll("image_class")
-            .data(chunk_objects)
+            .data(reverse_chunk_objects)
             .enter().append("svg:image")
             .attr("class", "image_class")
             .attr("x", date_width + border_left + blob_width)
@@ -222,8 +224,8 @@ function drawD3(){
             })
             .attr("width", timeline_width)
             .attr("fill", function(d) {
-                c = Math.min(d.duration*10, 255)
-                return "rgb(" + (255-c) + "," + (255-c) + "," + c + ")";
+                c = Math.min(d.duration/120.0, 1.0)
+                return "rgb(" + parseInt(255-c*185) + "," + parseInt(255-125*c) + "," + parseInt(255-c*75) + ")";
             });
 
 
@@ -252,7 +254,15 @@ function drawD3(){
                     }
                 }
                 return "benchmark.png";
-            });
+            })
+            .on("mouseover", function(){
+                tooltip.style("visibility", "visible")
+                var imgsrc = this.getAttribute("href")
+                d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
+                var rect = this.getBoundingClientRect();
+                tooltip.style("top", (rect.top + document.body.scrollTop)+"px").style("left",(rect.right+10)+"px");
+            })
+            .on("mouseout", function(){return tooltip.style("visibility", "hidden");});;
 
     }
 
@@ -281,7 +291,7 @@ function drawD3(){
 
     }
 
-    $("#timeGranularity").slider({max:60},{min:5},{value:30},{step:5},{slide: function( event, ui ) {
+    $("#timeGranularity").slider({max:60},{min:5},{value:20},{step:5},{slide: function( event, ui ) {
 
         time_interval = minutesToMilliseconds(ui.value);
 
@@ -300,7 +310,7 @@ function drawD3(){
 
     }});
 
-    $("#numberApps").slider({max:5},{min:1},{value:3},{slide: function( event, ui ) {
+    $("#numberApps").slider({max:5},{min:1},{value:4},{slide: function( event, ui ) {
 
         number_of_top_elements = ui.value;
         generateChunks();
@@ -321,7 +331,7 @@ function drawD3(){
 
     }});
 
-    $("#appSimilarity").slider({max:1.0},{min:0.0},{value:1.0},{step:0.1},{slide: function( event, ui ) {
+    $("#appSimilarity").slider({max:1.0},{min:0.0},{value:0.5},{step:0.1},{slide: function( event, ui ) {
 
         app_similarity_ratio = ui.value;
         generateChunks();

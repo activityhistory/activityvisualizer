@@ -31,16 +31,21 @@ h1{
     max-height: 400px;
 }
 
+#tooltip_text{
+    padding: 0px 5px 0px;
+}
+
 .clear{
     clear: both;
 }
 
 .activityCircles{
     fill: steelblue;
+    stroke: gray;
+    stroke-width: 1px;
 }
 
 .activityDurationText{
-    font-family: "sans-serif";
     font-size: 11px;
     fill: white;
 }

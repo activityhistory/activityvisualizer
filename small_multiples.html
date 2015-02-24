@@ -4,7 +4,7 @@
 Adam Rule
 02.16.2015
 
-Webpage showing screenshots and video for AEC study
+Webpage showing screenshots
 
 Helpful Websites
 http://stackoverflow.com/questions/13595113/html-javascript-iterate-through-all-elements-of-local-server-side-folder
@@ -12,7 +12,7 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 -->
 
 <head>
-    <title>Multiples</title>
+    <title>Small Multiples</title>
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
@@ -61,6 +61,10 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
             .append("div")
             .attr("id", "tooltip")
 
+        tooltip.append('p')
+            .text("Hello")
+            .attr("id","tooltip_text")
+
         tooltip.append("img")
                 .attr("src", "benchmark.png")
                 .attr("id", "tooltip_image");
@@ -79,7 +83,6 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 
                 //Convert the result back into JSON
                 var result = JSON.parse(httpReq.responseText);
-                // var img_data = [];
                 for(var i = 0; i < result.length; i++){
                     var filename_elements = result[i].split("_");
                     var x = filename_elements[1];
@@ -118,16 +121,20 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                 .append('img')
                     .attr('class', 'clickImg')
                     .attr('src', function(d){return d[0]})
-                    .style('top', function(d){return -( this.clientHeight - d[2]) + imgW/2 + 'px'})
-                    .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
                     .on("mouseover", function(){
                         tooltip.style("visibility", "visible")
                         var imgsrc = this.getAttribute("src");
                         d3.select("#tooltip_image").attr("src", function(){ return imgsrc});
+                        imgsrc = imgsrc.split("/").pop()
+                        d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
                         var rect = this.parentNode.getBoundingClientRect();
                         tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
                     })
                     .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
+            d3.selectAll('.clickImg')
+                .style('top', function(d){return -( this.clientHeight - d[2]) + imgW/2 + 'px'})
+                .style('left', function(d){return  -d[1] + imgW/2 + 'px'})
 
 
             // resize and reposition images on change of image size
@@ -136,7 +143,7 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                     .style('width', function(){return ui.value+'px'})
                     .style('height', function(){return ui.value+'px'})
                     .selectAll('.clickImg')
-                        .style('top', function(d){return -( this.clientHeight - d[2]) + ui.value/2 + 'px'})
+                        .style('top', function(d){return -(this.clientHeight - d[2]) + ui.value/2 + 'px'})
                         .style('left', function(d){return  -d[1] + ui.value/2 + 'px'});
 
                 document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
@@ -144,7 +151,7 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
             }});
 
             // get new set of images when slider for # of images changes
-            $("#numOfImages").slider({max:100},{min:10},{step:5},{value:20},{slide: function( event, ui ) {
+            $("#numOfImages").slider({max:200},{min:10},{step:5},{value:20},{slide: function( event, ui ) {
                 var reduced_images = [];
                 var jump_by = parseInt(img_data.length/ui.value)
                 for(var i = 0; i < img_data.length; i=i+jump_by) {
@@ -164,16 +171,20 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
                     .append('img')
                         .attr('class', 'clickImg')
                         .attr('src', function(d){return d[0]})
-                        .style('top', function(d){return -( this.clientHeight - d[2]) + imgW/2 + 'px'})
-                        .style('left', function(d){return -d[1] + imgW/2 + 'px'})
                         .on("mouseover", function(){
                             tooltip.style("visibility", "visible")
                             var imgsrc = this.getAttribute("src")
                             d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
+                            imgsrc = imgsrc.split("/").pop()
+                            d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
                             var rect = this.parentNode.getBoundingClientRect();
                             tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
                         })
                         .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
+                multiples
+                    .style('top', function(d){return -(this.clientHeight - d[2]) + imgW/2 + 'px'})
+                    .style('left', function(d){return -d[1] + imgW/2 + 'px'});
 
                 document.getElementById('numImageText').innerHTML = '# of images: ' + ui.value;
             }});
