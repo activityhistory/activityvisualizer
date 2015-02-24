@@ -18,7 +18,16 @@
 <body>
 
     <div id="header" class="clear">
-        <h1>Activity Visualizer: Moves</h1>
+        <h1>Activity Visualizer</h1>
+        <div class="viewSelect">
+            <hr>
+                <div id="myForm">
+                    <input type="radio" value="dayview" name="radio" id="radio1"><label for="radio1">Day</label>
+                    <input type="radio" value="weekview" name="radio" id="radio2" checked="checked"><label for="radio2">Week</label>
+                    <input type="radio" value="small_multiples" name="radio" id="radio3"><label for="radio3">Small multiples</label>
+                </div>
+            <hr>
+        </div>
 
         <div class="slider-block">
             <p id='timeGranularityText'>Time Granularity: 20</p>
@@ -40,11 +49,6 @@
             <div id='appSimilarity'></div>
         </div>
 
-		<div id="myForm" style="float: right;">
-		    <input type="radio" value="dayview" name="radio"><label for="radio1">Day View</label>
-		    <input type="radio" value="weekview" name="radio" checked="checked"><label for="radio2">Week View</label>
-		    <input type="radio" value="small_multiples" name="radio"><label for="radio3">Small multiples</label>
-		</div>
     </div>
 
 </body>

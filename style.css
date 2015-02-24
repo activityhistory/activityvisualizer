@@ -1,9 +1,13 @@
+* { box-sizing: border-box; } /* This ensures padding forces content inwards, rather than box boundaries outward */
+
 body{
     font-family: "Helvetica Neue", Helvetica, Arial, Sans-Serif;
     font-size: 10pt;
     margin: 0px;
     padding: 0px;
     background-color: #555;
+
+    margin-left: 350px;
 }
 
 h1{
@@ -11,13 +15,21 @@ h1{
     margin: 0px;
 }
 
+.viewSelect {
+    margin: 20px 0px;
+}
+
 #header{
     overflow: auto;
     background-color: #EEE;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 20px;
+    position: fixed;
+    width: 300px;
+    height: 100%;
+    left: 0;
 }
 
+<<<<<<< HEAD
 #tooltip{
     padding: 2px;
     background-color: #CCC;
@@ -33,6 +45,10 @@ h1{
 
 #tooltip_text{
     padding: 0px 5px 0px;
+}
+
+#header hr {
+    margin: 10px 0px;
 }
 
 .clear{
@@ -56,10 +72,10 @@ h1{
 }
 
 
-.slider-block{
-    float:left;
-    padding-right: 20px;
-    width:200px;
+.slider-block {
+    margin-left: auto;
+    margin-right: auto;
+    width:100%;
 }
 
 .rect_class{
@@ -90,4 +106,29 @@ h1{
 
 .clickImg{
     position: absolute;
+}
+
+#aspectForm {
+    margin-top: 20px;
+}
+/* Radio button styling */
+
+input[type=radio] {
+    display:none; 
+    margin:10px;
+}
+ 
+input[type=radio] + label {
+    display:inline-block;
+    margin:-2px;
+    padding: 4px 12px;
+    background-color: #e7e7e7;
+    border-color: #ddd;
+
+    cursor: pointer;
+}
+
+input[type=radio]:checked + label { 
+   background-image: none;
+    background-color:#d0d0d0;
 }

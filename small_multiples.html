@@ -27,10 +27,19 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 <body onload="callForImages()">
 
     <div id="header">
-        <h1>Activity Visualizer: Multiples</h1>
+        <h1>Activity Visualizer</h1>
+        <div class="viewSelect">
+            <hr>
+                <div id="myForm">
+                    <input type="radio" value="dayview" name="radio" id="radio1"><label for="radio1">Day</label>
+                    <input type="radio" value="weekview" name="radio" id="radio2"><label for="radio2">Week</label>
+                    <input type="radio" value="small_multiples" name="radio" id="radio3" checked="checked"><label for="radio3">Small multiples</label>
+                </div>
+            <hr>
+        </div>
 
         <div class="slider-block">
-            <p id='sizeText'>Thumbnail Size: 100</p>
+            <p id='sizeText'>Thumbnail Size: 100 x 100</p>
             <div id='windowSize'></div>
         </div>
 
@@ -44,6 +53,11 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
 		    <input type="radio" value="weekview" name="radio"><label for="radio2">Week View</label>
 		    <input type="radio" value="small_multiples" name="radio" checked="checked"><label for="radio3">Small multiples</label>
 		</div>
+
+        <div id="aspectForm">
+            <input type="radio" value="aspect11" name="radio" id="aspect11" checked="checked"><label for="aspect11">1:1</label>
+            <input type="radio" value="aspect1610" name="radio" id="aspect1610"><label for="aspect1610">16:10</label>
+        </div>
 
     </div>
 
@@ -140,14 +154,25 @@ http://stackoverflow.com/questions/20030162/getting-data-attribute-for-onclick-e
             // resize and reposition images on change of image size
             $("#windowSize").slider({max:800},{min:50},{value:100},{slide: function( event, ui ) {
                 d3.selectAll('.clickDiv')
-                    .style('width', function(){return ui.value+'px'})
                     .style('height', function(){return ui.value+'px'})
+                    .style('width', function(){
+                        if ($('input[name=radio]:checked', '#aspectForm').val() == "aspect1610"){
+                            return Math.round(ui.value*1.6)+'px';
+                        }
+                        else { return ui.value+'px'; }
+                        })
                     .selectAll('.clickImg')
                         .style('top', function(d){return -(this.clientHeight - d[2]) + ui.value/2 + 'px'})
                         .style('left', function(d){return  -d[1] + ui.value/2 + 'px'});
+                  
+                    if ($('input[name=radio]:checked', '#aspectForm').val() == "aspect1610"){
+                           imgW = Math.round(ui.value*1.6);
+                        }
+                        else { imgW = ui.value; }
+                    imgH = ui.value;
 
-                document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
-                imgW = ui.value;
+                    document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
+                        imgW = ui.value;
             }});
 
             // get new set of images when slider for # of images changes

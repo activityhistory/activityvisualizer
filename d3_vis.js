@@ -342,6 +342,7 @@ function drawD3(){
     }});
 
 
+
     $('#myForm input').on('change', function() {
         deleteEverything();
         updateAll();
