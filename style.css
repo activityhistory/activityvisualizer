@@ -5,8 +5,7 @@ body{
     font-size: 10pt;
     margin: 0px;
     padding: 0px;
-    background-color: #555;
-
+    background-color: #777;
     margin-left: 350px;
 }
 
@@ -29,7 +28,6 @@ h1{
     left: 0;
 }
 
-<<<<<<< HEAD
 #tooltip{
     padding: 2px;
     background-color: #CCC;
@@ -40,7 +38,7 @@ h1{
 
 #tooltip_image{
     max-width: 600px;
-    max-height: 400px;
+    max-height: 600px;
 }
 
 #tooltip_text{
@@ -114,10 +112,10 @@ h1{
 /* Radio button styling */
 
 input[type=radio] {
-    display:none; 
+    display:none;
     margin:10px;
 }
- 
+
 input[type=radio] + label {
     display:inline-block;
     margin:-2px;
@@ -128,7 +126,7 @@ input[type=radio] + label {
     cursor: pointer;
 }
 
-input[type=radio]:checked + label { 
+input[type=radio]:checked + label {
    background-image: none;
     background-color:#d0d0d0;
 }

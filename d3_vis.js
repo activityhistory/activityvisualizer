@@ -1,8 +1,9 @@
 function drawD3(){
 
     //Width and height
-    var w = 2000;
-    var h = 5000;
+    var w = 1500;
+    var h_week = 630;
+    var h_day = 5000
 
     var border_left = 5;
     var border_top = 10;
@@ -25,16 +26,19 @@ function drawD3(){
     var svg = d3.select("body")
         .append("svg")
         .attr("width", w)
-        .attr("height", h);
+        .attr("height", h_day);
 
     var tooltip = d3.select("body")
         .append("div")
         .attr("id", "tooltip")
-        // .text("a simple tooltip");
+
+    tooltip.append('p')
+        .text("Hello")
+        .attr("id","tooltip_text")
 
     tooltip.append("img")
-        .attr("src", "benchmark.png")
-        .attr("id", "tooltip_image");
+            .attr("src", "benchmark.png")
+            .attr("id", "tooltip_image");
 
     function durationToRadius(duration){
         return Math.pow(duration, 1/2) / 4.0;
@@ -45,6 +49,8 @@ function drawD3(){
     }
 
     function updateAllDayView(){
+
+        svg.attr("height", h_day)
 
         reverse_chunk_objects = chunk_objects.reverse()
 
@@ -98,10 +104,23 @@ function drawD3(){
             .enter().append("text")
             .attr("class", "text_time labelText")
             .text(function(d, i) {
-                date_string = new Date(d.start_time).toLocaleTimeString()
-                split_string = date_string.split(":")
+                var date = new Date(d.start_time)
+                date_adj = new Date(d.start_time + 16*60*60*1000) 
+
+                var weekday = new Array();
+                weekday[0] = "Sun";
+                weekday[1] = "Mon";
+                weekday[2] = "Tue";
+                weekday[3] = "Wed";
+                weekday[4] = "Thur";
+                weekday[5] = "Fri";
+                weekday[6] = "Sat";
+
+                var n = weekday[date_adj.getUTCDay()];
+
+                split_string = date.toLocaleTimeString().split(":")
                 trimmed_time =  split_string[0] + ":" + split_string[1] + " " + split_string[2].substring(3,5)
-                return trimmed_time
+                return n + " " + trimmed_time
             })
             .attr("x", border_left)
             .attr("y", function(d, i) {return image_height * i + border_top;})
@@ -138,6 +157,8 @@ function drawD3(){
                 tooltip.style("visibility", "visible")
                 var imgsrc = this.getAttribute("href")
                 d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
+                imgsrc = imgsrc.split("/").pop()
+                d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
                 var rect = this.getBoundingClientRect();
                 tooltip.style("top", (rect.top + document.body.scrollTop)+"px").style("left",(rect.right+10)+"px");
             })
@@ -147,6 +168,19 @@ function drawD3(){
 
 
     function updateAllWeekView(){
+
+        var trimmed_chunk_objects = []
+        now = new Date().getTime();
+        last_week = now - 7*24*60*60*1000
+
+
+        for(i=0; i<chunk_objects.length; i++){
+            if (chunk_objects[i]["start_time"] > last_week){
+                trimmed_chunk_objects.push(chunk_objects[i])
+            }
+        }
+
+        svg.attr("height", h_week)
 
         // get list of hours in the day
         var times = [];
@@ -209,7 +243,7 @@ function drawD3(){
         svg.selectAll(".rect_class").remove();
 
         var blobs = svg.selectAll(".rect_class")
-            .data(chunk_objects)
+            .data(trimmed_chunk_objects)
             .enter().append("rect")
             .attr("class", "rect_class")
             .attr("x", function(d) {
@@ -233,7 +267,7 @@ function drawD3(){
         svg.selectAll(".image_class").remove();
 
         var image_class = svg.selectAll("image_class")
-            .data(chunk_objects)
+            .data(trimmed_chunk_objects)
             .enter().append("svg:image")
             .attr("class", "image_class")
             .attr("x", function(d) {
@@ -259,6 +293,8 @@ function drawD3(){
                 tooltip.style("visibility", "visible")
                 var imgsrc = this.getAttribute("href")
                 d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
+                imgsrc = imgsrc.split("/").pop()
+                d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
                 var rect = this.getBoundingClientRect();
                 tooltip.style("top", (rect.top + document.body.scrollTop)+"px").style("left",(rect.right+10)+"px");
             })
@@ -274,7 +310,7 @@ function drawD3(){
         svg = d3.select("body")
         .append("svg")
         .attr("width", w)
-        .attr("height", h);
+        .attr("height", h_day);
     }
 
     function updateAll(){
