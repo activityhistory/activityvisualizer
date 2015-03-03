@@ -59,6 +59,9 @@ function drawD3(){
         if ($('input[name=radio]:checked', '#myForm').val() == "weekview"){
             updateAllWeekView(svg, h_week, border_left, pixel_per_minute, border_top, weekday_label_height, date_width, timeline_width, full_width, image_width);
         }
+        if ($('input[name=radio]:checked', '#myForm').val() == "activity_level"){
+            updateAllActivityLevelView(svg, h_week, border_left, pixel_per_minute, border_top, weekday_label_height, date_width, timeline_width, full_width, image_width);
+        }
         if ($('input[name=radio]:checked', '#myForm').val() == "small_multiples"){
             window.location.href = "small_multiples.html";
         }
