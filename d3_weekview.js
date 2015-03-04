@@ -55,7 +55,7 @@ function updateAllWeekView(svg, h_week, border_left, pixel_per_minute, border_to
         .enter().append("rect")
         .attr("class", "clicks_class")
         .attr("x", function(d) {
-            var day = new Date(d.minute_start_time-24*60*60*1000).getDay();
+            var day = new Date(d.minute_start_time-24*60*60*1000).getDay(); // TODO find general solution
             return  border_left + date_width + day * (full_width / 7);
         })
         .attr("y", function(d) {
