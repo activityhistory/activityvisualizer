@@ -233,6 +233,10 @@ var servers_resonse = httpGet('http://localhost:8001/').split(',');
 var servers_response_object = JSON.parse(servers_resonse);
 
 var click_times = servers_response_object['clicks'];
+var process_names = servers_response_object['process_names'];
+var process_ids = servers_response_object['process_ids'];
+var window_process_id = servers_response_object['window_process_id'];
+var window_browser_url = servers_response_object['window_browser_url'];
 
 var screenshots = httpGet('http://localhost:8001/').split(',');
 

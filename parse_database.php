@@ -56,26 +56,5 @@
 
 	echo "var window_process_id = ".json_encode($window_process_id).";\n";
 	echo "var window_browser_url = ".json_encode($window_browser_url).";\n";
-	
-	
-	
-	
-	// ## PARSE PROCESS - Get processes for labels //
-	$query = "SELECT * FROM process";
-
-	$process_names = array();
-	$process_ids = array();
-
-	// Iterate through the results and pass into JSON encoder //
-
-	foreach ($dbh->query($query) as $row) {
-
-		array_push($process_names, $row[2]);
-		array_push($process_ids, $row[0]);
-
-	}
-
-	echo "var process_names = ".json_encode($process_names).";\n";
-	echo "var process_ids = ".json_encode($process_ids).";\n";
 
 	?>

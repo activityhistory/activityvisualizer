@@ -18,10 +18,30 @@ var db = new SQL.Database(filebuffer);
 
 // Prepare an sql statement
 var stmt = db.prepare("SELECT created_at FROM click");
+var clicks = [];
+while (stmt.step()) clicks.push(stmt.get()[0]);
 
-var sql_clicks = [];
 
-while (stmt.step()) sql_clicks.push(stmt.get()[0]);
+var process_names = [];
+var process_ids = [];
+
+stmt = db.prepare("SELECT name FROM process");
+while (stmt.step()) process_names.push(stmt.get()[0]);
+
+stmt = db.prepare("SELECT id FROM process");
+while (stmt.step()) process_ids.push(stmt.get()[0]);
+
+
+var window_process_id = [];
+var window_browser_url = [];
+
+stmt = db.prepare("SELECT process_id FROM window");
+while (stmt.step()) window_process_id.push(stmt.get()[0]);
+
+stmt = db.prepare("SELECT browser_url FROM window");
+while (stmt.step()) window_browser_url.push(stmt.get()[0]);
+
+
 
 console.log('finished reading db file');
 
@@ -44,7 +64,11 @@ var server = http.createServer(function (req, res) {
 
     var response_object = {
         filenames : files,
-        clicks : sql_clicks
+        clicks : clicks,
+        process_names: process_names,
+        process_ids: process_ids,
+        window_process_id: window_process_id,
+        window_browser_url: window_browser_url
     };
 
     res.write(JSON.stringify(response_object));
