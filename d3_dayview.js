@@ -103,7 +103,7 @@ function updateAllDayView(svg, border_left, border_top, date_width, image_width,
             }
             if (imgs_in_interval.length > 0){
                 k = parseInt(imgs_in_interval.length/2);
-                return "data/screenshots/" + screenshot_times[imgs_in_interval[k]].filename;
+                return screenshot_path + screenshot_times[imgs_in_interval[k]].filename;
             }
             return "benchmark.png";
         })

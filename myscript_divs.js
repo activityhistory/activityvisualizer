@@ -216,6 +216,20 @@ var past_event = -1;
 var time_interval = minutesToMilliseconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
 var app_similarity_ratio = 0.5;
+var screenshot_path = 'data/screenshots/';
+// var path_to_datafile = ... configure in file parse_database.php
+
+function httpGet(theUrl)
+{
+    var xmlHttp = null;
+
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+
+var screenshots = httpGet('http://localhost:8001/').split(',');
 
 window.onload = function() {
 
