@@ -201,6 +201,34 @@ function generateChunks(){
 
 }
 
+// QUERY NODE SERVER
+
+function httpGet(theUrl)
+{
+    var xmlHttp = null;
+
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+
+var servers_resonse = httpGet('http://localhost:8002/').split(',');
+var servers_response_object = JSON.parse(servers_resonse);
+
+var click_times = servers_response_object['clicks'];
+var process_names = servers_response_object['process_names'];
+var process_ids = servers_response_object['process_ids'];
+var window_process_id = servers_response_object['window_process_id'];
+var window_browser_url = servers_response_object['window_browser_url'];
+var windowevent_times = servers_response_object['windowevent_times'];
+var windowevent_window_ids = servers_response_object['windowevent_window_ids'];
+var windowevent_event_type = servers_response_object['windowevent_event_type'];
+
+var screenshots = httpGet('http://localhost:8002/').split(',');
+
+// END QUERY NODE SERVER
+
 var filtered_events = [];
 var activities = [];
 var chunk_objects = [];
@@ -217,28 +245,7 @@ var time_interval = minutesToMilliseconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
 var app_similarity_ratio = 0.5;
 var screenshot_path = 'data/screenshots/';
-// var path_to_datafile = ... configure in file parse_database.php
 
-function httpGet(theUrl)
-{
-    var xmlHttp = null;
-
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, false );
-    xmlHttp.send( null );
-    return xmlHttp.responseText;
-}
-
-var servers_resonse = httpGet('http://localhost:8001/').split(',');
-var servers_response_object = JSON.parse(servers_resonse);
-
-var click_times = servers_response_object['clicks'];
-var process_names = servers_response_object['process_names'];
-var process_ids = servers_response_object['process_ids'];
-var window_process_id = servers_response_object['window_process_id'];
-var window_browser_url = servers_response_object['window_browser_url'];
-
-var screenshots = httpGet('http://localhost:8001/').split(',');
 
 window.onload = function() {
 
