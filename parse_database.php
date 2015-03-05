@@ -77,23 +77,5 @@
 
 	echo "var process_names = ".json_encode($process_names).";\n";
 	echo "var process_ids = ".json_encode($process_ids).";\n";
-	
-	
-	
-	
-	// ## PARSE CLICK - Get processes for labels //
-	$query = "SELECT * FROM click";
-
-	$click_times = array();
-
-	// Iterate through the results and pass into JSON encoder //
-
-	foreach ($dbh->query($query) as $row) {
-
-		array_push($click_times, $row[1]);
-
-	}
-
-	echo "var click_times = ".json_encode($click_times).";\n";
 
 	?>

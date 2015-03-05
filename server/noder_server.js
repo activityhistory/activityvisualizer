@@ -1,9 +1,29 @@
-var fs = require('fs');
-var http = require('http'); 
+//config
 
-var files = fs.readdirSync('/Volumes/SELFSPY/p1/screenshots');
+var path_to_data = '/Volumes/SELFSPY/p1/';
+
+// config end
+
+var fs = require('fs');
+var http = require('http');
+var SQL = require('sql.js');
+
+var files = fs.readdirSync(path_to_data + 'screenshots');
 
 console.log('finished reading filenames');
+
+var filebuffer = fs.readFileSync(path_to_data + 'selfspy.sqlite');
+
+var db = new SQL.Database(filebuffer);
+
+// Prepare an sql statement
+var stmt = db.prepare("SELECT created_at FROM click");
+
+var sql_clicks = [];
+
+while (stmt.step()) sql_clicks.push(stmt.get()[0]);
+
+console.log('finished reading db file');
 
 var server = http.createServer(function (req, res) {
 
@@ -21,7 +41,13 @@ var server = http.createServer(function (req, res) {
     res.setHeader('Access-Control-Allow-Credentials', true);
 
     res.writeHead(200);
-    res.write(files.toString());
+
+    var response_object = {
+        filenames : files,
+        clicks : sql_clicks
+    };
+
+    res.write(JSON.stringify(response_object));
     res.end();
 });
 

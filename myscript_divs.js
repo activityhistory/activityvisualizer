@@ -229,6 +229,11 @@ function httpGet(theUrl)
     return xmlHttp.responseText;
 }
 
+var servers_resonse = httpGet('http://localhost:8001/').split(',');
+var servers_response_object = JSON.parse(servers_resonse);
+
+var click_times = servers_response_object['clicks'];
+
 var screenshots = httpGet('http://localhost:8001/').split(',');
 
 window.onload = function() {
