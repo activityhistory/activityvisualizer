@@ -142,8 +142,8 @@ function generateChunks(){
         var current_top_apps = findNMostUsedActivities();
 
         // if the first chunk
-        //TODO check if chunk other than the first has 0 apps
-        if(prev_top_apps.length == 0){
+        if(i == earliest_time){
+            console.log('first chunk');
             prev_top_apps = current_top_apps;
             prev_start_time = i;
             prev_end_time = i + time_interval;
@@ -152,6 +152,7 @@ function generateChunks(){
 
         // if the last chunk
         else if( i + time_interval >= latest_time ){
+            console.log('last chunk');
             if(isSimilarArrays(prev_top_apps, current_top_apps)){
                 // update previous
                 prev_end_time = latest_time;
@@ -171,6 +172,7 @@ function generateChunks(){
 
         // if any intermediate chunk
         else{
+            console.log('intermediate chunk');
             if(isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 1){
                 first_similar = 0;
                 //update previous
@@ -198,6 +200,8 @@ function generateChunks(){
             }
         }
     }
+
+    console.log(chunk_objects);
 
 }
 
