@@ -6,6 +6,8 @@ function updateAllDayView(svg, border_left, border_top, date_width, image_width,
 
     svg.attr("height", h_day);
 
+    console.log(chunk_objects);
+
     reverse_chunk_objects = chunk_objects.reverse();
 
     // draw activity circles

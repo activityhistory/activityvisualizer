@@ -1,6 +1,11 @@
-function getActivityNameFromWindowId(){
-    var process_id = window_process_id[windowevent_window_ids[past_event]] - 1; // table is off by one
+function getActivityNameFromWindowId(id){
+    var process_id = window_process_id[windowevent_window_ids[id]] - 1; // table is off by one
     var name = process_names[process_id];
+    if (windowevent_window_ids[id] > 2500){
+        console.log('windowevent_window_ids[id]: ' + windowevent_window_ids[id]);
+        console.log("process id " + process_id);
+        console.log('name: ' + name);
+    }
     if (name == "Google Chrome" || name == "Safari"){
         // get hostname from url
         var getLocation = function(href) {
@@ -8,7 +13,7 @@ function getActivityNameFromWindowId(){
             l.href = href;
             return l;
         };
-        var l = getLocation(window_browser_url[windowevent_window_ids[past_event]]);
+        var l = getLocation(window_browser_url[windowevent_window_ids[id]]);
         return l.hostname;
     } else {
         return name;
@@ -47,7 +52,7 @@ function calculateClicksPerMinute(){
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
 function generateAbstraction(){
     for (var k = 0; k < windowevent_window_ids.length; k++) {
-        var activity_name = getActivityNameFromWindowId(past_event);
+        var activity_name = getActivityNameFromWindowId(k);
         var start_time = Date.parse(windowevent_times[past_event]);
         var end_time = Date.parse(windowevent_times[k]);
         // 1 : We find an 'Active' Event
@@ -115,6 +120,7 @@ function findNMostUsedActivities(){
 
 
 function createChunkObjects(interval_start_time, end_time, items, duration){
+
     var chunkobject = {
         start_time : interval_start_time,
         end_time : end_time,
@@ -141,6 +147,8 @@ function generateChunks(){
         getDurationsForGivenInterval(i);
         var current_top_apps = findNMostUsedActivities();
 
+        console.log(current_top_apps.length);
+
         // if the first chunk
         if(i == earliest_time){
             console.log('first chunk');
@@ -152,7 +160,6 @@ function generateChunks(){
 
         // if the last chunk
         else if( i + time_interval >= latest_time ){
-            console.log('last chunk');
             if(isSimilarArrays(prev_top_apps, current_top_apps)){
                 // update previous
                 prev_end_time = latest_time;
@@ -172,7 +179,6 @@ function generateChunks(){
 
         // if any intermediate chunk
         else{
-            console.log('intermediate chunk');
             if(isSimilarArrays(prev_top_apps, current_top_apps) && first_similar == 1){
                 first_similar = 0;
                 //update previous
@@ -217,7 +223,7 @@ function httpGet(theUrl)
     return xmlHttp.responseText;
 }
 
-var servers_resonse = httpGet('http://localhost:8002/').split(',');
+var servers_resonse = httpGet('http://localhost:8002/');
 var servers_response_object = JSON.parse(servers_resonse);
 
 var click_times = servers_response_object['clicks'];
@@ -229,7 +235,9 @@ var windowevent_times = servers_response_object['windowevent_times'];
 var windowevent_window_ids = servers_response_object['windowevent_window_ids'];
 var windowevent_event_type = servers_response_object['windowevent_event_type'];
 
-var screenshots = httpGet('http://localhost:8002/').split(',');
+console.log(window_process_id);
+
+var screenshots = servers_response_object['filenames'];
 
 // END QUERY NODE SERVER
 

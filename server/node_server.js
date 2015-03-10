@@ -42,6 +42,9 @@ while (stmt.step()) window_process_id.push(stmt.get()[0]);
 stmt = db.prepare("SELECT browser_url FROM window");
 while (stmt.step()) window_browser_url.push(stmt.get()[0]);
 
+console.log(window_process_id);
+
+
 var windowevent_times = [];
 var windowevent_window_ids = [];
 var windowevent_event_type = [];
