@@ -44,7 +44,7 @@ function updateAllWeekView(svg, h_week, border_left, pixel_per_minute, border_to
         .attr("y", border_top)
         .attr("x", function(d, i) {
             return  border_left + date_width + timeline_width + i * (full_width / 7);
-        })
+        });
 
 
     // draw rectangles for click activity

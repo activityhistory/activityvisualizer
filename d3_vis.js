@@ -73,15 +73,7 @@ function drawD3(){
         time_interval = minutesToMilliseconds(ui.value);
 
         generateChunks();
-        if ($('input[name=radio]:checked', '#myForm').val() == "dayview"){
-            updateAllDayView();
-        }
-        if ($('input[name=radio]:checked', '#myForm').val() == "weekview"){
-            updateAllWeekView();
-        }
-        if ($('input[name=radio]:checked', '#myForm').val() == "small_multiples"){
-            updateAllSmallMultiplesView();
-        }
+        updateAll();
 
         document.getElementById('timeGranularityText').innerHTML = 'Time Granularity: ' + ui.value;
 
@@ -97,7 +89,7 @@ function drawD3(){
 
     }});
 
-    $("#dateRange").slider({ max: latest_time },{min:earliest_time},{values: [earliest_time, latest_time]},{slide: function( event, ui ) {
+    $("#dateRange").slider({ max: maximum_time },{min:earliest_time},{values: [earliest_time, latest_time]},{slide: function( event, ui ) {
 
         earliest_time = ui.values[0];
         latest_time = ui.values[1];

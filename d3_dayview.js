@@ -21,7 +21,7 @@ function updateAllDayView(svg, border_left, border_top, date_width, image_width,
 
 
     // label activity circles with duration in minutes
-    svg.selectAll(".text_dur").remove();
+    svg.selectAll(".activityDurationText").remove();
 
     var text_dur = svg.selectAll("activityDurationText")
         .data(reverse_chunk_objects)

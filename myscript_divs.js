@@ -115,16 +115,13 @@ function findNMostUsedActivities(){
 
 
 function createChunkObjects(interval_start_time, end_time, items, duration){
-    if (items.length > 0){ //TODO DANGEROUS - this did not need to be here before migrating to node.js - why is it needed to?
-        // It probably means that something else in the pipeline before is broken
-        var chunkobject = {
-            start_time : interval_start_time,
-            end_time : end_time,
-            duration : duration,
-            items : items
-        };
-        chunk_objects.push(chunkobject);
-    }
+    var chunkobject = {
+        start_time : interval_start_time,
+        end_time : end_time,
+        duration : duration,
+        items : items
+    };
+    chunk_objects.push(chunkobject);
 }
 
 
@@ -237,6 +234,13 @@ var highest_numner_of_clicks_per_minute = 0;
 
 var earliest_time = Date.parse(windowevent_times[0]);
 var latest_time = Date.parse(windowevent_times[windowevent_times.length - 1]);
+var maximum_time = latest_time;
+
+var milliseconds_in_full_day = 24 * 60 * 60 * 1000;
+
+if (latest_time - earliest_time > milliseconds_in_full_day){
+    latest_time = earliest_time + milliseconds_in_full_day;
+}
 
 var past_event = -1;
 
