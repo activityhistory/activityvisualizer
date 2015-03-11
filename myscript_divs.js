@@ -46,7 +46,6 @@ function calculateClicksPerMinute(){
 // generating an abstraction of the activities in time
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
 function generateAbstraction(){
-    console.log(windowevent_event_type);
     for (var k = 0; k < windowevent_window_ids.length; k++) {
         var activity_name = getActivityNameFromWindowId(k);
         var start_time = Date.parse(windowevent_times[past_event]);
@@ -190,7 +189,6 @@ function generateChunks(){
                 first_similar = 1;
                 //write previous
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
-                //console.log(prev_top_apps)
 
                 //update previous = current
                 prev_start_time = i;
