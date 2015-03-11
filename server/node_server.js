@@ -1,6 +1,7 @@
-//config
+// config server
 
 var path_to_data = '/Volumes/SELFSPY/p1/';
+var port = 8002;
 
 // config end
 
@@ -16,7 +17,6 @@ var filebuffer = fs.readFileSync(path_to_data + 'selfspy.sqlite');
 
 var db = new SQL.Database(filebuffer);
 
-// Prepare an sql statement
 var clicks = db.exec("SELECT created_at FROM click ORDER BY id ASC")[0]['values'];
 
 var process_names = db.exec("SELECT name FROM process ORDER BY id ASC")[0]['values'];
@@ -69,4 +69,4 @@ var server = http.createServer(function (req, res) {
     res.end();
 });
 
-server.listen(8002);
+server.listen(port);

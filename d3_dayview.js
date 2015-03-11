@@ -1,5 +1,5 @@
 function durationToRadius(duration){
-        return Math.pow(duration, 1/4) / 1.0;
+        return Math.pow(duration, 1 / 4);
     }
 
 function updateAllDayView(svg, border_left, border_top, date_width, image_width, h_day, image_height, blob_scaling_factor, blob_width){
@@ -106,7 +106,7 @@ function updateAllDayView(svg, border_left, border_top, date_width, image_width,
                 return screenshot_path + screenshot_times[imgs_in_interval[k]].filename;
             }
             return "benchmark.png";
-        })
+        });
         //.on("mouseover", function(){
         //    tooltip.style("visibility", "visible");
         //    var imgsrc = this.getAttribute("href");

@@ -124,7 +124,7 @@ function updateAllWeekView(svg, h_week, border_left, pixel_per_minute, border_to
             tooltip.style("visibility", "visible");
             var imgsrc = this.getAttribute("href");
             d3.select("#tooltip_image").attr("src", function(){ return imgsrc});
-            imgsrc = imgsrc.split("/").pop()
+            imgsrc = imgsrc.split("/").pop();
             d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
             var rect = this.getBoundingClientRect();
             tooltip.style("top", (rect.top + document.body.scrollTop)+"px").style("left",(rect.right+10)+"px");
