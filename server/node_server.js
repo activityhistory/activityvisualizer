@@ -17,46 +17,18 @@ var filebuffer = fs.readFileSync(path_to_data + 'selfspy.sqlite');
 var db = new SQL.Database(filebuffer);
 
 // Prepare an sql statement
-var stmt = db.prepare("SELECT created_at FROM click");
-var clicks = [];
-while (stmt.step()) clicks.push(stmt.get()[0]);
+var clicks = db.exec("SELECT created_at FROM click ORDER BY id ASC")[0]['values'];
+
+var process_names = db.exec("SELECT name FROM process ORDER BY id ASC")[0]['values'];
+var process_ids = db.exec("SELECT id FROM process ORDER BY id ASC")[0]['values'];
+
+var window_process_id = db.exec("SELECT process_id FROM window ORDER BY id ASC")[0]['values'];
+var window_browser_url = db.exec("SELECT browser_url FROM window ORDER BY id ASC")[0]['values'];
 
 
-var process_names = [];
-var process_ids = [];
-
-stmt = db.prepare("SELECT name FROM process");
-while (stmt.step()) process_names.push(stmt.get()[0]);
-
-stmt = db.prepare("SELECT id FROM process");
-while (stmt.step()) process_ids.push(stmt.get()[0]);
-
-
-var window_process_id = [];
-var window_browser_url = [];
-
-
-stmt = db.prepare("SELECT process_id FROM window");
-while (stmt.step()) window_process_id.push(stmt.get()[0]);
-
-stmt = db.prepare("SELECT browser_url FROM window");
-while (stmt.step()) window_browser_url.push(stmt.get()[0]);
-
-console.log(window_process_id);
-
-
-var windowevent_times = [];
-var windowevent_window_ids = [];
-var windowevent_event_type = [];
-
-stmt = db.prepare("SELECT created_at FROM windowevent");
-while (stmt.step()) windowevent_times.push(stmt.get()[0]);
-
-stmt = db.prepare("SELECT window_id FROM windowevent");
-while (stmt.step()) windowevent_window_ids.push(stmt.get()[0]);
-
-stmt = db.prepare("SELECT event_type FROM windowevent");
-while (stmt.step()) windowevent_event_type.push(stmt.get()[0]);
+var windowevent_times = db.exec("SELECT created_at FROM windowevent ORDER BY id ASC")[0]['values'];
+var windowevent_window_ids = db.exec("SELECT window_id FROM windowevent ORDER BY id ASC")[0]['values'];
+var windowevent_event_type = db.exec("SELECT event_type FROM windowevent ORDER BY id ASC")[0]['values'];
 
 
 

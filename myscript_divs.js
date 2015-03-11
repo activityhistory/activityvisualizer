@@ -1,11 +1,6 @@
 function getActivityNameFromWindowId(id){
     var process_id = window_process_id[windowevent_window_ids[id]] - 1; // table is off by one
     var name = process_names[process_id];
-    if (windowevent_window_ids[id] > 2500){
-        console.log('windowevent_window_ids[id]: ' + windowevent_window_ids[id]);
-        console.log("process id " + process_id);
-        console.log('name: ' + name);
-    }
     if (name == "Google Chrome" || name == "Safari"){
         // get hostname from url
         var getLocation = function(href) {
@@ -51,6 +46,7 @@ function calculateClicksPerMinute(){
 // generating an abstraction of the activities in time
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
 function generateAbstraction(){
+    console.log(windowevent_event_type);
     for (var k = 0; k < windowevent_window_ids.length; k++) {
         var activity_name = getActivityNameFromWindowId(k);
         var start_time = Date.parse(windowevent_times[past_event]);
@@ -120,15 +116,16 @@ function findNMostUsedActivities(){
 
 
 function createChunkObjects(interval_start_time, end_time, items, duration){
-
-    var chunkobject = {
-        start_time : interval_start_time,
-        end_time : end_time,
-        duration : duration,
-        items : items
-    };
-
-    chunk_objects.push(chunkobject);
+    if (items.length > 0){ //TODO DANGEROUS - this did not need to be here before migrating to node.js - why is it needed to?
+        // It probably means that something else in the pipeline before is broken
+        var chunkobject = {
+            start_time : interval_start_time,
+            end_time : end_time,
+            duration : duration,
+            items : items
+        };
+        chunk_objects.push(chunkobject);
+    }
 }
 
 
@@ -147,11 +144,8 @@ function generateChunks(){
         getDurationsForGivenInterval(i);
         var current_top_apps = findNMostUsedActivities();
 
-        console.log(current_top_apps.length);
-
         // if the first chunk
         if(i == earliest_time){
-            console.log('first chunk');
             prev_top_apps = current_top_apps;
             prev_start_time = i;
             prev_end_time = i + time_interval;
@@ -207,8 +201,6 @@ function generateChunks(){
         }
     }
 
-    console.log(chunk_objects);
-
 }
 
 // QUERY NODE SERVER
@@ -234,8 +226,6 @@ var window_browser_url = servers_response_object['window_browser_url'];
 var windowevent_times = servers_response_object['windowevent_times'];
 var windowevent_window_ids = servers_response_object['windowevent_window_ids'];
 var windowevent_event_type = servers_response_object['windowevent_event_type'];
-
-console.log(window_process_id);
 
 var screenshots = servers_response_object['filenames'];
 
