@@ -28,17 +28,17 @@ function drawD3(){
         .attr("width", w)
         .attr("height", h_day);
 
-    var tooltip = d3.select("body")
-        .append("div")
-        .attr("id", "tooltip");
-
-    tooltip.append('p')
-        .text("Hello")
-        .attr("id","tooltip_text");
-
-    tooltip.append("img")
-            .attr("src", "benchmark.png")
-            .attr("id", "tooltip_image");
+    //var tooltip = d3.select("body") // TODO tooltips not appearing to work
+    //    .append("div")
+    //    .attr("id", "tooltip");
+    //
+    //tooltip.append('p')
+    //    .text("Hello")
+    //    .attr("id","tooltip_text");
+    //
+    //tooltip.append("img")
+    //        .attr("src", "benchmark.png")
+    //        .attr("id", "tooltip_image");
 
     function deleteEverything(){
 
@@ -68,7 +68,7 @@ function drawD3(){
 
     }
 
-    $("#timeGranularity").slider({max:60},{min:5},{value:20},{step:5},{slide: function( event, ui ) {
+    $("#timeGranularity").slider({max:360},{min:5},{value:20},{step:5},{slide: function( event, ui ) {
 
         time_interval = minutesToMilliseconds(ui.value);
 

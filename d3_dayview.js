@@ -1,5 +1,5 @@
 function durationToRadius(duration){
-        return Math.pow(duration, 1/2) / 4.0;
+        return Math.pow(duration, 1/4) / 1.0;
     }
 
 function updateAllDayView(svg, border_left, border_top, date_width, image_width, h_day, image_height, blob_scaling_factor, blob_width){
@@ -107,15 +107,15 @@ function updateAllDayView(svg, border_left, border_top, date_width, image_width,
             }
             return "benchmark.png";
         })
-        .on("mouseover", function(){
-            tooltip.style("visibility", "visible");
-            var imgsrc = this.getAttribute("href");
-            d3.select("#tooltip_image").attr("src", function(){ return imgsrc});
-            imgsrc = imgsrc.split("/").pop();
-            d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
-            var rect = this.getBoundingClientRect();
-            tooltip.style("top", (rect.top + document.body.scrollTop)+"px").style("left",(rect.right+10)+"px");
-        })
-        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+        //.on("mouseover", function(){
+        //    tooltip.style("visibility", "visible");
+        //    var imgsrc = this.getAttribute("href");
+        //    d3.select("#tooltip_image").attr("src", function(){ return imgsrc});
+        //    imgsrc = imgsrc.split("/").pop();
+        //    d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
+        //    var rect = this.getBoundingClientRect();
+        //    tooltip.style("top", (rect.top + document.body.scrollTop)+"px").style("left",(rect.right+10)+"px");
+        //})
+        //.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
 }

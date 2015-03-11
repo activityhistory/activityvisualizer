@@ -253,6 +253,8 @@ var screenshot_path = 'data/screenshots/';
 
 window.onload = function() {
 
+    document.getElementById('dateRangeText').innerHTML = new Date(earliest_time).toLocaleTimeString() + ' to ' + new Date(latest_time).toLocaleTimeString();
+
     parseScreenshotNames();
     calculateClicksPerMinute();
     generateAbstraction();

@@ -1,5 +1,7 @@
 function updateAllActivityLevelView(svg, h_week, border_left, pixel_per_minute, border_top, weekday_label_height, date_width, timeline_width, full_width, image_width){
 
+    // The following is only placeholder code to build a new View - replace everything below this comment!
+
     var trimmed_chunk_objects = [];
     now = new Date().getTime();
     last_week = now - 7*24*60*60*1000;
