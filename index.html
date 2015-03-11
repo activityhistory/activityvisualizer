@@ -2,16 +2,18 @@
 <html>
 <head>
     <title>Weekview</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 
-    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="parse_database.php"></script>
     <script type="text/javascript" src="helpers.js"></script>
     <script type="text/javascript" src="table.js"></script>
     <script type="text/javascript" src="d3_vis.js"></script>
+    <script type="text/javascript" src="d3_weekview.js"></script>
+    <script type="text/javascript" src="d3_dayview.js"></script>
+    <script type="text/javascript" src="d3_activitylevelview.js"></script>
     <script type="text/javascript" src="myscript_divs.js"></script>
 </head>
 
@@ -24,7 +26,8 @@
                 <div id="myForm">
                     <input type="radio" value="dayview" name="radio" id="radio1"><label for="radio1">Day</label>
                     <input type="radio" value="weekview" name="radio" id="radio2" checked="checked"><label for="radio2">Week</label>
-                    <input type="radio" value="small_multiples" name="radio" id="radio3"><label for="radio3">Small multiples</label>
+                    <input type="radio" value="activity_level" name="radio" id="radio3"><label for="radio3">Activity Level</label>
+                    <input type="radio" value="small_multiples" name="radio" id="radio4"><label for="radio4">Small multiples</label>
                 </div>
             <hr>
         </div>

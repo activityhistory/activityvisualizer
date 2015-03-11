@@ -1,5 +1,5 @@
-function getActivityNameFromWindowId(){
-    var process_id = window_process_id[windowevent_window_ids[past_event]] - 1; // table is off by one
+function getActivityNameFromWindowId(id){
+    var process_id = window_process_id[windowevent_window_ids[id]] - 1; // table is off by one
     var name = process_names[process_id];
     if (name == "Google Chrome" || name == "Safari"){
         // get hostname from url
@@ -8,7 +8,7 @@ function getActivityNameFromWindowId(){
             l.href = href;
             return l;
         };
-        var l = getLocation(window_browser_url[windowevent_window_ids[past_event]]);
+        var l = getLocation(window_browser_url[windowevent_window_ids[id]]);
         return l.hostname;
     } else {
         return name;
@@ -47,7 +47,7 @@ function calculateClicksPerMinute(){
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
 function generateAbstraction(){
     for (var k = 0; k < windowevent_window_ids.length; k++) {
-        var activity_name = getActivityNameFromWindowId(past_event);
+        var activity_name = getActivityNameFromWindowId(k);
         var start_time = Date.parse(windowevent_times[past_event]);
         var end_time = Date.parse(windowevent_times[k]);
         // 1 : We find an 'Active' Event
@@ -115,14 +115,16 @@ function findNMostUsedActivities(){
 
 
 function createChunkObjects(interval_start_time, end_time, items, duration){
-    var chunkobject = {
-        start_time : interval_start_time,
-        end_time : end_time,
-        duration : duration,
-        items : items
-    };
-
-    chunk_objects.push(chunkobject);
+    if (items.length > 0){ //TODO DANGEROUS - this did not need to be here before migrating to node.js - why is it needed to?
+        // It probably means that something else in the pipeline before is broken
+        var chunkobject = {
+            start_time : interval_start_time,
+            end_time : end_time,
+            duration : duration,
+            items : items
+        };
+        chunk_objects.push(chunkobject);
+    }
 }
 
 
@@ -142,8 +144,7 @@ function generateChunks(){
         var current_top_apps = findNMostUsedActivities();
 
         // if the first chunk
-        //TODO check if chunk other than the first has 0 apps
-        if(prev_top_apps.length == 0){
+        if(i == earliest_time){
             prev_top_apps = current_top_apps;
             prev_start_time = i;
             prev_end_time = i + time_interval;
@@ -188,7 +189,6 @@ function generateChunks(){
                 first_similar = 1;
                 //write previous
                 createChunkObjects(prev_start_time, prev_end_time, prev_top_apps, prev_duration);
-                //console.log(prev_top_apps)
 
                 //update previous = current
                 prev_start_time = i;
@@ -200,6 +200,34 @@ function generateChunks(){
     }
 
 }
+
+// QUERY NODE SERVER
+
+function httpGet(theUrl)
+{
+    var xmlHttp = null;
+
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+
+var servers_resonse = httpGet('http://localhost:8002/');
+var servers_response_object = JSON.parse(servers_resonse);
+
+var click_times = servers_response_object['clicks'];
+var process_names = servers_response_object['process_names'];
+var process_ids = servers_response_object['process_ids'];
+var window_process_id = servers_response_object['window_process_id'];
+var window_browser_url = servers_response_object['window_browser_url'];
+var windowevent_times = servers_response_object['windowevent_times'];
+var windowevent_window_ids = servers_response_object['windowevent_window_ids'];
+var windowevent_event_type = servers_response_object['windowevent_event_type'];
+
+var screenshots = servers_response_object['filenames'];
+
+// END QUERY NODE SERVER
 
 var filtered_events = [];
 var activities = [];
@@ -216,6 +244,8 @@ var past_event = -1;
 var time_interval = minutesToMilliseconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
 var app_similarity_ratio = 0.5;
+var screenshot_path = 'data/screenshots/';
+
 
 window.onload = function() {
 
