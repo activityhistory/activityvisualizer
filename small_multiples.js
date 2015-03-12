@@ -1,7 +1,7 @@
 // config small multiples
 
 var metadata_server = 'http://localhost:8002/';
-var path_to_screenshots_on_server = 'data/screenshots/';
+var path_to_screenshots_on_server = './data/screenshots/';
 
 // config end
 

@@ -10,7 +10,7 @@ Launch the node server with
 
 To run distributedly start a simple HTTP server. E.g. with
 
-    python -m SimpleHTTPServer 
+    python -m SimpleHTTPServer
 
 # Configuration:
 
