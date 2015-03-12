@@ -1,10 +1,15 @@
 // config browser side
 
+var screenshot_path = 'data/screenshots/'; // To get the image from a server, this needs to be changed to the http address
+// a few extra lines in the node server should be sufficient to make it serve the jpg files
+
+var metadata_server = 'http://localhost:8002/';
+
+// the following are the default values for the parameters that can be manipulated by the UI sliders
+
 var time_interval = minutesToMilliseconds(20); // 60k milliseconds = 1 minute
 var number_of_top_elements = 3;
 var app_similarity_ratio = 0.5;
-var screenshot_path = 'data/screenshots/'; // To get the image from a server, this needs to be changed to the http address
-// a few extra lines in the node server should be sufficient to make it serve the jpg files
 
 // config end
 
@@ -34,7 +39,12 @@ var earliest_time = 0;
 var latest_time = 0;
 var maximum_time = 0;
 
-
+/**
+ * Takes an ID of an Window Event and returns the name of the application the event belongs to. If this is either
+ * Chrome or Safari, it will return the URL of the tab in focus.
+ * @param id
+ * @returns {*}
+ */
 function getActivityNameFromWindowId(id){
     var process_id = window_process_id[windowevent_window_ids[id]] - 1; // table is off by one
     var name = process_names[process_id];
@@ -52,7 +62,9 @@ function getActivityNameFromWindowId(id){
     }
 }
 
-
+/**
+ * This creates an array that counts how many clicks there have been in each Minute of the time interval at hand.
+ */
 function calculateClicksPerMinute(){
     for (var i = earliest_time; i < latest_time; i += minutesToMilliseconds(1)){
         var minute_click_object = {
@@ -82,6 +94,10 @@ function calculateClicksPerMinute(){
 
 // generating an abstraction of the activities in time
 // TODO This algorithms understands periods of inactivity (e.g. nights) as long periods of the last active activity. This is bad.
+/**
+ * Looks at all the window events and creates a new datastructure that contains explicitly what was the application
+ * in focus from when to when.
+ */
 function generateAbstraction(){
     for (var k = 0; k < windowevent_window_ids.length; k++) {
         var activity_name = getActivityNameFromWindowId(k);
@@ -104,7 +120,12 @@ function generateAbstraction(){
     }
 }
 
-
+/**
+ * This creates the actual objects and adds to the data structure that gets created by generateAbstraction().
+ * @param activity_name
+ * @param start_time
+ * @param end_time
+ */
 function pushEvent(activity_name, start_time, end_time){
     var filtered_events_object = {
         description : activity_name,
@@ -116,7 +137,10 @@ function pushEvent(activity_name, start_time, end_time){
 
 }
 
-
+/**
+ * Looks at chunks of time and sums up the durations for each application or URLs.
+ * @param i
+ */
 function getDurationsForGivenInterval(i){
     // looking through all entries in the abstraction
     for(var k = 0; k < filtered_events.length; k++){
@@ -131,7 +155,11 @@ function getDurationsForGivenInterval(i){
     }
 }
 
-
+/**
+ * Creates the actual object and adds to datastructure created by getDurationsForGivenInterval().
+ * @param k
+ * @param duration
+ */
 function pushDuration(k, duration){
     var id = inArray(activities, filtered_events[k].description);
     if (id != -1){
@@ -145,7 +173,7 @@ function pushDuration(k, duration){
     }
 }
 
-
+/**
 function findNMostUsedActivities(){
     return activities.sort(function (a, b){ return b.duration - a.duration; }).slice(0,number_of_top_elements);
 }
@@ -248,7 +276,7 @@ function queryMetadataFromServer(){
         return xmlHttp.responseText;
     }
 
-    var servers_resonse = httpGet('http://localhost:8002/');
+    var servers_resonse = httpGet(metadata_server);
     var servers_response_object = JSON.parse(servers_resonse);
 
     click_times = servers_response_object['clicks'];
@@ -282,7 +310,7 @@ window.onload = function() {
     calculateClicksPerMinute();
     generateAbstraction();
     generateChunks();
-    //tableCreate();
+    //tableCreate(); // Outputs data as a table instead of a d3 visualisation. For debugging purposes.
     drawD3();
 
 };
