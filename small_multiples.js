@@ -1,34 +1,60 @@
+// config small multiples
+
+var metadata_server = 'http://localhost:8002/';
+var path_to_screenshots_on_server = 'data/screenshots/';
+
+// config end
+
+var screenshots = [];
+
+// initialize global variables
+
+
+/**
+ * Facilitates the communication with the server. Here all the metadata es queried at startup and than analyzed
+ * browser-side.
+ */
+function queryMetadataFromServer(){
+
+    function httpGet(theUrl)
+    {
+        var xmlHttp = null;
+
+        xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
+
+    var servers_resonse = httpGet(metadata_server);
+    var servers_response_object = JSON.parse(servers_resonse);
+
+    screenshots = servers_response_object['filenames'];
+}
+
 //Makes an asynchronous request, loading the getimages.php file
 function callForImages() {
 
     //Create the request object
     var httpReq = (window.XMLHttpRequest)?new XMLHttpRequest():new ActiveXObject("Microsoft.XMLHTTP");
 
-    //When it loads,
-    httpReq.onload = function() {
+    var img_data = [];
 
-        var img_data = []
+    queryMetadataFromServer();
 
-        //Convert the result back into JSON
-        var result = JSON.parse(httpReq.responseText);
-        for(var i = 0; i < result.length; i++){
-            var filename_elements = result[i].split("_");
-            var x = filename_elements[1];
-            var y = filename_elements[2].split(".")[0];
-            img_data.push([result[i], x, y]);
-        }
-
-        //Show the images
-        loadImages(img_data);
+    var result = screenshots;
+    for(var i = 0; i < result.length; i++){
+        var filename_elements = result[i].split("_");
+        var x = filename_elements[1];
+        var y = filename_elements[2].split(".")[0];
+        img_data.push([result[i], x, y]);
     }
 
-    //Request the page
-    try {
-        httpReq.open("GET", "small_multiples.php", true);
-        httpReq.send(null);
-    } catch(e) {
-        console.log(e);
-    }
+    //Show the images
+    loadImages(img_data);
+
+
+
 }
 
 //Generates the images and sticks them in the container
@@ -46,8 +72,8 @@ function loadImages(images) {
         .attr("id","tooltip_text")
 
     tooltip.append("img")
-            .attr("src", "benchmark.png")
-            .attr("id", "tooltip_image");
+        .attr("src", "benchmark.png")
+        .attr("id", "tooltip_image");
 
     var multiples = d3.select('#images').selectAll('.clickDiv')
         .data([]);
@@ -56,7 +82,7 @@ function loadImages(images) {
     var reduced_images = [];
     var jump_by = parseInt(images.length/20)
     for(var i = 0; i < images.length; i=i+jump_by) {
-            reduced_images.push(images[i]);
+        reduced_images.push(images[i]);
     }
 
     // add images to page in a div used for cropping
@@ -65,18 +91,18 @@ function loadImages(images) {
         .enter().append('div')
         .attr('class', 'clickDiv')
         .append('img')
-            .attr('class', 'clickImg')
-            .attr('src', function(d){return d[0]})
-            .on("mouseover", function(){
-                tooltip.style("visibility", "visible")
-                var imgsrc = this.getAttribute("src");
-                d3.select("#tooltip_image").attr("src", function(){ return imgsrc});
-                imgsrc = imgsrc.split("/").pop()
-                d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
-                var rect = this.parentNode.getBoundingClientRect();
-                tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
-            })
-            .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+        .attr('class', 'clickImg')
+        .attr('src', function(d){return path_to_screenshots_on_server + d[0]})
+        .on("mouseover", function(){
+            tooltip.style("visibility", "visible")
+            var imgsrc = this.getAttribute("src");
+            d3.select("#tooltip_image").attr("src", function(){ return imgsrc});
+            imgsrc = imgsrc.split("/").pop()
+            d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
+            var rect = this.parentNode.getBoundingClientRect();
+            tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
+        })
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
     d3.selectAll('.clickImg')
         .style('top', function(d){return -( this.clientHeight - d[2]) + imgW/2 + 'px'})
@@ -92,19 +118,19 @@ function loadImages(images) {
                     return Math.round(ui.value*1.6)+'px';
                 }
                 else { return ui.value+'px'; }
-                })
+            })
             .selectAll('.clickImg')
-                .style('top', function(d){return -(this.clientHeight - d[2]) + ui.value/2 + 'px'})
-                .style('left', function(d){return  -d[1] + ui.value/2 + 'px'});
+            .style('top', function(d){return -(this.clientHeight - d[2]) + ui.value/2 + 'px'})
+            .style('left', function(d){return  -d[1] + ui.value/2 + 'px'});
 
-            if ($('input[name=radio]:checked', '#aspectForm').val() == "aspect1610"){
-                   imgW = Math.round(ui.value*1.6);
-                }
-                else { imgW = ui.value; }
-            imgH = ui.value;
+        if ($('input[name=radio]:checked', '#aspectForm').val() == "aspect1610"){
+            imgW = Math.round(ui.value*1.6);
+        }
+        else { imgW = ui.value; }
+        imgH = ui.value;
 
-            document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
-                imgW = ui.value;
+        document.getElementById('sizeText').innerHTML = 'Thumbnail Size: ' + ui.value;
+        imgW = ui.value;
     }});
 
     // get new set of images when slider for # of images changes
@@ -112,7 +138,7 @@ function loadImages(images) {
         var reduced_images = [];
         var jump_by = parseInt(images.length/ui.value)
         for(var i = 0; i < images.length; i=i+jump_by) {
-                reduced_images.push(images[i]);
+            reduced_images.push(images[i]);
         }
 
         multipleDivs = d3.select('#images').selectAll('.clickDiv')
@@ -126,18 +152,18 @@ function loadImages(images) {
             .attr('width', imgW)
             .attr('height', imgW)
             .append('img')
-                .attr('class', 'clickImg')
-                .attr('src', function(d){return d[0]})
-                .on("mouseover", function(){
-                    tooltip.style("visibility", "visible")
-                    var imgsrc = this.getAttribute("src")
-                    d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
-                    imgsrc = imgsrc.split("/").pop()
-                    d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
-                    var rect = this.parentNode.getBoundingClientRect();
-                    tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
-                })
-                .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+            .attr('class', 'clickImg')
+            .attr('src', function(d){return path_to_screenshots_on_server + d[0]})
+            .on("mouseover", function(){
+                tooltip.style("visibility", "visible")
+                var imgsrc = this.getAttribute("src")
+                d3.select("#tooltip_image").attr("src", function(){ return imgsrc})
+                imgsrc = imgsrc.split("/").pop()
+                d3.select("#tooltip_text").text( function(){ return imgsrc.substring(2,4) + "/" + imgsrc.substring(4,6) + "/" + imgsrc.substring(0,2) + " - " + imgsrc.substring(7,9) + ":" + imgsrc.substring(9,11) });
+                var rect = this.parentNode.getBoundingClientRect();
+                tooltip.style("top", (rect.bottom + document.body.scrollTop + 10)+"px").style("left",(rect.left)+"px");
+            })
+            .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
         multiples
             .style('top', function(d){return -(this.clientHeight - d[2]) + imgW/2 + 'px'})
@@ -148,12 +174,12 @@ function loadImages(images) {
 
     // Go to the index page if the page selection changes
     $('#myForm input').on('change', function() {
-            if ($('input[name=radio]:checked', '#myForm').val() == "dayview"){
-                window.location.href = "index.html";
-            }
-            if ($('input[name=radio]:checked', '#myForm').val() == "weekview"){
-                window.location.href = "index.html";
-            }
-        });
+        if ($('input[name=radio]:checked', '#myForm').val() == "dayview"){
+            window.location.href = "index.html";
+        }
+        if ($('input[name=radio]:checked', '#myForm').val() == "weekview"){
+            window.location.href = "index.html";
+        }
+    });
 
 }
