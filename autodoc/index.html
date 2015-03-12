@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>window</title>
+
+    <link rel="stylesheet" type="text/css" href="docs.css" />
+    <link rel="stylesheet" type="text/css" href="examples.css" />
+    <link rel="stylesheet" type="text/css" href="highlight.css" />
+    <script src="//pivotal.github.io/jasmine/lib/jasmine-1.3.1/jasmine.js"></script>
+    <script src="//lodash.com/_js/lodash.js"></script>
+    <script src="//benchmarkjs.com/_js/benchmark.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="//code.highcharts.com/highcharts.js"></script>
+    <script src="//danieltao.com/HighTables/hightables.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
+
+    <script type="text/javascript" src="activityvisualizer.js"></script>
+
+    <script type="text/javascript" src="defaults.js"></script>
+
+    <script type="text/javascript">
+      var benchmarks = {};
+    </script>
+</head>
+
+<body>
+    <main>
+        <header>
+            <h1>window</h1>
+
+            <p>config browser side</p>
+
+        </header>
+
+        <!-- Notification area for failing specs -->
+        <div id="spec-failures"></div>
+
+        <div class="search">
+            <fieldset>
+                <legend>Search</legend>
+                <input type="text" name="search" placeholder="Start typing the name of a function or type" />
+            </fieldset>
+        </div>
+
+        <div class="layout">
+            <div class="index">
+                <nav>
+                    <h2>Functions</h2>
+                    <ul>
+                        <li class="nav-header">
+                            <a href="#calculateClicksPerMinute">calculateClicksPerMinute</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#createChunkObjects">createChunkObjects</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#findNMostUsedActivities">findNMostUsedActivities</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#generateAbstraction">generateAbstraction</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#generateChunks">generateChunks</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#getActivityNameFromWindowId">getActivityNameFromWindowId</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#getDurationsForGivenInterval">getDurationsForGivenInterval</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#getLocation">getLocation</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#pushDuration">pushDuration</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#pushEvent">pushEvent</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#queryMetadataFromServer">queryMetadataFromServer</a>
+                        </li>
+                        <li class="nav-header">
+                            window
+                        </li>
+                        <li><a href="#window-onload" class="">onload</a></li>
+                        <li class="nav-header">
+                            <a href="#deleteEverything">deleteEverything</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#drawD3">drawD3</a>
+                        </li>
+                        <li class="nav-header">
+                            <a href="#updateAll">updateAll</a>
+                        </li>
+                    </ul>
+
+                </nav>
+            </div>
+
+            <article>
+                <section class="method" id="calculateClicksPerMinute" data-name="calculateclicksperminute" data-acronym="ccpm" data-filter="calculate-clicks-per-minute">
+                    <h1>
+                        calculateClicksPerMinute
+                        <small>calculateClicksPerMinute</small>
+                    </h1>
+
+                    <p>This creates an array that counts how many clicks there have been in each Minute of the time interval at hand.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="createChunkObjects" data-name="createchunkobjects" data-acronym="cco" data-filter="create-chunk-objects">
+                    <h1>
+                        createChunkObjects
+                        <small>createChunkObjects</small>
+                    </h1>
+
+                    <p>Creates the objects that are used by d3 for visualisation.</p>
+
+
+                    <div class="signature">
+                        <h3>Signature</h3>
+
+                        <pre><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">createChunkObjects</span>(<span class="cm-def">interval_start_time</span>, <span class="cm-def">end_time</span>, <span class="cm-def">items</span>, <span class="cm-def">duration</span>) { <span class="cm-comment"><a class="reveal-source" href="#source-createChunkObjects">/*...*/</a></span> }</span></pre>
+
+                        <pre class="function-source" id="source-createChunkObjects"><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">createChunkObjects</span>(<span class="cm-def">interval_start_time</span>, <span class="cm-def">end_time</span>, <span class="cm-def">items</span>, <span class="cm-def">duration</span>){</span>
+<span class="line" data-line-no="1">    <span class="cm-keyword">var</span> <span class="cm-def">chunkobject</span> = {</span>
+<span class="line" data-line-no="2">        <span class="cm-property">start_time</span> : <span class="cm-variable-2">interval_start_time</span>,</span>
+<span class="line" data-line-no="3">        <span class="cm-property">end_time</span> : <span class="cm-variable-2">end_time</span>,</span>
+<span class="line" data-line-no="4">        <span class="cm-property">duration</span> : <span class="cm-variable-2">duration</span>,</span>
+<span class="line" data-line-no="5">        <span class="cm-property">items</span> : <span class="cm-variable-2">items</span></span>
+<span class="line" data-line-no="6">    };</span>
+<span class="line" data-line-no="7">    <span class="cm-variable">chunk_objects</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">chunkobject</span>);</span>
+<span class="line" data-line-no="8">}</span></pre>
+
+                        <table id="createChunkObjects-parameters">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type(s)</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>interval_start_time</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>end_time</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>items</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>duration</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+
+                            </tbody>
+
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="findNMostUsedActivities" data-name="findnmostusedactivities" data-acronym="fnmua" data-filter="find-n-most-used-activities">
+                    <h1>
+                        findNMostUsedActivities
+                        <small>findNMostUsedActivities</small>
+                    </h1>
+
+                    <p>Sorts the durations of activities in given time and returns the most used apps.</p>
+
+
+                    <div class="signature">
+                        <h3>Signature</h3>
+
+                        <pre><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">findNMostUsedActivities</span>() { <span class="cm-comment"><a class="reveal-source" href="#source-findNMostUsedActivities">/*...*/</a></span> }</span></pre>
+
+                        <pre class="function-source" id="source-findNMostUsedActivities"><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">findNMostUsedActivities</span>(){</span>
+<span class="line" data-line-no="1">    <span class="cm-keyword">return</span> <span class="cm-variable">activities</span>.<span class="cm-property">sort</span>(<span class="cm-keyword">function</span> (<span class="cm-def">a</span>, <span class="cm-def">b</span>){ <span class="cm-keyword">return</span> <span class="cm-variable-2">b</span>.<span class="cm-property">duration</span> - <span class="cm-variable-2">a</span>.<span class="cm-property">duration</span>; }).<span class="cm-property">slice</span>(<span class="cm-number">0</span>,<span class="cm-variable">number_of_top_elements</span>);</span>
+<span class="line" data-line-no="2">}</span></pre>
+
+                        <table id="findNMostUsedActivities-parameters">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type(s)</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <td>returns</td>
+                                    <td>Array.&lt;T&gt;</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="generateAbstraction" data-name="generateabstraction" data-acronym="ga" data-filter="generate-abstraction">
+                    <h1>
+                        generateAbstraction
+                        <small>generateAbstraction</small>
+                    </h1>
+
+                    <p>Looks at all the window events and creates a new datastructure that contains explicitly what was the application
+in focus from when to when.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="generateChunks" data-name="generatechunks" data-acronym="gc" data-filter="generate-chunks">
+                    <h1>
+                        generateChunks
+                        <small>generateChunks</small>
+                    </h1>
+
+                    <p>This contains the main logic. It slices the time up and analyzes the individual slices. The results
+are so-called chunk-objects for every slice.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="getActivityNameFromWindowId" data-name="getactivitynamefromwindowid" data-acronym="ganfwi" data-filter="get-activity-name-from-window-id">
+                    <h1>
+                        getActivityNameFromWindowId
+                        <small>getActivityNameFromWindowId</small>
+                    </h1>
+
+                    <p>Takes an ID of an Window Event and returns the name of the application the event belongs to. If this is either
+Chrome or Safari, it will return the URL of the tab in focus.</p>
+
+
+                    <div class="signature">
+                        <h3>Signature</h3>
+
+                        <pre><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">getActivityNameFromWindowId</span>(<span class="cm-def">id</span>) { <span class="cm-comment"><a class="reveal-source" href="#source-getActivityNameFromWindowId">/*...*/</a></span> }</span></pre>
+
+                        <pre class="function-source" id="source-getActivityNameFromWindowId"><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">getActivityNameFromWindowId</span>(<span class="cm-def">id</span>){</span>
+<span class="line" data-line-no="1">    <span class="cm-keyword">var</span> <span class="cm-def">process_id</span> = <span class="cm-variable">window_process_id</span>[<span class="cm-variable">windowevent_window_ids</span>[<span class="cm-variable-2">id</span>]] - <span class="cm-number">1</span>; <span class="cm-comment">// table is off by one</span></span>
+<span class="line" data-line-no="2">    <span class="cm-keyword">var</span> <span class="cm-def">name</span> = <span class="cm-variable">process_names</span>[<span class="cm-variable-2">process_id</span>];</span>
+<span class="line" data-line-no="3">    <span class="cm-keyword">if</span> (<span class="cm-variable-2">name</span> == <span class="cm-string">&quot;Google Chrome&quot;</span> || <span class="cm-variable-2">name</span> == <span class="cm-string">&quot;Safari&quot;</span>){</span>
+<span class="line" data-line-no="4">        <span class="cm-comment">// get hostname from url</span></span>
+<span class="line" data-line-no="5">        <span class="cm-keyword">var</span> <span class="cm-def">getLocation</span> = <span class="cm-keyword">function</span>(<span class="cm-def">href</span>) {</span>
+<span class="line" data-line-no="6">            <span class="cm-keyword">var</span> <span class="cm-def">l</span> = <span class="cm-variable">document</span>.<span class="cm-property">createElement</span>(<span class="cm-string">&quot;a&quot;</span>);</span>
+<span class="line" data-line-no="7">            <span class="cm-variable-2">l</span>.<span class="cm-property">href</span> = <span class="cm-variable-2">href</span>;</span>
+<span class="line" data-line-no="8">            <span class="cm-keyword">return</span> <span class="cm-variable-2">l</span>;</span>
+<span class="line" data-line-no="9">        };</span>
+<span class="line" data-line-no="10">        <span class="cm-keyword">var</span> <span class="cm-def">l</span> = <span class="cm-variable-2">getLocation</span>(<span class="cm-variable">window_browser_url</span>[<span class="cm-variable">windowevent_window_ids</span>[<span class="cm-variable-2">id</span>]]);</span>
+<span class="line" data-line-no="11">        <span class="cm-keyword">return</span> <span class="cm-variable-2">l</span>.<span class="cm-property">hostname</span>;</span>
+<span class="line" data-line-no="12">    } <span class="cm-keyword">else</span> {</span>
+<span class="line" data-line-no="13">        <span class="cm-keyword">return</span> <span class="cm-variable-2">name</span>;</span>
+<span class="line" data-line-no="14">    }</span>
+<span class="line" data-line-no="15">}</span></pre>
+
+                        <table id="getActivityNameFromWindowId-parameters">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type(s)</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <td>returns</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="getDurationsForGivenInterval" data-name="getdurationsforgiveninterval" data-acronym="gdfgi" data-filter="get-durations-for-given-interval">
+                    <h1>
+                        getDurationsForGivenInterval
+                        <small>getDurationsForGivenInterval</small>
+                    </h1>
+
+                    <p>Looks at chunks of time and sums up the durations for each application or URLs.</p>
+
+
+                    <div class="signature">
+                        <h3>Signature</h3>
+
+                        <pre><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">getDurationsForGivenInterval</span>(<span class="cm-def">i</span>) { <span class="cm-comment"><a class="reveal-source" href="#source-getDurationsForGivenInterval">/*...*/</a></span> }</span></pre>
+
+                        <pre class="function-source" id="source-getDurationsForGivenInterval"><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">getDurationsForGivenInterval</span>(<span class="cm-def">i</span>){</span>
+<span class="line" data-line-no="1">    <span class="cm-comment">// looking through all entries in the abstraction</span></span>
+<span class="line" data-line-no="2">    <span class="cm-keyword">for</span>(<span class="cm-keyword">var</span> <span class="cm-def">k</span> = <span class="cm-number">0</span>; <span class="cm-variable-2">k</span> &lt; <span class="cm-variable">filtered_events</span>.<span class="cm-property">length</span>; <span class="cm-variable-2">k</span>++){</span>
+<span class="line" data-line-no="3">        <span class="cm-keyword">var</span> <span class="cm-def">start_time</span> = <span class="cm-variable">Math</span>.<span class="cm-property">max</span>.<span class="cm-property">apply</span>(<span class="cm-atom">null</span>, [<span class="cm-variable">filtered_events</span>[<span class="cm-variable-2">k</span>].<span class="cm-property">start_time</span>, <span class="cm-variable-2">i</span>]);</span>
+<span class="line" data-line-no="4">        <span class="cm-keyword">var</span> <span class="cm-def">end_time</span> = <span class="cm-variable">Math</span>.<span class="cm-property">min</span>.<span class="cm-property">apply</span>(<span class="cm-atom">null</span>, [<span class="cm-variable">filtered_events</span>[<span class="cm-variable-2">k</span>].<span class="cm-property">end_time</span>, <span class="cm-variable-2">i</span>+<span class="cm-variable">time_interval</span>]);</span>
+<span class="line" data-line-no="5">        <span class="cm-keyword">var</span> <span class="cm-def">duration</span> = <span class="cm-variable-2">end_time</span> - <span class="cm-variable-2">start_time</span>;</span>
+<span class="line" data-line-no="6">        <span class="cm-keyword">if</span> (<span class="cm-variable-2">duration</span> &gt; <span class="cm-number">0</span> &amp;&amp; <span class="cm-variable">filtered_events</span>[<span class="cm-variable-2">k</span>].<span class="cm-property">description</span> != <span class="cm-string">&quot;localhost&quot;</span> &amp;&amp; <span class="cm-variable">filtered_events</span>[<span class="cm-variable-2">k</span>].<span class="cm-property">description</span> != <span class="cm-string">&quot;NO_URL&quot;</span>){ <span class="cm-comment">//TODO maybe not the best place to filter</span></span>
+<span class="line" data-line-no="7">            <span class="cm-variable">pushDuration</span>(<span class="cm-variable-2">k</span>, <span class="cm-variable-2">duration</span>);</span>
+<span class="line" data-line-no="8">        } <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable">filtered_events</span>[<span class="cm-variable-2">k</span>].<span class="cm-property">start_time</span> &gt; <span class="cm-variable-2">i</span>+<span class="cm-variable">time_interval</span>){</span>
+<span class="line" data-line-no="9">            <span class="cm-keyword">break</span>;</span>
+<span class="line" data-line-no="10">        }</span>
+<span class="line" data-line-no="11">    }</span>
+<span class="line" data-line-no="12">}</span></pre>
+
+                        <table id="getDurationsForGivenInterval-parameters">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type(s)</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>i</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+
+                            </tbody>
+
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="getLocation" data-name="getlocation" data-acronym="gl" data-filter="get-location">
+                    <h1>
+                        getLocation
+                        <small>getLocation</small>
+                    </h1>
+
+                    <p>get hostname from url</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="pushDuration" data-name="pushduration" data-acronym="pd" data-filter="push-duration">
+                    <h1>
+                        pushDuration
+                        <small>pushDuration</small>
+                    </h1>
+
+                    <p>Creates the actual object and adds to datastructure created by getDurationsForGivenInterval().</p>
+
+
+                    <div class="signature">
+                        <h3>Signature</h3>
+
+                        <pre><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">pushDuration</span>(<span class="cm-def">k</span>, <span class="cm-def">duration</span>) { <span class="cm-comment"><a class="reveal-source" href="#source-pushDuration">/*...*/</a></span> }</span></pre>
+
+                        <pre class="function-source" id="source-pushDuration"><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">pushDuration</span>(<span class="cm-def">k</span>, <span class="cm-def">duration</span>){</span>
+<span class="line" data-line-no="1">    <span class="cm-keyword">var</span> <span class="cm-def">id</span> = <span class="cm-variable">inArray</span>(<span class="cm-variable">activities</span>, <span class="cm-variable">filtered_events</span>[<span class="cm-variable-2">k</span>].<span class="cm-property">description</span>);</span>
+<span class="line" data-line-no="2">    <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> != -<span class="cm-number">1</span>){</span>
+<span class="line" data-line-no="3">        <span class="cm-variable">activities</span>[<span class="cm-variable-2">id</span>].<span class="cm-property">duration</span> += <span class="cm-variable-2">duration</span>;</span>
+<span class="line" data-line-no="4">    } <span class="cm-keyword">else</span> {</span>
+<span class="line" data-line-no="5">        <span class="cm-keyword">var</span> <span class="cm-def">activity_object</span> = {</span>
+<span class="line" data-line-no="6">            <span class="cm-property">duration</span> : <span class="cm-variable-2">duration</span>,</span>
+<span class="line" data-line-no="7">            <span class="cm-property">name</span> : <span class="cm-variable">filtered_events</span>[<span class="cm-variable-2">k</span>].<span class="cm-property">description</span></span>
+<span class="line" data-line-no="8">        };</span>
+<span class="line" data-line-no="9">        <span class="cm-variable">activities</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">activity_object</span>);</span>
+<span class="line" data-line-no="10">    }</span>
+<span class="line" data-line-no="11">}</span></pre>
+
+                        <table id="pushDuration-parameters">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type(s)</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>k</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>duration</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+
+                            </tbody>
+
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="pushEvent" data-name="pushevent" data-acronym="pe" data-filter="push-event">
+                    <h1>
+                        pushEvent
+                        <small>pushEvent</small>
+                    </h1>
+
+                    <p>This creates the actual objects and adds to the data structure that gets created by generateAbstraction().</p>
+
+
+                    <div class="signature">
+                        <h3>Signature</h3>
+
+                        <pre><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">pushEvent</span>(<span class="cm-def">activity_name</span>, <span class="cm-def">start_time</span>, <span class="cm-def">end_time</span>) { <span class="cm-comment"><a class="reveal-source" href="#source-pushEvent">/*...*/</a></span> }</span></pre>
+
+                        <pre class="function-source" id="source-pushEvent"><span class="line" data-line-no="0"><span class="cm-keyword">function</span> <span class="cm-variable">pushEvent</span>(<span class="cm-def">activity_name</span>, <span class="cm-def">start_time</span>, <span class="cm-def">end_time</span>){</span>
+<span class="line" data-line-no="1">    <span class="cm-keyword">var</span> <span class="cm-def">filtered_events_object</span> = {</span>
+<span class="line" data-line-no="2">        <span class="cm-property">description</span> : <span class="cm-variable-2">activity_name</span>,</span>
+<span class="line" data-line-no="3">        <span class="cm-property">start_time</span> : <span class="cm-variable-2">start_time</span>,</span>
+<span class="line" data-line-no="4">        <span class="cm-property">end_time</span> : <span class="cm-variable-2">end_time</span></span>
+<span class="line" data-line-no="5">    };</span>
+<span class="line" data-line-no="6"></span>
+<span class="line" data-line-no="7">    <span class="cm-variable">filtered_events</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">filtered_events_object</span>);</span>
+<span class="line" data-line-no="8"></span>
+<span class="line" data-line-no="9">}</span></pre>
+
+                        <table id="pushEvent-parameters">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type(s)</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>activity_name</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>start_time</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>end_time</td>
+                                    <td>*</td>
+                                    <td></td>
+                                </tr>
+
+                            </tbody>
+
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="queryMetadataFromServer" data-name="querymetadatafromserver" data-acronym="qmfs" data-filter="query-metadata-from-server">
+                    <h1>
+                        queryMetadataFromServer
+                        <small>queryMetadataFromServer</small>
+                    </h1>
+
+                    <p>Facilitates the communication with the server. Here all the metadata es queried at startup and than analyzed
+browser-side.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="window-onload" data-name="onload" data-acronym="w" data-filter="onload">
+                    <h1>
+                        onload
+                        <small>window.onload</small>
+                    </h1>
+
+                    <p>Main function that calls all other functions.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="deleteEverything" data-name="deleteeverything" data-acronym="de" data-filter="delete-everything">
+                    <h1>
+                        deleteEverything
+                        <small>deleteEverything</small>
+                    </h1>
+
+                    <p>Remove the entire SVG and create a new blank one.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="drawD3" data-name="drawd3" data-acronym="dd" data-filter="draw-d3">
+                    <h1>
+                        drawD3
+                        <small>drawD3</small>
+                    </h1>
+
+                    <p>This is the main function facilitating the d3 visualization. The individual views are called here but live in
+individual files.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+                <section class="method" id="updateAll" data-name="updateall" data-acronym="ua" data-filter="update-all">
+                    <h1>
+                        updateAll
+                        <small>updateAll</small>
+                    </h1>
+
+                    <p>Depening on what view is selected, call the according function to paint it.</p>
+
+
+
+
+
+                    <script type="text/javascript">
+                      window.addEventListener('load', function() {
+
+                        
+
+                      });
+                    </script>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <script type="text/javascript" src="docs.js"></script>
+</body>
+
+</html>
